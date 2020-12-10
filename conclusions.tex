@@ -1,0 +1,197 @@
+%!TEX root =  main.tex
+\chapter{Conclusion}\label{sec:Conclusions}
+
+In this chapter, we summarize the contributions, present related work, and give some initial ideas for future work. 
+
+\section{Summary of contributions}
+In this thesis, we have presented two formal models: one modeling confidential information passing via restricting forwarding, and the other modeling controlled usages of resources via floating authorizations.
+
+In Chapter~\ref{chapter:Cpi}, we have presented a model for confidential name passing, called Confidential $\pi$-calculus ($C_\pi$). Our model, which is a simple fragment of the $\pi$-calculus~\cite{pi_calculus}, was previously introduced in~\cite{DBLP:journals/corr/abs-1902-09927}. 
+The $C_\pi$-calculus disables forwarding of received names directly at the syntax level by restricting the $\pi$-calculus feature that input variables can appear as objects of the output prefixes. 
+To the best of our knowledge, this is the first process model based on the $\pi$-calculus 
+that %tackles the problem of representing
+represents the controlled name passing by constraining and not extending the original syntax. 
+We have defined the non-forwarding property, which claims that a process cannot forward any of its received names, and as a sanity check we have shown that $C_\pi$ processes satisfy this property. 
+We have also shown that a $\pi$ process respects the non-forwarding property when it can be related to a $C_\pi$ process via strong bisimilarity relation. The same relation is then used to show that in $C_\pi$-calculus one can directly represent the creation of closed domains for channels.
+%An initial investigation of the behavioral semantics of our model is given and we state the property that a fresh name received by a process cannot be later on sent by the same process. % is attested.  
+
+We have provided some insight on the usefulness of our model by presenting examples that show the $C_\pi$ can be used to model restricted information passing, authentication, closed and open-ended groups.
+The encoding presented in this thesis, which simplifies the one presented in~\cite{DBLP:journals/corr/abs-1902-09927}, shows that the $\pi$-calculus processes can be represented in the $C_\pi$-calculus. We have proved the correctness of the encoding in the form of an operational correspondence result (Completeness in Corollary~\ref{theorem:operational-corresp} and Soundness in Corollary~\ref{cor:op_corresp_soundness}). %The soundness of the encoding is left for future work.
+
+In Chapter~\ref{chapter:auth}, we have presented a model of floating authorizations, 
+which was previously introduced in~\cite{pantovic2018calculus, PROKIC2019136}. 
+We took advantage of already existing work on authorizations~\cite{clar:eke} to directly adopt the syntax presented there. Hence, our aim was to investigate the accounting principle associated to floating authorizations, by changing an existing model in the minimal necessary way.
+We defined the semantics for our model in terms of a labeled transition system and also a reduction relation, and we showed these two indeed represent alternatives to each other via a harmony result (Corollary~\ref{cor:red=tau}). We motivated our work by showing that the starting process model~\cite{clar:eke} directly conflicts with our notion of accounting, as it allows to change the number of authorizations in the system directly, e.g., by rewriting rules of the structural congruence. 
+We also defined error processes as undesired configurations that cannot reduce due to lacking authorizations. We have shown there is an alternative way to define errors by using the labeled transition system.
+
+The thesis also provides a preliminary investigation of the behavioral semantics of our authorization model. We have used the strong bisimilarity relation to show some fundamental properties and to validate our design principles, but also to provide insight on the difficulty 
+of obtaining a normal form characterization of processes. 
+% by extending the
+%model in a minimal way so to carry out our investigation, even though the required technical changes 
+%revealed themselves to be far from straightforward. We %left out non-determinism in the form of choice 
+%since our focus is on the interplay between parallel composition and authorization scope, and we 
+%
+% that 
+%in~\cite{clar:eke}  % throughout the model. 
+%We intend to study the behavioral theory of our model, also for the sake of illuminating
+%our notion of floating authorizations and their accounting, where for instance an axiomatization of 
+%the behavioral semantics would surely be informative on the authorization scoping construct.
+%Also, our approach can be generalized to address contextual authorizations for name 
+%generation for certain forms of infinite behavior, namely considering recursion 
+%together with linearity constraints that ensure race freedom (cf. behavioral types~\cite{bettyreport})
+%
+To statically single out processes that are not errors and that never reduce to errors, we devised a typing analysis that addresses contextual authorizations. %, which we also believeis unexplored in other approaches in the form we present it here. 
+We have proved a soundness result (Corollary~\ref{cor:Type_Safety}) for our typing discipline.
+%Our typing rules induce a decidable 
+%type-checking procedure, since rules are syntax directed, provided as usual that a (carried) type 
+%annotation is added to name restrictions. Considering such annotations are present, 
+We also presented a refinement of our typing discipline that lead to a more efficient type-checking procedure, and we showed a correspondence result (Theorem~\ref{lemm:algotirhmic_correctness}) for the two type systems. 
+Finally, we presented an extended example showing a scenario that involves the notion of Bring Your Own License, and we exploit this example to provide an insight on a possible application of our model in programming language design.
+%However, we have already started working on a 
+%type-checking procedure nevertheless based on our typing rules but where the focus is on efficiency, 
+%namely at the level of distributing authorizations provided by the environment to (parallel) subsystems.
+%This allows for fine-grained information on authorizations actually required by processes, which will 
+%hopefully lead to identifying principles that may be used for the sake of type inference.
+%
+
+Apart from the work reported in this thesis, during his PhD studies the candidate was also involved in research in the field of multiple-valued logic, specifically in the encodings of threshold functions. The results thus far include showing that the well-known results of Chow and Nomura can be generalized to the case of generalized multi-layer S-threshold functions~\cite{ProkicPantovic19, DBLP:conf/ismvl/ProkicP17}, and a characterization of multiple-valued threshold function in the Vilenkin-Chrestenson basis~\cite{DBLP:conf/ismvl/Prokic18, Prokic20}. 
+
+\section{Related work}
+
+In past, a plethora of approaches have been proposed both for controlling name sharing and name usages. We first address work related to our calculus for confidential name passing, presented in Chapter~\ref{chapter:Cpi}.
+
+Confidentiality and secrecy has been extensively studied in the field of process calculi. 
+We found the process models based on the $\pi$-calculus, such as~\cite{cardelli05,crafa07, Giunti, hennessy05, DBLP:journals/lmcs/KouzapasP17,  vivas02}, as the most related to our $C_\pi$-calculus.
+Building on the $\pi$-calculus, Cardelli et al.~\cite{cardelli05} introduce an additional language construct that represents the
+group creation. Groups are then associated to channels as types. The semantics of the model disables the scope extrusion of groups, and their devised typing discipline ensures that grouped names are never communicated on open channels,  
+hence preventing the leakage of protected channels. 
+The work of~\cite{cardelli05} is used by Kouzapas and Philippou~\cite{DBLP:journals/lmcs/KouzapasP17} to extend 
+the model with groups with constructs that permit reasoning about the private 
+data in information systems.
+
+The work of Giunti et. al.~\cite{Giunti} considers the $\pi$-calculus with an additional operator, called hide. The hide operator resembles the name restriction, as it binds the name specified inside, but is, in a sense, more constraining than name restriction since it blocks extrusion of the name. Hence, the name specified inside the hide operator has closed scope, which again prevents that the name leaks outside its originally defined scope.
+Vivas and Yoshida~\cite{vivas02} have introduced an operator called filter.  Filter  
+is statically associated to a process and allow interaction of the process with its environment only on names that are contained in the (polarized) filter, while blocking any other actions of the process. 
+We also mention~\cite{crafa07, hennessy05} where the types associate the 
+security levels to channels. In the latter work, the security level of a channel
+can be downgraded via special declassified 
+input and output prefix constructs. 
+%{\bf{TBC: CONNECT ALL PAPERS NAMED SO FAR TO THIS WORK!!!}}
+
+All models mentioned so far share one property: to be able to reason on a specific aspect of secrecy in a proper way they extend the $\pi$-calculus with 
+additional language constructs and/or introduce a typing discipline.
+In contrast, the $C_\pi$-calculus does not extend but uses only a fragment of the $\pi$-calculus. 
+For this,  
+we believe that %$C_\pi$-calculus can be seen as more appropriate as an underlying model for investigating  secrecy, and that 
+many aspects of secrecy can be modeled and studied in a more canonical way when using our model. 
+As a first step to strengthen this claim, we plan to make a precise representation of group creation~\cite{cardelli05} in the 
+$C_\pi$-calculus, following the intuition provided in Section~\ref{sec:groups}.
+
+Studying fragments of the $\pi$-calculus is not a new idea by itself. We find several proposals following these lines.
+The most famous probably is the asynchronous $\pi$-calculus, proposed by Honda and Takoro~\cite{DBLP:conf/ecoop/HondaT91} and by Boudol~\cite{boudol:inria-00076939} independently. The asynchronous $\pi$ puts a 
+constrain on the $\pi$-calculus syntax that only an inactive process can be specified as the continuation of an output 
+prefix. Thus, the output does not block any continuation as it is always performed independently of the rest of the process, which allows to  modeling asynchronous communications. 
+Merro and Sangiorgi proposed the Localized $\pi$-calculus~\cite{merro04}, which 
+restricts the input capability for the received names (and does not consider the matching operator). Hence, similarly to the $C_\pi$-calculus, the Localized $\pi$-calculus also puts a restriction on the input variable, but now such a variable cannot appear as a subject of an input prefix (and can appear as  the object of an output action).
+%There, the syntactic restriction is that input placeholder cannot appear as a subject of an  input, but, in contrast to our work, the forwarding of names is allowed.
+
+Sangiorgi has also proposed the Private $\pi$-calculus~\cite{DBLP:journals/tcs/Sangiorgi96a}, that  
+restricts the $\pi$-calculus syntax so that objects of output prefixes are always bound. This induces a simplification in the theory of the Private $\pi$, coming from the fact that there is now symmetry between the output and the input prefixes (both bind object of the prefix) and that substitution rising in a synchronization can be considered as $\alpha$-conversion (renaming of a bound name). 
+A similarity between the $C_\pi$ and the Private $\pi$ is that in both forwarding of names is not possible. A significant difference is that in the Private $\pi$ each name can be sent only once, hence our notion of channel handlers does not seems to be directly representable there.
+The common goal of all these models is investigating specific notions in a dedicated way, without requiring the introduction of specialized primitives, instead by considering a suitable fragment of the $\pi$-calculus.
+
+%\subsection{conclusions...}
+
+
+We now turn to comment on work related to our calculus for floating authorizations, presented in Chapter~\ref{chapter:auth}.
+We find many approaches that address controlling resource usage, such as locks (for mutual exclusion in critical code blocks) and communication protocols 
+(e.g., token ring), just to name a few. 
+A number of type systems have been developed to this end, such
+as~\cite{DBLP:conf/lics/Das0P18,DBLP:journals/jlp/GorlaP09,DBLP:conf/esop/SwamyCC10}, 
+where the types specify capabilities over resources. We believe our model provides more flexibility than those considering type systems, as it directly separates resource and capability. Thus, in our model one can communicate a resource without granting the capabilities, that are provided 
+separately (cf. example with the ``unauthorized'' brokers given in Section~\ref{subsec:examples}).
+We point out that in~\cite{DBLP:conf/lics/Das0P18} the types specify the number of messages that may be exchanged, therefore related to the accounting notion
+ investigated here. 
+
+We also find a number of models that introduce capabilities as first class entities. The work on which ours directly relies is the one that introduced authorizations~\cite{DBLP:journals/corr/GhilezanJPPV16, clar:eke}. A detailed comparison is given by a number of examples throughout Chapter~\ref{chapter:auth}, basically showing that the original work on authorizations directly conflicts with our notion of accounting.
+Papers such 
+as~\cite{DBLP:journals/scp/BodeiDF17,Giunti,DBLP:journals/lmcs/KobayashiSW06,vivas02} address usage
+of channels and of resources as communication objects. 
+Among these are already mentioned models that consider constructs hide and filter that restrict the behaviors allowed on channels~\cite{Giunti,vivas02}. Both models differ from ours as their constructs are static and therefore not able to 
+capture our floating resource capabilities.
+
+We also mention models that specify usages in a (binding) name scope 
+construct~\cite{DBLP:journals/lmcs/KobayashiSW06}, and authorization scopes for resources based 
+on given access policies~\cite{DBLP:journals/scp/BodeiDF17}. In~\cite{DBLP:journals/lmcs/KobayashiSW06}, 
+the usage specification that corresponds to a type is directly inserted in the model in a binding 
+scoping construct, which contrasts with our non-binding authorization scoping.
+Also,~\cite{DBLP:journals/scp/BodeiDF17} provides detailed usage policies 
+that are associated with the authorization scopes for resources. 
+We believe both models~\cite{DBLP:journals/scp/BodeiDF17,DBLP:journals/lmcs/KobayashiSW06} are less 
+adequate to represent our notion of floating authorizations, since there access is granted explicitly and 
+controlled via the usage/policy specification. This leads us to think that our notion of confinement cannot be directly represented in these two models in a direct way.
+
+% Perhaps even more relevant would be to convey our principles to the licensing
+%domain where we have identified related patents~\cite{armstrong2005management,baratti2003license} for the purpose of 
+%certifying license usage. At this level it would be important to extend our work considering
+%also non-consumptive authorizations in the sense of authorizations that can be placed back
+%to their original scope after they have been used.
+
+
+%At this level it would be important to extend our work considering
+%also non-consumptive authorizations in the sense of authorizations that can be placed back
+%to their original scope after they have been used.
+%
+
+
+
+
+
+
+
+
+
+\section{Future work }
+
+Our work on the $C_\pi$-calculus is at an early stage and leaves many open questions. 
+For instance, our initial work on testing forwarding of the $\pi$ processes using the $C_\pi$ processes, presented in Section~\ref{sec:the_non-forwarding_of_pi_processes}, has already opened the question of providing an algorithmic procedure for deriving $C_\pi$ processes considered in Proposition~\ref{prop:non-forwarding-of-pi-processes}.
+Another question is a representation of models with groups and hiding~\cite{cardelli05, Giunti} in our calculus, for which the initial ideas are already presented in Section~\ref{sec:groups}. 
+Also, one direction for the future work is considering the $C_\pi$ for modeling and analyzing some already existing protocols, such as OAuth2.0~\cite{oauth}, where we can also find restricted information sharing in the context of an authentication scheme.
+
+Regarding our work on floating authorizations, we also find several directions for possible future work. 
+Our model shows a way to deal with accountable resources that can be accessed in a shared way. This general idea is then made concrete with our design choice to confine authorizations when they are used, this way (permanently) restricting their scope. 
+It would be interesting to consider non-consumptive authorizations, that return to their
+original scope after (complete) use. 
+
+We believe the principles of our work can be applied when considering also ``one-shot'' authorizations. By one-shot authorizations we think of authorizations that can be used only once, i.e., only for a single action. Considering such authorizations the induced model would be able to make a precise accounting on how many times channels can be used. We remark that such a model would rely on the same technical machinery as the work presented here. For instance, we would use the same reduction rules (relying on the $\operator$ operator), with a simple twist that the deleted authorizations are not reintroduced as they are in our model (for the confinement purposes).  
+Along these lines, we can consider building our calculus for floating authorizations by considering the $C_\pi$-calculus instead of the $\pi$-calculus as the underlying model, since the obtained model would combine control over usages with the control over sharing.
+
+
+
+By endowing authorizations with type information we would get another layer in the control of usages of channels. For instance, this can be achieved by considering input/output types, where the authorization can be used only for input or output, or session types, where the authorization is to be used according to a specified protocol.
+
+Our type system, presented in Section~\ref{sec:Types}, can also be subject to possible improvements  and extensions. For instance, a notion of substitutability naturally arises in our typing analysis and we leave to future work a detailed 
+investigation of a subtyping relation that captures such notion.
+%, but we may mention that our preliminary 
+%assessment actually hinted on some non standard features with respect to variance and covariance of 
+%carried types. 
+Our model can be extended also by some form of usage specifications like
+the ones mentioned above~\cite{DBLP:journals/scp/BodeiDF17,DBLP:journals/lmcs/KobayashiSW06}, and
+by endowing authorizations as indicated in the previous paragraph. %scoping more precise capabilities in the form of behavioral  types~\cite{bettyreport}. 
+This would also allow us to generalize our approach addressing certain forms of infinite behavior, namely considering recursion 
+together with linearity constraints that ensure race freedom. It would also be interesting to resort to refinement 
+types~\cite{DBLP:conf/pldi/FreemanP91} to carry out our typing analysis, given that our types 
+can be seen to some extent as refinements on the domain of names.
+Our typing analysis can be improved also to address names created in the body of replicated input in a uniform way, by considering the approach presented in~\cite{francalanza2018pointing} that provides the unique identification of private names even in the presence of replicated processes.
+%, an investigation we leave to future work.
+
+Even though we have presented a theoretical investigation in this document, we believe our principles developed for floating authorizations can be conveyed to more practical settings. One such setting is the licensing
+domain (as already mentioned in the Introduction), where we already have identified patents~\cite{armstrong2005management,baratti2003license,byol} 
+for the purpose of certifying license usage. 
+Another is the setting of recently introduced permissioned blockchain systems such as Hyperledger Fabric~\cite{eurosys/AndroulakiBBCCC18}. 
+%\del{A starting point would be to give a} 
+We believe it would be interesting to provide high-level descriptions and %\del{defining and} 
+prove properties of the Membership Service Provider (MSP), the part of the Fabric system which is responsible for issuing node credentials (used for authorization and authentication). We intend to pursue this idea, starting by 
+aiming at the formal verification of smart contracts (chaincode) in Fabric, exploiting recently introduced developments for smartcontracts~\cite{DBLP:conf/post/AtzeiBCLZ18,DBLP:journals/iacr/BartolettiZ18} in the context of contract-oriented programming~\cite{DBLP:conf/lics/BartolettiZ10}. In particular, we have already identified notions of \emph{active contract}~\cite{DBLP:journals/iacr/BartolettiZ18}, which encompasses a running \emph{balance}, and of \emph{authorizations} to perform operations, 
+hence where we expect to also find the dimensions of domain, accounting and delegation.
+And the last setting we would like to mention is again protocol OAuth2.0, where we believe some of our principles can be used to reason on Access Token manipulation, since there we also find the notions of domain and  delegation. 

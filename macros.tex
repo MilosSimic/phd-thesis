@@ -1,0 +1,221 @@
+\newcommand{\htv}[1]{\marginpar{\tiny\textbf{Hugo}:  #1}}
+
+%Encoding
+
+\newcommand{\encode}[2]{\llbracket #1 \rrbracket_{#2}}
+\newcommand{\enc}[1]{\llbracket #1 \rrbracket}
+\newcommand{\handler}{\mathit{H}}
+
+
+
+% Macros from Hugo's sources
+\newcommand{\der}                             	{\vdash}
+\newcommand{\wf}{\der}
+\newcommand\BEND{{\mathbf{end} } }
+\newcommand{\apart} 				{\#}
+\newcommand\PAR{\hspace{0.06cm}|\hspace{0.06cm}}
+\newcommand{\ROLE}[1]							{{#1}}
+
+\newcommand{\til}[1]{\widetilde{#1}}
+
+%Comments
+\newcommand{\V}[1]{{#1}}
+\newcommand{\J}[1]{{\color{green} #1}}
+\newcommand{\SG}[1]{{\color{blue} #1}}
+
+%Names
+\newcommand{\N}{{\cal N}}
+\newcommand{\Var}{{\cal V}}
+\newcommand{\Chn}{{\cal C}}
+\newcommand{\NA}{a}
+\newcommand{\NB}{b}
+\newcommand{\NC}{c}
+\newcommand{\ND}{d}
+\newcommand{\NE}{e}
+\newcommand{\NX}{x}
+\newcommand{\NY}{y}
+\newcommand{\NZ}{z}
+\newcommand{\NK}{k}
+\newcommand{\NL}{l}
+\newcommand{\NM}{m}
+\newcommand{\NN}{n}
+\newcommand{\NT}{t}
+\newcommand{\NO}{o}
+\newcommand{\NGG}{g}
+\newcommand{\fn}[1]{\mathsf{fn}(#1)}
+\newcommand{\fnn}[1]{\mathsf{fnn}(#1)}
+\newcommand{\bn}[1]{\mathsf{bn}(#1)}
+\newcommand{\n}[1]{\mathsf{n}(#1)}
+\newcommand{\fo}[1]{\mathsf{fo}(#1)}
+
+\newcommand{\sym}[1]{\mathsf{sym}(#1)}
+\newcommand{\ttype}{\gamma}
+\newcommand{\nub}{{\mathbf{\kappa}}}
+\newcommand{\rec}{{\mathbf{rep}}}
+\newcommand{\rrec}{{\mathbf{r}}}
+\newcommand{\nrec}{{\mathbf{notrep}}}
+\newcommand{\NR}{{\mathbf{r}}}
+\newcommand{\NS}{{\mathbf{s}}}
+
+\newcommand{\transfer}{\mathit{move}}
+\newcommand{\erase}{\mathit{erase}}
+\newcommand{\usedsym}{\xi}
+
+
+%Roles
+\newcommand{\RR}{r}
+\newcommand{\RS}{s}
+\newcommand{\RT}{t}
+\newcommand{\RQ}{q}
+\newcommand{\role}{\rho}
+\newcommand{\roleS}{\sigma}
+\newcommand{\roleZ}{\zeta}
+\newcommand{\Rauth}[1]{{\lceil #1 \rceil}}
+\newcommand{\Runauth}[1]{{\lfloor #1 \rfloor}}
+\newcommand{\Rnunauth}[1]{{\lfloor #1 \rceil}}
+\newcommand{\varx}{x}
+\newcommand{\varv}{v}
+\newcommand{\varu}{u}
+
+%Relations and funcitons
+\newcommand\dual[1]{\overline{#1}}
+\newcommand{\unauth}[2]{{\tt unauth}(#1,#2)}
+
+
+%Processes
+\newcommand{\Proc}{Pr}
+\newcommand{\PP}{P}
+\newcommand{\PQ}{Q}
+\newcommand{\PR}{R}
+\newcommand{\PS}{S}
+\newcommand{\PX}{X}
+\newcommand{\inact}{0}
+\newcommand{\parop}{\;|\;}
+\newcommand{\rest}[1]{(\nu #1)}
+\newcommand{\scope}[1]{(#1)}
+\newcommand{\prefix}{\sigma}
+\newcommand{\lab}{\alpha}
+\newcommand{\alab}[1]{\lceil #1 \rceil}
+\newcommand{\dlab}[1]{\lfloor #1 \rfloor}
+\newcommand{\msg}{l}
+\newcommand{\send}[4]{#1!#4}
+\newcommand{\ssend}[2]{#1!#2}
+\newcommand{\receive}[4]{#1?#4}
+\newcommand{\rreceive}[2]{#1?#2}
+\newcommand{\repreceive}[4]{!(#1)#1?#4}
+\newcommand{\rep}[1]{! #1}
+\newcommand{\sauth}[4]{#1\langle#4\rangle}
+%\newcommand{\ssauth}[2]{#1\langle#2\rangle}
+\newcommand{\rauth}[4]{#1(#4)}
+%\newcommand{\rrauth}[2]{#1(#2)}
+%\newcommand{\sep}{\;\; \mid \;\;}
+\newcommand{\match}[4]{[ #1 = #4 ]}
+
+\newcommand{\dsend}[2]{\lfloor #1\rfloor!#2}
+\newcommand{\asend}[2]{\lceil #1\rceil !#2}
+\newcommand{\dsauth}[2]{\lfloor #1 \rfloor \langle \lfloor #2 \rfloor \rangle}
+\newcommand{\asauth}[2]{\lceil #1 \rceil \langle \lceil #2 \rceil \rangle}
+\newcommand{\dasauth}[2]{\lfloor #1 \rfloor \langle \lceil #2 \rceil \rangle}
+\newcommand{\dreceive}[2]{\lfloor #1 \rfloor ?#2}
+\newcommand{\areceive}[2]{\lceil #1 \rceil ?#2}
+\newcommand{\drauth}[2]{\lfloor #1 \rfloor (#2)}
+\newcommand{\arauth}[2]{\lceil  #1 \rceil (#2)}
+
+%Reduction
+\newcommand{\red}{\rightarrow}
+\newcommand{\redd}{\rightarrow\negthickspace^*}
+
+\newcommand{\lts}[1]{\xrightarrow{#1}}
+\newcommand{\ltss}[2]{\xrightarrow#1{}\negthickspace^#2}
+\newcommand{\subst}[2]{\{#1/#2\}}
+\newcommand{\chsubst}[3]{\{#1:#2/#3\}}
+
+%Types
+\newcommand{\B}{B}
+\newcommand{\T}{T}
+
+%Miscellaneous
+\newcommand{\rname}[1]{{[#1]}}
+\newcommand\roles[1]{{\tt pr}_2(#1)}
+\newcommand\channels[1]{{\tt pr}_1(#1)}
+\newcommand\funauth[2]{{\tt unauth}(#1,#2)}
+
+%%This context is used for operator op%%
+\newcommand\context{\mathcal{C}}
+
+%%Usual context%%
+\newcommand\ucontext{\mathcal{D}}
+
+%conversation types
+\newcommand\bin[3]{?{#1}\,#2(#3)}
+\newcommand\bout[3]{!{#1}\,#2(#3)}
+\newcommand\bend{{\tt end}}
+\newcommand\btau[2]{(#1\to #2):}
+\newcommand\p{{\tt p}}
+\newcommand\q{{\tt q}}
+\newcommand{\bbtau}[4]{(#1\to #2): #3(#4)}
+
+%theorems
+%\theoremstyle{definition}
+%\newtheorem{example}{Example}
+
+
+\newcommand{\lp}{{paper}}
+\newcommand{\li}{{instruction}}
+\newcommand{\lex}{{extend}}
+\newcommand{\lf}{{final}}
+\newcommand{\lread}{{read}}
+\newcommand{\lreport}{{report}}
+\newcommand{\lr}{{auth1}}
+\newcommand{\lrr}{{auth2}}
+\newcommand{\lrrr}{{auth3}}
+\newcommand{\lrrrr}{{auth4}}
+
+\newcommand{\chr}{{\tt subm}}
+\newcommand{\chj}{{\tt journal}}
+\newcommand{\cha}{{\tt assist}}
+
+%\theoremstyle{definition}
+\newtheorem{proposition}{Proposition}[section]
+\newtheorem{lemma}[proposition]{Lemma}
+\newtheorem{theorem}[proposition]{Theorem}
+\newtheorem{corollary}[proposition]{Corollary}
+\newtheorem{definition}[proposition]{Definition}
+\newtheorem{example}[proposition]{Example}
+\newtheorem{remark}[proposition]{Remark}
+
+%\newenvironment{proof}[1][Proof.]{\begin{trivlist}
+%\item[\hskip \labelsep {\bfseries #1}]}{\end{trivlist}}
+
+\newcommand{\countauth}[2]{\mathit{m}(#1,#2)}
+\newcommand{\auth}[2]{\mathit{auth}(#1,#2)}
+\newcommand{\operator}{\mathit {drift}}
+
+\newcommand{\ophole}[3]{\operator(#1;#2;#3)}
+\newcommand{\opholes}[5]{\operator(#1;#2;#3;#4;#5)}
+\newcommand{\optop}[3]{\operator(#1;#2;#3)}
+
+\newcommand{\rulename}[1]{\text{\small \textsc{#1}}}
+
+% environments for appendix
+\newenvironment{theorema}[2]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Theorem #1}] {#2}}{\end{trivlist}}
+
+\newenvironment{lemmata}[2]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Lemma #1}] {#2}}{\end{trivlist}}
+
+\newenvironment{corollar}[2]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Corollary #1}] {#2}}{\end{trivlist}}
+
+\newenvironment{prop}[2]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries Proposition #1}] {#2}}{\end{trivlist}}
+
+%%% TO ASSIST EDITING %%%
+
+\newcommand{\new}[1]{{\color{blue} #1}}
+
+\newcommand{\del}[1]{{\color{lightgray} #1}}
+
+\newcommand{\repl}[2]{\del{#1} \new{#2}}
+
+\newcommand{\comment}[1]{{\color{magenta} \emph{[#1]}}}

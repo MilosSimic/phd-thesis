@@ -1,0 +1,1881 @@
+%!TEX root =  main.tex
+
+\chapter{A calculus of floating authorizations}\label{chapter:auth}
+
+As we discussed in the Introduction, controlling access to resources is an important aspect of distributed systems. The limited capacity of resources imposes a need for careful control over their usages, such as the case, for instance,  of the router that has limited access points to yield.
+In order to formally reason on controlling usages of resources in distributed systems, in this chapter we introduce a calculus for modeling floating authorizations, which is based on the work previously published in~\cite{PROKIC2019136}. In essence, our model allows us to reason on controlling the usages of channels relying on the previous developments~\cite{DBLP:journals/corr/GhilezanJPPV16, clar:eke} that extend the $\pi$-calculus~\cite{pi_calculus} with the constructs for authorization manipulation. 
+The main distinction with respect to previous approaches is that in our model, a floating authorization represents the right to use a channel by a process, in such a way that only one thread of the process can use the channel. 
+
+\paragraph{Overview of the chapter.}
+We start this chapter by a sequence of examples that gradually and informally introduce our process model in Section~\ref{subsec:examples}, after which we introduce the syntax in Section~\ref{sec:Calculus}. The  operational semantics is then given by means of a labeled transition system in Section~\ref{subsec:LTS}, and a reduction in Section~\ref{subsec:reduction}, where we also define the notion of error processes and, via Harmony result, we show that the two semantics can be seen as alternatives to each other.
+Relying on the labeled transition system, Section~\ref{sec:Bisimulation} presents a preliminary investigation 
+of the behavioral semantics of the model, including some fundamental results and 
+behavioral (in)equalities that inform on the specific nature of our authorizations.
+The typing discipline, given in Section~\ref{sec:Types}, addresses 
+processes where authorizations for received names may be 
+provided by the context, refined in 
+Section~\ref{sec:TypeChecking} so as to allow for a more applicable procedure. 
+%
+In 
+Section~\ref{sec:BYOL_example} we present an extended example inspired by the Bring Your Own License %\del{(BYOL)} 
+notion, while in
+{Section~\ref{sec:go_program} we discuss possible programming language applications of our formal framework for authorization control, namely by considering an extension of the Go programming language.}
+
+
+\section{Preview of the model}
+\label{subsec:examples}
+
+This section informally introduces our process model. We make use of concurrent use licenses~\cite{baratti2003license} setting to place our examples, which should allow for an intuitive reading of the formalisms introduced throughout later sections. 
+
+As noted in the Introduction, we investigate the following dimensions of floating authorizations: 
+domain (to capture where access may be implicitly granted), accounting (to capture the capacity), and delegation (to capture explicit granting).
+
+\paragraph{{Domain}.} We model authorization domains by considering a non-binding scoping 
+construct. For instance, we may have  
+\[
+    {\scope{\mathit{license}} \mathit{University}}
+ \] 
+representing that the process $\mathit{University}$ is a domain that holds one ${\mathit{license}}$. 
+In this case, construct $\scope{\mathit{license}}$ authorizes the usage of $\mathit{license}$ inside domain $\mathit{University}$ only for one user.
+This means that if domain $\mathit{University}$ is composed of two concurrently active students $\mathit{Alice}$ and $\mathit{Bob}$ then we have 
+\[
+    { \scope{\mathit{license}} (\mathit{Alice} \parop \mathit{Bob})}
+\]
+where license $\scope{\mathit{license}}$ is available for both students, but only one of them can use it. In other words, here $\scope{\mathit{license}}$ is ``floating'', as it can be grabbed by either $\mathit{Alice}$ or $\mathit{Bob}$, but not both of them. The authorization is a non-binding scoping construct, meaning that name $\mathit{license}$ can be also known in other domains except $\mathit{University}$. 
+%in which case either $\mathit{Alice}$ or $\mathit{Bob}$ can be granted the 
+%$\mathit{license}$ that is floating, but not both of them. The notation for the authorization scope is inspired by one of name restriction $\rest{a}$, which will be presented later, since on the one hand both are scoping operators, while on the other hand we elide $\nu$ since the authorization scope is non-binding.
+
+\paragraph{{Accounting}.} In the example above, the capacity of $\mathit{University}$ includes one license for usages of $\mathit{license}$. Hence, if $\mathit{Bob}$ uses the license and evolves to $\mathit{LicensedBob}$, for the purpose of accounting, we need to denote that the license is not available for $\mathit{Alice}$ anymore. In our model, we confine the scope of the license to the user that grabs the license, and the system above evolves to 
+% 
+\begin{equation}\label{eq:Alice_LicensedBob}
+ {\mathit{Alice} \parop \scope{\mathit{license}}\mathit{LicensedBob}}
+\end{equation}
+%
+in which case $\mathit{Alice}$ loses the ability to use the license. The license is implicitly granted to $\mathit{Bob}$ only because he was the first one to use it, and afterwards he can continue using the $\mathit{license}$. If now $\mathit{Alice}$ tries to use $\mathit{license}$ she will get ``stuck'' as the proper authorization is now missing. Notice that, since the authorization is a non-binding construct, the confinement of the license in~(\ref{eq:Alice_LicensedBob}) does not mean that the name is privately held by 
+$\mathit{LicensedBob}$, just the authorization. %We remark this interpretation of accounting is novel to our approach.
+
+In our model resources are used in a non-eager way, as we do not allow a user to be confined with a shared license if his domain already includes the respective license. For instance, in 
+\[
+    { \scope{\mathit{license}} (\mathit{Alice} \parop \scope{\mathit{license}}\mathit{LicensedBob})}
+\]
+the user $\mathit{LicensedBob}$ shares one $\scope{\mathit{license}}$ with $\mathit{Alice}$ and also possesses one by himself. If $\mathit{LicensedBob}$ needs the license, he will be granted with the ``private'' one first, not 
+interfering with $\mathit{Alice}$, but can be also granted the shared $\mathit{license}$ if he really needs
+two licenses.
+
+\paragraph{{Delegation}.} In our model, the licenses can be explicitly exchanged between the users via a delegation mechanism, that allows for sending and receiving a license over a communication channel.   %the configuration
+%$\mathit{Carol} \parop\scope{\mathit{license}}\scope{\mathit{license}} (\mathit{Alice} \parop \mathit{Bob}) $
+%which specifies two authorizations for $\mathit{license}$ are available to
+% $\mathit{Alice}$ and $\mathit{Bob}$, and none for 
+%$\mathit{Carol}$. Although 
+For instance, if $\mathit{Bob}$ wants to explicitly delegate one authorization $\scope{\mathit{license}}$ to $\mathit{Carol}$, we may write process
+\[ 
+   {  \sauth{\mathit{auth}}\role\msg{\mathit{license}}.\mathit{UnlicensedBob}}
+\]
+to represent that $\mathit{Bob}$ sends on channel $\mathit{auth}$ one authorization for $\mathit{license}$, and then evolves to 
+$\mathit{UnlicensedBob}$. Then, if $\mathit{Carol}$ wants to receive the authorization, we may write 
+\[
+   {  \rauth{\mathit{auth}}\role\msg{\mathit{license}}.\mathit{LicensedCarol}}
+\]
+to 
+represent the dual primitive that allows receiving one authorization for
+$\mathit{license}$ on channel $\mathit{auth}$, after which the process evolves to $\mathit{LicensedCarol}$. Then, the configuration
+%
+$$\scope{\mathit{license}} \scope{\mathit{auth}}\sauth{\mathit{auth}}\role\msg{\mathit{license}}.\mathit{UnlicensedBob} \parop \scope{\mathit{auth}}\rauth{\mathit{auth}}\role\msg{\mathit{license}}.\mathit{LicensedCarol}$$
+%
+%\noindent
+represents a system where the authorization for $\mathit{license}$ can
+be transferred from $\mathit{Bob}$ to $\mathit{Carol}$, %from the delegating user to the receiving user 
+evolving to
+%
+$$ \scope{\mathit{auth}}\mathit{UnlicensedBob} \parop \scope{\mathit{auth}}\scope{\mathit{license}}\mathit{LicensedCarol}$$%\vspace{2pt}}
+%
+%\noindent
+where the scope of $\scope{\mathit{license}}$ primitive changes accordingly. 
+Notice that the authorizations for channel $\mathit{auth}$, on which the communication is carried, are present at both sending and receiving end.
+As we noted, the only resources in our model are channels and their usages are always subject to the authorization 
+granting mechanism. 
+
+In addition to authorization manipulation constructs, our model comprehends $\pi$-calculus constructs for name passing, name generation and replicated input.
+
+\paragraph{{Name passing}.}  The authorization delegation mechanism illustrated above does not involve name passing since the name $\mathit{license}$ is known to both $\mathit{Bob}$ and $\mathit{Carol}$ in the first 
+place.  Name passing is supported by dedicated primitives. For example, process
+%
+$$\scope{\mathit{comm}}\send{\mathit{comm}}\role\msg{\mathit{license}}.{\mathit{Alice}}
+\parop \scope{\mathit{comm}}\receive{\mathit{comm}}\role\msg{\mathit{x}}.{\mathit{Dylan}}$$
+%
+%\noindent
+represents a system where the name $\mathit{license}$ can be passed
+%from the left hand side to the right hand side 
+via a synchronization on 
+channel $\mathit{comm}$. If the synchronization take place, continuations $\mathit{Alice}$ 
+and $\mathit{Dylan}'$ are activated, where $\mathit{Dylan}'$ is obtained from process $\mathit{Dylan}$ by replacing each occurrence of placeholder $x$ with
+$\mathit{license}$. Again, we remark that the sending and receiving actions on channel $\mathit{comm}$ are properly authorized, enabling that the synchronization can take place. The authorizations can also be floating, like in
+\[
+     {\scope{\mathit{comm}}\scope{\mathit{comm}} (\send{\mathit{comm}}\role\msg{\mathit{license}}.{\mathit{Alice}}
+\parop \receive{\mathit{comm}}\role\msg{\mathit{x}}.{\mathit{Dylan}})}
+\]
+where the synchronization may also occur. However, the synchronization in 
+\[
+\scope{\mathit{comm}} (\send{\mathit{comm}}\role\msg{\mathit{license}}.{\mathit{Alice}}
+\parop \receive{\mathit{comm}}\role\msg{\mathit{x}}.{\mathit{Dylan}})
+\]
+is not properly authorized since there is only one authorization available for both actions on channel $\mathit{comm}$.
+
+
+
+\paragraph{{Name restriction and replicated input}.}   The two last constructs of our language are name restriction and replicated input. As an example, consider process
+%
+$$\repreceive{{\mathit{license}}}\role\msg{x}.\scope{x}\sauth{\mathit{license}}\role\msg{x}.\inact
+\parop \rest{\mathit{fresh}} \scope{\mathit{license}} 
+\send{\mathit{license}}\role\msg{\mathit{fresh}}.
+\rauth{\mathit{license}}\role\msg{\mathit{fresh}}. \inact
+$$
+%
+representing a system in which in the left-hand side thread a licensing server is specified, used in the
+right-hand side thread. Construct $\rest{\mathit{fresh}}
+\mathit{Domain}$ 
+represents the creation of a new name $\mathit{fresh}$, which is known only to scoped process
+$\mathit{Domain}$, in contrast with authorization scoping (cf. discussion after~(\ref{eq:Alice_LicensedBob})). %so the 
+The thread on the right-hand side represents a process that  
+first creates a name and then sends it via channel 
+$\mathit{license}$. Then, via channel $\mathit{license}$, the thread receives the authorization to 
+use channel $\mathit{fresh}$ 
+and then terminates (denoted with $\inact$). The thread on the left-hand side is repeatably available to receive a name on 
+channel $\mathit{license}$. After that, one authorization scope for
+the received name is specified that may then be delegated away. %via $\mathit{license}$.
+%So first name $\mathit{fresh}$ is exchanged, after which 
+%only the authorization to use it is transferred.
+
+\paragraph{{A remark on authorization delegation and name passing}.}
+As the communicated names refer to channels the name passing is the mechanism that allows to model systems in which access to channels 
+changes dynamically. However, knowing a name does not mean being authorized to use it. 
+For example, process
+\[\scope{\mathit{comm}}\receive{\mathit{comm}}\role\msg{\mathit{x}}.\send{\mathit{x}}\role\msg{\mathit{reply}}.\inact
+\] 
+specifies an authorized reception
+on $\mathit{comm}$, after which the process outputs $\mathit{reply}$ on the received name and then terminates.
+If the received name is $\mathit{license}$, the process evolves to
+$\scope{\mathit{comm}}\send{\mathit{license}}\role\msg{\mathit{reply}}.\inact$
+where the authorization for $\mathit{comm}$ is still present but no authorization 
+for $\mathit{license}$ is acquired as a result of the communication. Therefore,
+the output on $\mathit{license}$ is not authorized and cannot take
+place. However, notice that we do not require an authorization for the name
+$\mathit{reply}$ specified in the output, 
+as communicating a name does not entail usage for the purpose of
+authorization control. Our design choice to separate name passing and authorization delegation allows us to model systems where unauthorized intermediaries (e.g., brokers)
+may forward names between authorized parties, without ever 
+being authorized to use such names. For instance, consider process $\scope{\mathit{comm}}\receive{\mathit{comm}}\role\msg{\mathit{x}}.\scope{\mathit{forward}}\send{\mathit{forward}}\role\msg{\mathit{x}}.\inact.$ 
+that requires no further authorizations.
+
+There are two patterns for authorizing names that are received and new to the process. To illustrate the first, consider process
+%\del{, except for the case when the authorization for the received name is granted implicitly,} 
+\[
+{\scope{\mathit{comm}}\receive{\mathit{comm}}\role\msg{\mathit{x}}.
+\scope{\mathit{auth}}\rauth{\mathit{auth}}\role\msg{\mathit{x}}.
+\mathit{LicensedDylan}}
+\]
+where, for the name received on $\mathit{comm}$, an authorization
+reception (using placeholder $x$) on $\mathit{auth}$ is specified. This enables to acquire an 
+authorization to use the received name. Another pattern for acquiring authorizations for received names is to use the 
+authorization scoping directly. For instance, in process
+\[
+{\scope{\mathit{comm}}\receive{\mathit{comm}}\role\msg{\mathit{x}}.
+\scope{\mathit{x}}\mathit{LicensedDylan}}
+\]
+the authorization $\scope{x}$ is instantiated by the received name (cf. example with the licensing server above).
+The last example shows that the authorization scoping is a powerful 
+mechanism, as it allows for the generation of authorizations for any received name, that therefore should be reserved only to the 
+Trusted Computing Base, while the authorization delegation should be used elsewhere.
+We may notice that the above combination of name reception and authorization scoping resembles the authorization reception since the result is also an acquired authorization. However, we do not see a 
+direct way to represent authorization delegation with this combination of name passing and authorization scoping, as in the former the delegating party actually loses the respective authorization, while in the latter an additional authorization is created. 
+
+
+
+
+%We refer to the supporting document~\cite{ppv18} for
+%additional material, namely proofs of the results reported here.
+
+
+\section{Syntax}\label{sec:Calculus}
+This section presents the syntax of our process calculus, which builds on previous work on process calculi for authorizations~\cite{DBLP:journals/corr/GhilezanJPPV16,clar:eke}.
+%It is as an extension of the $\pi$-calculus~\cite{pi_calculus} with specialized constructs regarding authorizations, adopted from \cite{GhilezanJPPV16}-\cite{clar:eke}.
+%In \cite{clar:eke}, the authors presented a typed process calculus for the analysis of multiparty interactions with dynamic role authorization and delegation, relying on the conversation type analysis presented in \cite{BaltazarCVV12}. The syntax of the process algebra introduced in \cite{clar:eke} was additionally simplified in \cite{GhilezanJPPV16}, focusing exclusively on the authorization dimension.   
+We do not introduce any new syntax constructs and we fully exploit the syntax from~\cite{DBLP:journals/corr/GhilezanJPPV16}. Our calculus departs semantically in the interpretation of the accounting principle, and this appears to be crucial to capture the floating nature of the authorizations investigated in this work. We will point to the similarities/differences of the two process algebras throughout the presentation.
+ 
+
+
+%
+\begin{table}[t]
+\[
+\displaystyle
+\begin{array}[t]{@{}rcl@{\quad}r@{}}
+  \PP & ::= &  &                                    \emph{Process terms} \\
+  	      &        & \inact &                       \text{(termination)} \\
+          & \parop & \PP\parop\PP &                 \text{(parallel composition)}\\
+          & \parop & \rest\NA \PP &                 \text{(name restriction)}\\
+          & \parop & \send\NA\role\msg\NB.\PP &     \text{(output)} \\
+          & \parop & \receive\NA\role\msg{x}.\PP &  \text{(input)}\\
+         &  \parop & \scope{\NA} \PP &              \text{(authorization)}\\
+         &  \parop & \sauth\NA\role\msg\NB.\PP &    \text{(send authorization)}\\
+         &  \parop & \rauth\NA\role\msg\NB.\PP &    \text{(receive authorization)}\\
+         &  \parop & \repreceive\NA\role\msg{x}.\PP & \text{(replicated input)}\\
+\end{array}
+\]
+\caption{\label{tab:syntax}Syntax of processes.}
+\end{table}
+%
+Our language also relies on {\it names}. We assume a countable set of {names} $\N$, and we let $\NA, \NB, \NC, \ldots,$ $\NX, \NY, \NZ, \ldots$ range over $\N$. Hence, here we do not make an explicit distinction between channels and variables, as we did in the previous chapter.
+Table~\ref{tab:syntax} presents the syntax of the language.
+The first five constructs are adopted from the $\pi$-calculus. Their interpretation is the same as for the $C_\pi$. To make the chapter self-contained, we briefly repeat the explanations: $\inact$ represents the terminated process; $\PP\parop\PP$ represents two processes simultaneously active (that can interact via synchronization in channels); $\rest\NA \PP$ represents the creation of a channel name $\NA$, known only to process $\PP$; $\send\NA\role\msg\NB.\PP$ represents the output prefixed process that can send name $\NB$ on name $\NA$ and proceed as $\PP$; and $\receive\NA\role\msg{x}.\PP$ represents the input prefixed process that receives a name on channel $\NA$ and replaces name $\NX$ in $\PP$ with the received name. Notice that here we do not restrict forwarding as in the previous chapter, since it does not serve the goals of the work presented here.
+
+The remaining language constructs, except the replicated input, are adopted from~\cite{DBLP:journals/corr/GhilezanJPPV16} but are given a different interpretation:
+\begin{itemize}
+%Term $\scope{\NA} \PP$ is the authorization scoping, representing that process
+%$\PP$ has one authorization to use channel $\NA.$
+\item Authorization scoping $\scope{\NA} \PP$ represents that process
+$\PP$ has one authorization to use channel $\NA$  for any actions that are composed sequentially. For instance, if $\PP=\send\NA\role\msg\NB.\receive\NA\role\msg\NX.\inact$ then both sending and receiving on $\NA$ are considered to be authorized in $\scope\NA\PP$. Conversely, if  $\PP=\send\NA\role\msg\NB.\inact \parop \receive\NA\role\msg\NX.\inact$ then only one of the actions is authorized in $\scope\NA\PP$.
+In contrast with name restriction, in $\scope\NA\PP$ name $\NA$ is not private to $\PP$, hence the name can be known to other processes.
+%\item 
+\item Authorization sending $\sauth\NA\role\msg\NB.\PP$ represents the process that delegates one authorization for name $\NB$ along name $\NA$ and evolves to $\PP$. For instance, if $\scope\NB\sauth\NA\role\msg\NB.\PP$ then performing the authorization sending the scoping authorization for $\NB$ will be delegated, and the process evolves to $\PP$.
+%\item 
+\item Authorization receiving $\rauth\NA\role\msg\NB.\PP$ represents the (dual) process that receives one authorization for name $\NB$ along name $\NA$ and evolves to $\scope{\NB}\PP$. Notice that the authorization that is lost in the output action now appears in the input action. Hence, the number of authorizations remains stable.
+%\comment{H: Move the following sentence} Since $\NB$ is not bound in $\PP$, constructs send and receive authorization can only affect the possible change of the scope of authorization $\scope{\NB},$ and can not be used for  name passing.
+\item 
+Replicated input $\repreceive\NA\role\msg{x}.\PP$ represents the process with an infinite behavior. It receives a name on authorized name $\NA$ and in $\PP$ replaces $\NX$ with the received name, and in parallel activates the original process. For instance, if the received name is $\NB$, the above process evolves to $\scope\NA\PP' \parop\repreceive\NA\role\msg{x}.\PP$, where $\PP'$ is obtained from $\PP$ by replacing $\NX$ with $\NB$.
+%$\repreceive\NA\role\msg{x}.\PP.$
+\end{itemize} 
+When compared with the $C_\pi$-calculus syntax introduced in Section~\ref{sec:Cpi-syntax}, one may notice that here we are adopting a restricted and more controlled version of the replicated processes. However, we will show later that a general replication construct 
+can be encoded using replicated input following standard lines.
+
+%\new{
+%\begin{itemize}[-]
+%\item
+%Term $\scope{\NA} \PP$ is the authorization scoping, representing that process
+%$\PP$ has one authorization to use channel $\NA.$
+%In contrast with name restriction, name $\NA$ is not private to $\PP$.
+%\item 
+%Term $\sauth\NA\role\msg\NB.\PP$ represents the process that delegates one authorization for name $\NB$ along name $\NA$ and proceeds as $\PP.$ 
+%\item 
+%Term $\rauth\NA\role\msg\NB.\PP$ represents the dual, i.e., a process which receives one authorization for name $\NB$ along name $\NA$ and proceeds as $\scope{\NB}\PP.$ 
+%%\comment{H: Move the following sentence} Since $\NB$ is not bound in $\PP$, constructs send and receive authorization can only affect the possible change of the scope of authorization $\scope{\NB},$ and can not be used for  name passing.
+%\item 
+%Term $\repreceive\NA\role\msg{x}.\PP$ allows to specify infinite behavior: the process receives the name along (authorized) name $\NA$ and substitutes $\NX$ in $\PP$ with the received name, which is activated in parallel with the original process.
+%%$\repreceive\NA\role\msg{x}.\PP.$
+%\end{itemize} 
+%}
+
+As in $C_\pi$, name restriction and input are binding names (cf. Definition~\ref{def:Cpi_bound_names}). Hence, in $\rest\NX \PP,$ $\receive\NA\role\msg{x}.\PP$ and $\repreceive\NA\role\msg{x}.\PP$ the name $\NX$ is {\it binding} with scope $\PP.$ 
+%All occurrences of a name that are binding, or that are under the scope of it binding occurrence, are said 
+%to be {\it bound}. If the occurrence of the name is not bound in a term, it is said to be {\it free}. 
+As in Section~\ref{sec:Cpi-syntax}, we use $\fn\PP$, $\bn\PP$ and $\n\PP$ to denote the sets of free, bound and all names in $\PP$, respectively. 
+In $\scope\NA\PP$ the name $\NA$ is free and the names $\NA$ and $\NB$ in processes $\sauth\NA\role\msg\NB.\PP$ and $\rauth\NA\role\msg\NB.\PP$ are also free. Hence, we extend here Definition~\ref{def:Cpi_bound_names} of Section~\ref{sec:Cpi-syntax} to consider constructs for authorization manipulation and we define $\fn{\scope\NA\PP}=\{\NA\}\cup\fn\PP$ and $\fn{\sauth\NA\role\msg\NB.\PP}=\fn{\rauth\NA\role\msg\NB.\PP}=\{\NA,\NB\}\cup\fn\PP$, and also $\fn{\repreceive\NA\role\msg{x}.\PP}=(\{\NA\}\cup\fn\PP)\setminus\{\NX\}$.
+%We remark that in our model authorization scope extrusion is not applicable since a free name is specified, unlike name restriction, % (see Table~\ref{tab:structural}), 
+%and constructs to send and receive authorizations only affect the scope of authorizations.
+% $\scope{\NB}$. % and do not involve name passing. 
+For the rest of presentation we use $\alpha_\NA$ to abbreviate $\send\NA\role\msg\NB, \receive\NA\role\msg\NX, \sauth\NA\role\msg\NB$ or $\rauth\NA\role\msg\NB$ (including when $b = a$)
+%useful for the remaining presentation
+%: a prefix  stands for any %communication prefix along name $\NA$, i.e. 
+ and $\rest{\tilde{\NA}}$ to abbreviate $\rest{\NA_1}\ldots\rest{\NA_n}$.
+ % when  
+ 
+
+Same as in the previous chapter, here we also do not consider the sum operator of the $\pi$-calculus~\cite{pi_calculus}. Our aim is to study floating authorizations in a minimal setting and  we believe the sum operator can be added to our development following standard lines, as the interplay between choice and authorization scope is the same with respect to the one between communication prefixes and authorization scope. % (i.e., that a summation is authorized in the same way a prefix is in this work, and that the evolution triggered by one of the summation branches involves the confinement as defined here for the prefix). 
+The principal relation that is addressed here in a central way is the one between parallel composition and authorization scope, so as to capture the desired notion of accounting.
+
+The communication can be seen as a core of the behavior of processes (same as in $\pi$ and $C_\pi$). Our model imposes control on this behavior: two processes can communicate on a channel only if both are authorized to use the channel. 
+We present two examples that motivate our operational semantics introduced in the next section. The examples informally describe what sort of communications are to be considered authorized.
+%Before introducing operational semantics, we first motivate it by examples that illustrate some simple configurations where communication is either enabled or disabled.
+\begin{example}[Authorized communications]
+\label{ex:op_semantics1}
+\begin{enumerate}\item[]{}
+\item
+Two processes
+ \[
+   {\scope\NA\send\NA\role\msg\NB.\PP \parop \scope\NA\receive\NA\role\msg\NX.\PQ \quad  \text{ and } 
+   \quad \scope\NA\scope\NA(\send\NA\role\msg\NB.\PP \parop \receive\NA\role\msg\NX.\PQ)}
+ \]
+have their output and input actions authorized and can both evolve to  the same process $\scope\NA\PP \parop \scope\NA\PQ\subst{\NB}{\NX}$, where the confinement of the authorizations takes place as described in Section~\ref{subsec:examples}. 
+\item
+Authorization delegation is another aspect of our language. For instance, process
+\[
+   { \scope\NA\scope\NB\sauth\NA\role\msg\NB.\PP \parop \scope\NA\rauth\NA\role\msg\NB.\PQ}
+\] 
+ %\del{where the process on the left hand side is authorized on both $\NA$ and $\NB$.} 
+has both actions authorized on name $\NA$ and the delegating process has the %respective 
+authorization on $\NB$. Therefore, two processes can synchronize evolving to $\scope\NA\PP \parop \scope\NA\scope\NB\PQ$ %. Notice that 
+where the scope of authorization for $\NB$ changes accordingly.
+% to scope over to the process that received the authorization. 
+Notice that for the delegation to take place three authorizations are needed, one for each of the two processes on name $\NA$ and one for the delegating process for name $\NB$.
+\item
+As already noted, in the communication the authorizations are only confined and are not consumed. These can further be used to authorize the actions of the continuations.
+For instance, 
+ \[
+   \scope\NA\send\NA\role\msg\NB.\receive\NA\role\msg\NY.0 \parop \scope\NA\receive\NA\role\msg\NX.\send\NA\role\msg\NC.0 \quad
+ \]
+can evolve to  $\scope\NA\receive\NA\role\msg\NY.0 \parop \scope\NA\send\NA\role\msg\NC.0$, that in turn can further evolve to  $\scope\NA 0 \parop \scope\NA 0.$
+\end{enumerate}
+\end{example}
+
+
+\begin{example}[Unauthorized communications]
+\label{ex:op_semantics2}
+\begin{enumerate}\item[]{}
+\item
+Both of the processes
+\[     
+  {\scope\NA\send\NA\role\msg\NB.\PP \parop \receive\NA\role\msg\NX.\PQ \quad \text{ and } \quad \scope\NA(\send\NA\role\msg\NB.\PP \parop \receive\NA\role\msg\NX.\PQ)}
+\] 
+are considered as stuck, as in both the synchronization is not possible only due to lack of one authorization for $\NA$.
+The left-hand side process lacks one authorization for name $\NA$ on the receiving end and the right-hand side process also lacks one authorization for name $\NA$ since only one is available, while two are required for the synchronization to occur.
+This is one of the main differences with respect to~\cite{DBLP:journals/corr/GhilezanJPPV16,clar:eke}, where the operational semantics allows the latter process to evolve, since there both communication ends are considered to be %under the scope of authorization
+authorized by $\scope\NA$, due to a different interpretation of the accounting principle.
+\item
+Process
+ \[
+    \scope\NA \sauth\NA\role\msg\NB.\PP \parop  \scope\NA\rauth\NA\role\msg\NB.\PQ
+\]
+is again stuck as it cannot evolve only due to lack of one authorization. The 
+delegation in left-hand side is not authorized as authorization for name $\NB$ is missing. 
+\end{enumerate}
+\end{example}
+%
+%
+%The operational semantic for a language usually could be given in a two ways, one describing possible computations within individual processes, called {\it reduction semantics}, and the other describing possible interactions between process and process environment, called {\it an action semantics}. This section presents the reduction semantic for our language.
+
+
+
+
+
+We formally define the evolutions of processes in two alternative ways, using a labeled transition system and a reduction semantics, and we show that these are equivalent. 
+Compared to $C_\pi$ and $\pi$, the reduction semantics of this model is more involved, but still more convenient to be used in the proofs than the labeled transition system. Furthermore, we believe our authorization accounting principle can be explained in a more appropriate way when considering the reduction semantics (in particular when addressing the structural congruence relation), so we leave a more detailed account of this principle (including the main difference w.r.t.~\cite{clar:eke}) for the beginning of Section~\ref{subsec:reduction}. 
+
+
+
+
+
+
+\section{Action semantics}\label{subsec:LTS}
+%\comment{I: Here starts the old LTS paragraph}\comment{H: edited}
+As we noted in Section~\ref{sec:Cpi-semantics}, a labeled transition system (LTS) can be used to describe the behavior of a process by observing the actions of its sub-processes. 
+We now characterize the observable labels.
+%that provides an equivalent (as shown later) alternative 
+%representation of the operational semantics of our model. 
+%As usual the LTS is less compact, albeit more informative, with respect to the reduction semantics. 
+%We define 
+
+\begin{definition}[Actions] The set of observable actions ${\cal A}$, ranged over by $\alpha$, is defined as  
+%
+$$
+\alpha ::= \scope\NA^i\send\NA\role\msg\NB \; \parop \; \scope\NA^i\receive\NA\role\msg\NB \; \parop \; \scope\NA^i\scope\NB^j\sauth\NA\role\msg\NB \; \parop \; \scope\NA^i\rauth\NA\role\msg\NB \; \parop \;  \scope\NA^i\rest\NB\send\NA\role\msg\NB \; \parop \; \tau_\omega
+$$
+%
+%\noindent
+where $\omega$ is of the form 
+$\scope\NA^{i+j}\scope\NB^k$ and $i,j,k\in\{0,1\}$ and it may be the case that $a = b$. 
+\end{definition}
+When compared with Definition~\ref{def:Cpi_actions}, we may recognize the communication actions decorated here with %some 
+annotations that capture lacking authorizations. Intuitively, a communication action is decorated with 
+$\scope{\NA}^0$ when the action 
+ carries
+%lacks
+sufficient authorizations on $\NA$,
+and $\scope{\NA}^1$, represents the action %is carrying
+lacks an authorization on $\NA$.  
+%Notice 
+In the action for authorization delegation two such annotations are present, one for each name involved. 
+%As usual 
+As in the $C_\pi$-calculus, $\rest \NB$
+%is used to denote 
+denotes that the name in the object of the 
+%communication
+output is bound. %(cf. $\pi$-calculus bound output). 
+In the case of internal steps, the $\omega$ %annotation 
+%identifies the authorizations lacking for the synchronization to take place
+identifies the  lacking authorizations. 
+Whenever possible, we omit $\scope\NA^0$ annotations 
+and, thus, we use $\tau$ to abbreviate $\tau_{\scope\NA^{0}}$ and $\tau_{\scope\NA^{0}\scope\NB^0}$ where no authorizations are lacking. As expected, we also abbreviate tags $\scope\NA^1$ with $\scope\NA$.
+%
+
+By $\n\alpha,$ $\fn\alpha$ and $\bn\alpha$ we denote the set of all, free and bound names of $\alpha$. As in Definition~\ref{def:free_and_bound_name_of_actions}, only the object name of the bound output action is bound, while the rest of the names in all actions are free. Also, we define $\n{\tau}=\emptyset$ and $\fn{\tau_{\scope\NA}}=\fn{\tau_{\scope\NA\scope\NB^0}}=\fn{\tau_{\scope\NA^{2}\scope\NB^0}}=\{\NA\}$. Hence, if the internal action is not lacking authorizations for a name, the name is not considered as exposed in the label.
+The substitution of names is defined analogously as for the $C_\pi$ processes (cf. Definition~\ref{def:Cpi_substitutions}).
+We also identify here $\alpha$-convertible processes (cf. Definition~\ref{def:alpha-conversion}), and we use the convention that all bound and free names are distinct in all processes, substitutions and actions under consideration.
+%respectively. %, defined in expected lines. 
+
+\begin{table}[t]
+\[
+\begin{array}[t]{@{}c@{}}
+\inferrule[(l-out)]{}
+{\send\NA\role\msg\NB.\PP\lts{\scope\NA\send\NA\role\msg\NB}\scope{\NA}\PP}
+\qquad
+\inferrule[(l-in)]{}
+{\receive\NA\role\msg\varx.\PP\lts{\scope\NA\receive\NA\role\msg\NB}\scope{\NA}\PP\subst\NB\varx}
+\qquad
+\inferrule[(l-out-a)]{}
+{\sauth\NA\role\msg\NB.\PP\lts{\scope\NA\scope\NB\sauth\NA\role\msg\NB}\scope{\NA}\PP}
+\vspace{2ex}\\
+\inferrule[(l-in-a)]{}
+{\rauth\NA\role\msg\NB.\PP\lts{\scope\NA\rauth\NA\role\msg\NB}\scope{\NA}\scope{\NB}\PP}
+\qquad
+\inferrule[(l-in-rep)]{}
+{\repreceive\NA\role\msg{x}.\PP\lts{%\scope{\NA}
+\receive\NA\role\msg\NB}\scope{\NA}\PP\subst\NB\varx\parop\repreceive\NA\role\msg{x}.\PP}
+\vspace{2ex}\\
+\inferrule[(l-par)]
+{\PP\lts{\alpha}\PQ \quad \bn\alpha\cap\fn\PR=\emptyset}
+{\PP\parop\PR\lts{\alpha}\PQ\parop\PR}
+\qquad
+\inferrule[(l-res)]
+{\PP\lts{\alpha}\PQ \quad \NA\notin \n\alpha}
+{\rest\NA\PP\lts{\alpha}\rest\NA\PQ}\qquad
+\inferrule[(l-open)]
+{\PP\lts{\scope\NA^i\send\NA\role\msg\NB}\PQ \quad a\not= b}
+{\rest\NB\PP\lts{\scope\NA^i\rest\NB\send\NA\role\msg\NB}\PQ }
+\vspace{2ex}\\
+\inferrule[(l-scope-int)]
+{\PP\lts{\tau_{\omega\scope{\NA}}}\PQ}
+{\scope\NA\PP\lts{\tau_\omega}\PQ}
+\qquad
+\inferrule[(l-scope-ext)]
+{\PP\lts{\scope\NA\prefix_\NA}\PQ }
+{\scope\NA\PP\lts{%\scope\NA
+\prefix_\NA}\PQ}
+\qquad
+\inferrule[(l-scope)]
+{\PP\lts{\alpha}\PQ \quad \tau_{\omega\scope{\NA}}\neq \alpha\neq \scope\NA\prefix_\NA}
+{\scope\NA\PP\lts{\alpha}\scope{\NA}\PQ}
+\vspace{2ex}\\
+\inferrule[(l-comm)]
+{\PP\lts{\scope\NA^i\send\NA\role\msg\NB}\PP' \quad \PQ\lts{\scope\NA^j\receive\NA\role\msg\NB}\PQ' \quad \omega=\scope\NA^{i+j}}%{2-i-j}}
+{\PP\parop\PQ\lts{\tau_\omega}\PP'\parop\PQ'}
+\vspace{2ex}\\
+\inferrule[(l-close)]
+{\PP\lts{\scope\NB^i\rest\NA\send\NB\role\msg\NA}\PP' \quad \PQ\lts{\scope\NB^j\receive\NB\role\msg\NA}\PQ' \quad \omega=\scope\NB^{i+j}%{2-i-j}
+\quad \NA\notin \fn{\PQ}}
+{\PP\parop\PQ\lts{\tau_\omega}(\nu \NA)(\PP'\parop\PQ')}
+\vspace{2ex}\\
+\inferrule[(l-auth)]
+{\PP\lts{\scope\NB^k\scope\NA^i\sauth\NA\role\msg\NB}\PP' \quad \PQ\lts{\scope\NA^j\rauth\NA\role\msg\NB}\PQ' \quad \omega=\scope\NA^{i+j}%{2-i-j}
+\scope\NB^{k}}%{1-k}}
+{\PP\parop\PQ\lts{\tau_\omega}\PP'\parop\PQ'}
+\end{array}
+\]
+\caption{\label{tab:Transition}LTS rules.}
+\end{table}
+
+The labeled transition relation is the least relation included in ${\cal P} \times {\cal A} \times {\cal P}$, where $\cal P$ is the set of all processes, that satisfies the rules given in Table~\ref{tab:Transition}. We now describe the rules.
+
+\begin{itemize}
+\item 
+Rules \rulename{(l-out)}, \rulename{(l-in)}, \rulename{(l-out-a)}, \rulename{(l-in-a)} directly correspond to explanations given for the communication prefixes. %Notice that 
+Each label is tagged with the authorizations needed to complete the action, as at this point none of the actions is authorized. Also, the resulting processes are scoped with the authorizations required for the action (and provided in case of authorization reception),
+so as to implement confinement. %Notice 
+%The labels are decorated with the corresponding
+% authorizations, %which 
+%representing that the actions are lacking authorizations. 
+\item 
+Rule  \rulename{(l-in-rep)} describes the only possible action of the
+%In contrast, 
+replicated input. Notice that the replicated input is authorized by definition, for which the action is authorized and the label is not decorated (tag $\scope{\NA}^0$ is omitted). 
+\item 
+Rule \rulename{(l-par)} lifts the action of one of the branches at the level of parallel composition
+%(the symmetric rule is omitted) 
+and the side condition ensures the bound name of the action is not specified as free in the parallel process;
+%The rules for restriction \rulename{(l-res)} and \rulename{(l-open)} follow the lines of the ones given for 
+\item 
+In rule \rulename{(l-res)} the action of $\PP$ is lifted at the level of the scoped process, ensuring that the restricted name is not a name of the action.
+\item 
+Rule \rulename{(l-open)} supports the scope extrusion of the sent restricted name $\NA$ by opening its scope,  which is then to be closed by rule \rulename{(l-close)}, following the lines of the semantics of $C_\pi$. 
+\item
+Rules \rulename{(l-scope-int)} and \rulename{(l-scope-ext)} deal with the case of an action that lacks (at least) one authorization on $\NA$. This is represented with labels $\tau_{\omega\scope\NA}$ and $\scope\NA\sigma_\NA$. 
+In the conclusions of the rules, the actions exhibited no longer lack the respective authorization and in the resulting processes the authorization scope is no longer present. With ${\omega\scope\NA}$ we abbreviate $\scope\NA^{2}\scope\NB^k$, $\scope\NA^{1}\scope\NB^k$, and $\scope\NB^{i+j}\scope\NA^1$,
+for a given $\NB$ (including the case $\NB = \NA$). With $\scope\NA\prefix_\NA$ we abbreviate the communication actions lacking authorization on $\NA$ ($\scope\NA\alpha_\NA, \scope\NA\rest\NB\send\NA\role\msg\NB$, and 
+$\scope\NA\scope\NB^i\sauth\NB\role\msg\NA$ where $i \in \{0,1\}$, which includes $ \scope{\NA}^1\sauth\NA\role\msg\NA$). 
+In both cases $\tau_\omega$ and $\prefix_\NA$ are obtained from $\tau_{\omega\scope\NA}$ and $\scope\NA\sigma_\NA$ by the respective exponent decrement for $\NA$.
+%
+We remark that in contrast to the extrusion of a restricted name via bound output, where the scope floats \emph{up} to the point a synchronization (rule \rulename{(l-close)} explained below), authorization scopes actually float \emph{down} to the level of communication prefixes (cf. rules \rulename{(l-out)}, \rulename{(l-in)}, \rulename{(l-out-a)}, \rulename{(l-in-a)}), so as to capture confinement. 
+%\item 
+%Rule \rulename{(l-scope-ext)} follows similar lines as \rulename{(l-scope-int)} as it also refers to lacking authorizations, specifically for the case of an external action. 
+%\del{that is not carrying a necessary authorization.} 
+%We use $\prefix_\NA$ to denote both an action that specifies $\NA$ as communication subject ($\alpha_\NA$) %\del{and is annotated with $\scope\NA^0$}%(
+%, including bound output $\rest\NB\send\NA\role\msg\NB$%)
+%, and of the form
+%$\scope\NB^i\sauth\NB\role\msg\NA$ where $i \in \{0,1\}$ (which includes $ \scope{\NA}^1\sauth\NA\role\msg\NA$).
+%where a second authorization on $\NA$ is lacking). 
+%\del{By $\scope{\NA}\prefix_\NA$ we denote the respective annotation exponent increase.} 
+\item 
+In rule \rulename{(l-scope)} the action of $\PP$ is not lacking an authorization on $\NA$, thus, the action is lifted at the level of the scoped process.
+\item 
+%The synchronization of parallel processes is expressed by the last three rules, omitting the symmetric cases. 
+In rule \rulename{(l-comm)} two parallel processes synchronize their dual actions: one process is sending and the other is receiving a name $\NB$ on $\NA$. %Notice that 
+The authorizations lacking in sending and receiving actions are then specified in the resulting internal action in $\omega$.
+%If the sending and receiving actions are not carrying the appropriate authorizations, then the transition label $\tau_\omega$ specifies the lacking authorizations. %\del{(the two needed minus the existing ones).}
+\item 
+In rule \rulename{(l-close)} %the scope of a bound name is closed. 
+two parallel processes are also synchronizing their dual actions, only now the sent name $\NB$ is bound. The scope of the sent name is closed in the final process (the scope was previously opened in \rulename{(l-open)}). The side condition ensures avoiding unintended name capture.
+%where one process is able to send a bound name $\NA$ and the other to receive it, along name $\NB$, so the synchronization may occur leading to a configuration where the restriction scope is specified (avoiding unintended name capture) so as to finalize the scope extrusion. 
+\item
+In rule  \rulename{(l-auth)} the processes synchronize their dual actions: one is sending (delegating) and the other receiving authorization for $\NB$ on channel $\NA$. The lacking authorizations of the sending and receiving authorization actions are again specified in $\omega$. 
+%expresses the authorization delegation, where an extra annotation for $\omega$ is considered given the required authorization for the delegated authorization. 
+\end{itemize}
+
+Symmetric cases of rules~\rulename{(l-comm)}, \rulename{(l-close)}, \rulename{(l-auth)} and \rulename{(l-par)} are omitted from the table. Let us notice that carried authorization annotations, considered here up to permutation, thus identify,  in a compositional way, the requirements for a synchronization to occur.
+
+To illustrate the rules, consider process 
+\[
+\scope\NB(\scope\NA\send\NA\role\msg\NB.\sauth\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\receive\NA\role\msg\NX.\rauth\NA\role\msg\NX.\send\NX\role\msg\NC.\inact)
+\]
+By \rulename{(l-out)} and \rulename{(l-in)} we have that
+\[
+\send\NA\role\msg\NB.\sauth\NA\role\msg\NB.\inact
+\lts{\scope\NA\send\NA\role\msg\NB}
+\scope\NA\sauth\NA\role\msg\NB.\inact 
+\quad \text{and}\quad
+\receive\NA\role\msg\NX.\rauth\NA\role\msg\NX.\send\NX\role\msg\NC.\inact
+\lts{\scope\NA\receive\NA\role\msg\NB}
+\scope\NA\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact
+\]
+Then, the lacking authorizations in labels, that are already confined to the continuation processes, are removed by \rulename{(l-scope-ext)}, obtaining
+\[
+\scope\NA\send\NA\role\msg\NB.\sauth\NA\role\msg\NB.\inact
+\lts{\send\NA\role\msg\NB}
+\scope\NA\sauth\NA\role\msg\NB.\inact 
+\quad \text{and}\quad
+\scope\NA\receive\NA\role\msg\NX.\rauth\NA\role\msg\NX.\send\NX\role\msg\NC.\inact
+\lts{\receive\NA\role\msg\NB}
+\scope\NA\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact
+\]
+The two branches now can synchronize their actions by rule \rulename{(l-comm)}
+\[
+\scope\NA\send\NA\role\msg\NB.\sauth\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\receive\NA\role\msg\NX.\rauth\NA\role\msg\NX.\send\NX\role\msg\NC.\inact
+\lts{\tau}
+\scope\NA\sauth\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact
+\]
+The authorization for $\NB$ scoping over both branches is not lacking in the action, hence by \rulename{(l-scope)} the action is seamlessly lifted
+\[
+\scope\NB(\scope\NA\send\NA\role\msg\NB.\sauth\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\receive\NA\role\msg\NX.\rauth\NA\role\msg\NX.\send\NX\role\msg\NC.\inact)
+\lts{\tau}
+\scope\NB(\scope\NA\sauth\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact)
+\]
+Now the name $\NB$ is received in the right branch, and the respective authorization, that is floating over both branches, can be explicitly delegated from the left to the right branch. By rules \rulename{(l-out-a)} and \rulename{(l-in-a)} we have 
+\[
+\sauth\NA\role\msg\NB.\inact
+\lts{\scope\NA\scope\NB\sauth\NA\role\msg\NB}
+\scope\NA\inact 
+\quad \text{and}\quad
+\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact
+\lts{\scope\NA\rauth\NA\role\msg\NB}
+\scope\NA\scope\NB\send\NB\role\msg\NC.\inact
+\]
+and again by rule \rulename{(l-scope-ext)}
+\[
+\scope\NA\sauth\NA\role\msg\NB.\inact
+\lts{\scope\NB\sauth\NA\role\msg\NB}
+\scope\NA\inact 
+\quad \text{and}\quad
+\scope\NA\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact
+\lts{\rauth\NA\role\msg\NB}
+\scope\NA\scope\NB\send\NB\role\msg\NC.\inact
+\]
+Then, the two branches can synchronize by rule \rulename{(l-auth)}
+\[
+\scope\NA\sauth\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact
+\lts{\tau_{\scope\NB}}
+\scope\NA\inact 
+\parop 
+\scope\NA\scope\NB\send\NB\role\msg\NC.\inact
+\]
+where the authorization for $\NB$ is lacking to finish the synchronization. 
+Since the respective authorization is scoping over the process, by \rulename{(l-scope-int)} we obtain 
+\[
+\scope\NB(\scope\NA\sauth\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\rauth\NA\role\msg\NB.\send\NB\role\msg\NC.\inact)
+\lts{\tau}
+\scope\NA\inact 
+\parop 
+\scope\NA\scope\NB\send\NB\role\msg\NC.\inact
+\]
+where the action on $\NB$ is now authorized explicitly, and by \rulename{(l-out)}, \rulename{(l-scope-ext)}, \rulename{(l-scope)}, and \rulename{(l-par)} we conclude
+\[
+\scope\NA\inact 
+\parop 
+\scope\NA\scope\NB\send\NB\role\msg\NC.\inact
+\lts{\send\NB\role\msg\NC}
+\scope\NA\inact 
+\parop 
+\scope\NA\scope\NB\inact
+\] 
+Notice, however that we do not need the delegation in order for the final output on $\NB$ to take place. If we consider process
+\[
+\scope\NB(\scope\NA\send\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\receive\NA\role\msg\NX.\send\NX\role\msg\NC.\inact)
+\]
+after the initial synchronization 
+\[
+\scope\NB(\scope\NA\send\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\receive\NA\role\msg\NX.\send\NX\role\msg\NC.\inact)
+\lts{\tau}
+\scope\NB(\scope\NA\inact 
+\parop 
+\scope\NA\send\NB\role\msg\NC.\inact)
+\]
+the right branch is ``contextually'' authorized by the floating authorization for $\NB$. Thus, by \rulename{(l-out)} \rulename{(l-scope)}, \rulename{(l-par)}, and \rulename{(l-scope-ext)} 
+\[
+\scope\NB(\scope\NA\inact 
+\parop 
+\scope\NA\send\NB\role\msg\NC.\inact)
+\lts{\send\NB\role\msg\NC}
+\scope\NA\inact 
+\parop 
+\scope\NA\scope\NB\inact
+\]
+and we end up with the same configuration as with the first process. 
+
+
+
+
+\section{Reduction semantics}\label{subsec:reduction}
+This section introduces the reduction semantics of our process model.
+Informally, a reduction $\PP \red \PQ$ specifies that process $\PP$ evolves to process $\PQ$ in one computational step. The reduction relation relies on the {\it structural congruence} relation that allows for term manipulation. The structural congruence relation, denoted $\equiv$, is the least binary congruence  on processes that satisfies the rules given in Table~\ref{tab:structural}. All rules except the last three are standard also in the $\pi$-calculus (and also in $C_\pi$, cf. Table~\ref{tab:Cpi-structural}). These allow for: $({\cal P}, \parop, \inact)$ to be a commutative monoid, discard name restrictions scoping terminated process, two name restrictions to be swapped, name extrusion, and activation of one copy of a replicated input process.
+The last three rules address authorization scopes, and allow for: swapping the two authorizations, discarding unused authorizations and swapping authorization and name restriction, provided that the two specified names are distinct. These last three rules are adopted from~\cite{clar:eke}. Structural congruence also provides an insight to the main difference of our work with respect to the work in~\cite{clar:eke}, which is to be explained after 
+% but  while we depart from previous work in the principle explained %next after 
+Example~\ref{ex:scope_extrusion}. % so as to be able to capture the notion of floating authorizations.
+
+\begin{table}[t]
+\[
+\begin{array}{@{}c@{}} 
+  \inferrule[(sc-par-inact)]{}
+  {\PP\parop\inact\equiv\PP}
+  \qquad
+  \inferrule[(sc-par-comm)]{}
+  {\PP\parop\PQ\equiv\PQ\parop\PP}
+  \qquad
+  \inferrule[(sc-par-assoc)]{}
+  {(\PP\parop\PQ)\parop\PR\equiv\PP\parop(\PQ\parop\PR)}
+\vspace{2ex} \\
+  \inferrule[(sc-res-inact)]{}
+  {\rest\NA\inact\equiv\inact}
+  \qquad
+  \inferrule[(sc-res-swap)]{}
+  {\rest\NA\rest\NB\PP\equiv\rest\NB\rest\NA\PP}
+\vspace{2ex} \\
+  \inferrule[(sc-res-extr)]{}
+  {\PP\parop\rest\NA\PQ\equiv\rest\NA(\PP\parop\PQ)\quad \text{if }\NA\notin\fn\PP)}
+  \qquad
+  \inferrule[(sc-rep)]{}
+  {\repreceive\NA\role\msg{x}.\PP\equiv\; \repreceive\NA\role\msg{x}.\PP \parop 
+  \scope{\NA}\receive\NA\role\msg{x}.\PP  }      
+\vspace{2ex}\\
+  \inferrule[(sc-auth-swap)]{}
+  {\scope{\NA}\scope{\NB}\PP \equiv \scope{\NB}\scope{\NA}\PP}
+    \qquad
+  \inferrule[(sc-auth-inact)]{}
+  {\scope{\NA}\inact \equiv \inact}
+\qquad
+  \inferrule[(sc-scope-auth)]{}
+  {\scope{\NA}\rest{\NB}\PP \equiv \rest{\NB}\scope{\NA}\PP \quad\text{if $\NA\neq \NB$}
+  }
+%\vspace{2mm}\\
+%	\new{\inferrule[(sc-rep-in)]{}
+%	{\repreceive\NA\role\msg{x}.\PP \equiv \scope\NA\receive\NA\role\msg{x}.\PP \parop \repreceive\NA\role\msg{x}.\PP}}
+	
+%  \qquad
+%  \inferrule[]{}
+%  {\PP \equiv_{\alpha} \PQ \implies \PP \equiv \PQ}
+\end{array}
+\]
+\caption{\label{tab:structural}Structural congruence.}
+\end{table}
+
+Considering the structural congruence rules in Table~\ref{tab:structural}, we may notice that the scope of name restrictions can be extruded by rule \rulename{(sc-res-extr)}, but there is no similar rule for extruding the scope of $\scope\NA$. This is a consequence of the fact that the former binds the name, while in the latter the specified name is free. We elaborate this difference in the next example.
+%One can  notice that there exist a standard rule for extrusion of the scope of $\rest \NA$, namely \rulename{(sc-res-extr)}, while there is no such rule for the scope of $\scope\NA.$
+%We discuss %it  
+%this difference by means of an  example.
+
+\begin{example}[Extrusion of authorization scope]
+\label{ex:scope_extrusion}
+   Consider the process comprehending two branches 
+   \[
+      \scope\NB \receive\NB\role\msg\NX.\send\NX\role\msg\NC.0 \parop \rest\NA \scope\NA  \scope\NB \send\NB\role\msg\NA.0
+   \]
+   In the right branch a fresh name $\NA$ is created and one authorization for the same name. 
+   Applying structural congruence axiom \rulename{(sc-res-extr)}, the scope of name $\NA$ can be extruded to the left branch, obtaining
+      \[
+         \scope\NB \receive\NB\role\msg\NX.\send\NX\role\msg\NC.0 \parop \rest\NA \scope\NA  \scope\NB \send\NB\role\msg\NA.0
+         \equiv
+          \rest\NA \left(\scope\NB \receive\NB\role\msg\NX.\send\NX\role\msg\NC.0 \parop  \scope\NA \scope\NB \send\NB\role\msg\NA.0\right)
+        \]
+  On the contrary, even though the name $\NA$ is not specified as free in the left branch, the scope of the authorization for $\NA$ cannot be extruded in the same way, as the rules given in Table~\ref{tab:structural} do not allow for this to happen. Thus, we have the inequality
+      \[
+        \rest\NA \left(\scope\NB \receive\NB\role\msg\NX.\send\NX\role\msg\NC.0 \parop  \scope\NA \scope\NB \send\NB\role\msg\NA.0\right)
+        \not\equiv
+       \rest\NA \scope\NA \left(\scope\NB \receive\NB\role\msg\NX.\send\NX\role\msg\NC.0 \parop  \scope\NB \send\NB\role\msg\NA.0\right)
+       \]
+   To see why processes related with the last inequality are to be considered as having different behavior, observe that the lhs process evolves (by the standard $\pi$-calculus rule for communication)  to 
+     \[
+                \rest\NA \left(\scope\NB \send\NA\role\msg\NC.0 \parop  \scope\NA \scope\NB 0\right)
+     \]
+     where the output $\NA$ is unauthorized. On the other hand, the rhs process evolves to
+    \[
+              \rest\NA \scope\NA \left(\scope\NB \send\NA\role\msg\NC.0 \parop \scope\NB 0\right)
+     \]
+     where the action on $\NA$ is authorized.
+\end{example}
+
+The last example shows that authorization scoping construct cannot be manipulated over the parallel composition in the same way as the name restriction. In~\cite{clar:eke} the structural congruence relation included rule $\scope{\NA}(\PP \parop \PQ)\equiv \scope{\NA}\PP\parop\scope{\NA}\PQ$. 
+Adopting this rule in our model would represent introducing/discarding one authorization, thus interfering with our notion of authorization accounting. In our model, we distinguish $\scope{\NA}(\PP \parop \PQ)$ where the authorization is floating over $\PP$ and $\PQ$, while in $\scope{\NA}\PP\parop\scope{\NA}\PQ$ two authorizations are specified, one for each process. %Another approach to capture confinement could be a rule of the sort $\scope{\NA}(\PP \parop \PQ)\equiv \PP\parop \scope{\NA} \PQ$, which, however, may also affect the computational power of a process. For example, processes $\send\NA\role\msg\NB.\inact \parop \scope{\NA}\inact$ and $\scope{\NA}(\send\NA\role\msg\NB.\inact \parop  \inact)$ are clearly not to be deemed equal.
+%should not be considered equal since the first one is not authorized to perform the output, while the second one is. 
+%
+%
+This leads us to believe that the authorization scoping construct cannot be manipulated over parallel composition statically, hence, without examining the behavior of the parallel branches, and also that the structural congruence relation cannot be used in an obvious way to obtain a normal form characterization of processes, as it is the case in~\cite{clar:eke}.
+This brings us to a novel development of a non-standard approach.
+% communicate on the same channel. 
+%For example, consider process $\scope\NA(\scope\NA(\PQ \parop \send\NA\role\msg\NB.0) \parop \receive\NA\role\msg\NX.0)$ cannot be rewritten, using structural congruence rules, into  $\PQ\parop\scope\NA\send\NA\role\msg\NB.0 \parop \scope\NA\receive\NA\role\msg\NX.0$. However both processes are able to reduce to process $\PQ\parop\scope\NA\inact \parop \scope\NA \inact$
+%since the actions are under the scope of the proper authorizations.
+%
+
+Intuitively, for reduction to take place the two active prefixes willing to synchronize must be properly authorized, i.e., in the scope of the respective authorizations. In order to statically determine if the communication can occur, we define \emph{static contexts} and operator $\operator$. 
+The static context is a process with one (two) non-prefixed, not scoped with name restrictions and not replicated hole(s) in which processes can be instantiated (cf. Definition~\ref{def:active_contexts}).
+
+
+\begin{definition}[Static Contexts]
+Static contexts with one and two holes are defined as follows.
+%\begin{table}[t]
+\[
+\displaystyle
+\begin{array}[t]{@{}r@{\;\;}c@{\;\;}l@{}}
+  \context[\cdot] \;& ::= &\; \cdot \;\; | \;\; (\PP\parop \context[\cdot]) \;\; | \;\; \scope{\NA} \context[\cdot] \\
+%\;\qquad \;
+ \context[\cdot_1, \cdot_2] \; &::=& \; (\context[\cdot_1]\parop\context[\cdot_2])
+\;\; | \;\;  (\PP\parop \context[\cdot_1, \cdot_2]) \;\; | \;\; \scope{\NA} \context[\cdot_1, \cdot_2] 
+\end{array}
+\]
+%\caption{\label{tab:Contexts} Contexts with one and two holes.}
+%\end{table}
+\end{definition}
+
+%Static contexts are defined in Table~\ref{tab:Contexts} following standard lines. 
+We annotate the holes with $\cdot_1$ and $\cdot_2$ to avoid ambiguity, i.e., when
+$ \context[\cdot_1, \cdot_2] \!=\! \context'[\cdot_1]\parop\context''[\cdot_2]$ then
+$ \context[\PP, \PQ] \!=\! \context'[\PP]\parop\context''[\PQ]$.
+Note that
+% in Table~\ref{tab:Contexts}
+the definition of the contexts does not mention the name restriction construct $\rest\NA$. This allows us to single out specific names and avoid name clashes. Remaining cases define holes can occur in parallel composition and underneath the authorization scope, the only other contexts underneath which processes are deemed active. We omit the symmetric cases for parallel 
+composition since contexts are used up to structural congruence.
+For instance, if in context $\context[\cdot_1, \cdot_2]=\scope\NB(\scope\NA \,\cdot_1 \parop \scope\NA \,\cdot_2)$
+ we instantiate processes $\send\NA\role\msg\NB.\inact $ and $\receive\NA\role\msg\NX.\inact$ we obtain process
+$
+\scope\NB(\scope\NA\send\NA\role\msg\NB.\inact 
+\parop 
+\scope\NA\receive\NA\role\msg\NX.\inact)$.
+
+Operator $\operator$ has two roles. Firstly, the operator works as a predicate over contexts as it singles out contexts in which hole(s) is(are) under the scope of the requested authorizations. Secondly, when defined, the operator removes the specific authorizations from the original context, so as to capture confinement in the resulting context. In addition, in the presence of a larger number of the authorizations that are to be removed from the context, the operator removes the ones that occur nearest to the hole (for the purpose of fairness). 
+%
+%
+\begin{table}[t]
+\[
+\begin{array}{c} %@{\quad}l}
+\inferrule[(c-end)]{} 
+{\ophole{\,\cdot\,}{\emptyset}{\rho'%\tilde \ND
+}=\cdot}
+\qquad
+\inferrule[(c-rem)]{ \ophole{\context[\cdot]}{\rho
+%\tilde{\NA}
+}{\rho'\uplus\{\NA\}
+%\tilde \ND, \NC
+}=\context'[\cdot]
+ }
+{\ophole{\scope\NA\context[\cdot]}{\rho\uplus\{\NA\}
+%\tilde{\NA},\NC
+\, }{ \rho'
+%\tilde \ND
+}=\context'[\cdot]}
+% \vspace{2ex}\\
+\vspace{2ex}\\
+\inferrule[(c-skip)]{ \ophole{\context[\cdot]}{\rho
+%\tilde{\NA}
+}{ \rho'
+%\tilde \ND  
+}=\context'[\cdot] \quad \NA \not \in \rho'
+%\tilde \ND
+} 
+{\ophole{\scope\NA\context[\cdot]}{\rho
+%\tilde{\NA}
+}{ \rho'
+%\tilde \ND
+}=\scope\NA \context'[\cdot]}
+ \qquad
+%s\qquad
+\inferrule[(c-par)]{\ophole{\context[\cdot]}{\rho
+%\tilde{\NA}
+}{\rho'
+%\tilde \ND
+}=\context'[\cdot]}  
+{\ophole{\context[\cdot] \parop \PR}{\rho
+%\tilde{\NA}
+}{\rho'
+%\tilde \ND
+}=\context'[\cdot] \parop \PR}
+\end{array}
+\]
+%\vspace{-12pt}
+\caption{\label{tab:op_for_one_hole} ${\operator}$ on contexts with one hole}
+%\vspace{-26pt}
+\end{table}
+%
+%
+%
+%\paragraph{{The operator for contexts with one hole}}
+%
+
+Operator $\operator$ for contexts with one hole is defined inductively on the structure of contexts by the rules given in Table~\ref{tab:op_for_one_hole}.
+%, both for contexts with one hole %$\ophole{\context[\cdot]}{\tilde{\NA}}{ \tilde \ND }$
+%rules prefixed with $\rulename{c-}$).
+%and for contexts with two holes 
+%%$\opholes{\context[\cdot_1,\cdot_2]}{\tilde{\NA}}{ \tilde{\NB}}{ \tilde \ND}{ \tilde{\NE}}$ 
+%(rules prefixed with $\rulename{c2-}$). 
+The operator 
+\[
+     \ophole{\context[\cdot]}{\rho
+%\tilde{\NA}
+}{\rho' 
+%\tilde \ND 
+}
+\]
+ takes a one-hole context $\context[\cdot]$ and two multisets
+%lists 
+of names $\rho$ and $\rho'$. The multiset notation is used since the same name can appear more than once.  The first multiset $\rho$ contains the names of authorizations that the operator should remove from the context, while the second contains the names of authorizations that have already been removed. 
+
+
+We comment on the rules given in Table~\ref{tab:op_for_one_hole}, reading from conclusion to premises.
+\begin{itemize}
+\item
+In rule \rulename{(c-end)} the operator is defined only if the first multiset is empty. Thus, the operator is defined only in case all authorizations from the first multiset 
+have been actually removed from the context up to the point the hole is reached. 
+\item 
+In rule~\rulename{(c-rem)} the operator removes the authorization from the context, that was specified in the first multiset. The removed name is passed from the first multiset (``to be removed'')
+to the second multiset (``has been removed''). The multiset addition operation $\rho\uplus\{\NA\}$ (or just $\rho\uplus\NA$)
+ sums the frequencies of the elements. %, also used to single-out an occurrence as usual.
+%The rule where the authorization is removed from the context \rulename{(c-rem)} 
+%specifies that the name is passed from the ``to be removed'' multiset 
+%to the ``has been removed'' multiset 
+%, where
+%we use $\rho\uplus\{\NA\}$ (or simply $\rho\uplus\NA$)
+%to represent the addition operation for multisets which sums the frequencies of the elements, also used to single-out an occurrence as usual.
+\item 
+In rule~ \rulename{(c-skip)} the operator seamlessly passes the authorization, but only if the name does not occur in the second multiset. 
+The last restriction ensures that the removed authorizations are the ones nearest to the hole, since only authorizations that were not already removed proceeding towards the hole can be preserved.
+For instance, $\ophole{\scope\NA\;\cdot\;}{\emptyset}{ \{\NA\}}$ is undefined 
+since the authorization is not specified to be removed from the context by the operator (rule \rulename{(c-rem)} cannot be applied),
+%($\NA$ is not in the multiset of names that are to be removed) 
+and also the authorization is specified as already removed from the context (rule \rulename{(c-skip)} cannot be applied). 
+% ($\NA$ is in the multiset of names that have already been removed by the operator). 
+
+%In the rule where the authorization is preserved in the context \rulename{(c-skip)}, we check if the name is not in the second multiset
+%, hence only authorizations that were not already removed proceeding towards the hole can be preserved, ensuring that the removed authorizations  are the ones nearest to the hole.
+%For example, $\ophole{\scope\NA\;\cdot\;}{\emptyset}{ \{\NA\}}$ is undefined 
+%since neither rule \rulename{(c-rem)} can be applied 
+%($\NA$ is not in the multiset of names that are to be removed) 
+%nor rule \rulename{(c-skip)} can be applied ($\NA$ is in the multiset of names that 
+%have already been removed by the operator). 
+\item 
+In rule~\rulename{(c-par)} the operator seamlessly proceeds towards the one of the branches.
+\end{itemize}
+When defining the operator one specifies the context and the names of authorizations that are to be removed, while the multiset of names of authorizations that have been removed is obviously empty.
+%Note that when defining the operator for some context $\context[\cdot]$ and some multiset  of names $\rho$ that are to be removed from the context, no authorizations have been removed and the respective multiset  $\rho'$ is empty.
+We illustrate the application of the operator with two simple examples. 
+
+
+
+
+% For example,
+
+\begin{example}[$\operator$ for one hole contexts]
+%We next show possible applications of the $\operator$ operator for some simple examples.
+\begin{align*}
+ & \ophole{ \scope\NA \,\cdot\,}{ \NA }{ \emptyset }= \cdot                     \\
+ & \ophole{ \scope\NA (\scope\NA \,\cdot \parop R) }{ \NA }{ \emptyset }= \scope\NA (\,\cdot \parop R)  \\
+  & \ophole{ \,\cdot\, }{ \NA }{ \emptyset } \text{  is undefined }  \\
+ & \ophole{ \scope\NA \scope\NA \,\cdot\,}{ \NA,\NA } { \emptyset } = \cdot                    \\
+&  \ophole{ \scope\NA  \,\cdot\,}{ \NA,\NB } { \emptyset } \text{ is undefined }   \\
+ & \ophole{ \scope\NA \,\cdot \parop \scope \NB \inact }{ \NA,\NB } { \emptyset } \text{ is undefined.}
+\end{align*}
+\end{example}
+
+
+\begin{example}[$\operator$ derivation]
+Let us again consider the second application of the operator in the example above
+\[
+     \ophole{ \scope\NA (\scope\NA \,\cdot \parop R) }{ \NA }{ \emptyset }= \scope\NA (\,\cdot \parop R)
+\]
+and let us show the derivation conducted. 
+%so as to provide further intuition on the definition of $\operator$. 
+Necessarily, at the top of the derivation, only an axiom can be applied. The only axiom in Table~\ref{tab:op_for_one_hole} rule \rulename{(c-end)} requires that the first multiset must be empty at the root, in order for the derivation to be defined. %says that any derivation using the rules in Table~\ref{tab:opwhole}
+%is defined only if the first multiset is empty at the root. 
+Observing all rules, we may notice that only \rulename{(c-rem)} manipulates names in the two multisets by transferring names from the first to the second multiset. Hence, the sum of the two multisets is preserved invariant in the rules.
+Thus, we can conclude the derivation in our example is rooted by $\ophole{\cdot}{\emptyset}{\NA}= \cdot\;$ by axiom \rulename{(c-end)}.
+We then consider the authorization $\scope\NA$ that directly scopes the hole, and by \rulename{(c-rem)} we have that 
+\[
+\inferrule{\ophole{\,\cdot\,}{\emptyset}{\NA}= \cdot}
+{\ophole{\scope\NA\,\cdot\,}{\NA}{\emptyset}= \cdot}
+\]
+In this case, rule \rulename{(c-skip)} could not be applied instead, since $\NA$ is in the second multiset.
+After that, the process in parallel in the context is handled by rule \rulename{(c-par)} 
+\[
+\inferrule{\ophole{\scope\NA\,\cdot\,}{\NA}{\emptyset}= \cdot}
+{\ophole{\scope\NA\,\cdot \parop \PR}{\NA}{\emptyset}= \cdot \parop \PR}
+\]
+Then, we can complete the derivation by rule \rulename{(c-skip)}
+\[
+\inferrule{\ophole{\scope\NA\,\cdot \parop \PR}{\NA}{\emptyset}= \cdot \parop \PR}
+{\ophole{\scope\NA(\scope\NA\,\cdot \parop \PR)}{\NA}{\emptyset}= \scope\NA(\,\cdot \parop \PR)}
+\]
+ 
+
+We may observe that starting the derivation from the bottom we could first apply \rulename{(c-rem)} and  deduce 
+$\ophole{\scope\NA(\scope\NA\,\cdot \parop \PR)}{\NA}{\emptyset}= \context[\cdot]$, for some $\context$. However, in that case the name $\NA$ is transferred to the ``has been removed'' multiset, and moving up in the derivation, after applying \rulename{(c-par)}, the derivation gets stuck as none of the rules \rulename{(c-rem)} nor \rulename{(c-skip)} can be applied for the authorization that directly scopes the hole (cf. the example given in the explanation of rule \rulename{(c-skip)}). 
+\end{example}
+
+The only derivations for the operator we are interested in consider in the bottom of the derivation the set of removed authorizations is empty, while at the top of the derivation the set of to be removed authorizations is empty. This implies that in order for the operator to be defined all the authorizations specified as to be removed from the context at the beginning were found and have been removed in the resulting context.
+%Consider that the only derivations 
+%we are interested in specify in the conclusion that the second multiset is empty and in the root that the first multiset is empty. Hence, 
+%all the names are transferred from the first to the second multiset, between conclusion and axiom, by means of rule \rulename{(c-rem)}. 
+Furthermore, in the derivation tree, the rule \rulename{(c-rem)} is always used above the rule \rulename{(c-skip)} for a given name, as ensured by the side condition of the latter rule.
+
+
+% The operator $\opholes{\context[\cdot_1,\cdot_2]}{\tilde{\NA}}{ \tilde{\NB}}{ \tilde \ND}{ \tilde{\NE}}$, defined inductively by the rules shown in Table~\ref{tab:op_for_two_holes}, takes as arguments a context with two holes, two lists of names $\tilde {\NA}$ and $\tilde {\NB}$ representing the names of authorizations which are to be removed and two list of names $ \tilde \ND$ and $ \tilde{\NE}$ representing names of authorizations already removed. Lists 
+%$\tilde {\NA}$ and $\tilde{\ND}$ refer to the $\cdot_1$ hole while $\tilde{\NB}$ and $\tilde{\NE}$ refer to the $\cdot_2$ hole. 
+
+%We briefly describe the rules reading from conclusion to premise. 
+%
+\begin{table}[t]
+\[
+\begin{array}{c} %@{\quad}l}
+%\qquad
+ \inferrule[(c2-spl)]{
+\ophole{\context_1[\cdot_1]}{ \rho_1
+%\tilde{\NA}
+}{ \rho_1'
+%\tilde \ND
+} = \context_1'[\cdot] \quad 
+\ophole{\context_2[\cdot_2]}{ \rho_2
+%\tilde{\NB}
+}{ \rho_2'
+%\tilde \NE
+} = \context_2'[\cdot]}
+{
+\opholes{\context_1[\cdot_1]\parop\context_2[\cdot_2]}{\rho_1
+%\tilde{\NA}
+}{\rho_2
+%\tilde{\NB}
+}{\rho_1'
+%\tilde \ND
+} { \rho_2'
+%\tilde \NE
+}= \context_1'[\cdot_1]\parop\context_2'[\cdot_2]}
+ \vspace{2ex}\\
+\inferrule[(c2-rem-l)]{
+\opholes{\context[\cdot_1,\cdot_2]}{ \rho_1
+%\tilde{\NA}
+}{ \rho_2
+%\tilde{\NB}
+}{ \rho_1'\uplus\{\NA\}
+%\tilde \ND, \NC
+}{\rho_2' 
+%\tilde \NE
+} = \context'[\cdot_1,\cdot_2] }
+{
+\opholes{\scope\NA\context[\cdot_1,\cdot_2]}{ \rho_1\uplus\{\NA\}
+%\tilde{\NA},\NC\,
+}{\rho_2
+%\tilde{\NB}
+}{\rho_1'%\tilde \ND
+}{ \rho_2'
+%\tilde{\NE}
+}= \context'[\cdot_1,\cdot_2]}
+\vspace{2ex}\\
+\inferrule[(c2-rem-r)]{
+\opholes{\context[\cdot_1,\cdot_2]}{\rho_1
+%\tilde{\NA}
+}{ \rho_2
+%\tilde{\NB}
+}{\rho_1' 
+%\tilde \ND
+}{\rho_2'\uplus\{\NA\}
+%\tilde \NE, \NC
+} = \context'[\cdot_1,\cdot_2]
+}
+{
+\opholes{\scope\NA\context[\cdot_1,\cdot_2]}{\rho_1
+%\tilde{\NA}
+}{\rho_2\uplus\{\NA\}
+%\tilde{\NB},\NC\, 
+}{\rho_1'
+%\tilde \ND
+}{\rho_2'
+%\tilde{\NE}
+}= \context'[\cdot_1,\cdot_2]}
+ \vspace{2ex}\\
+\inferrule[(c2-skip)]{
+\opholes{\context[\cdot_1,\cdot_2]}{ \rho_1
+%\tilde{\NA}
+}{\rho_2
+%\tilde{\NB}
+}{\rho_1'
+%\tilde \ND
+}{\rho_2'
+%\tilde{\NE}
+} = \context'[\cdot_1,\cdot_2] \quad \NA \not \in \rho_1'\uplus\rho_2'
+%\tilde \ND, \tilde{\NE}
+}
+{
+\opholes{\scope\NA\context[\cdot_1,\cdot_2]}{
+\rho_1
+%\tilde{\NA}
+}{
+\rho_2
+%\tilde{\NB}
+}{\rho_1'
+%\tilde \ND
+}{\rho_2'
+%\tilde{\NE}
+}= \scope\NA\context'[\cdot_1,\cdot_2]}
+ \vspace{2ex}\\
+ \inferrule[(c2-par)]{
+\opholes{\context[\cdot_1,\cdot_2]}{ \rho_1
+%\tilde{\NA}
+}{\rho_2
+%\tilde{\NB}
+}{\rho_1'
+%\tilde \ND
+}{\rho_2'
+%\tilde{\NE}
+} = \context'[\cdot_1,\cdot_2]}
+{
+\opholes{\context[\cdot_1,\cdot_2]\parop\PR}{\rho_1
+%\tilde{\NA}
+}{\rho_2
+%\tilde{\NB}
+}{\rho_1' 
+%\tilde \ND
+}{\rho_2'
+%\tilde{\NE}
+}= \context'[\cdot_1,\cdot_2]\parop\PR}
+\end{array}
+\]
+\caption{\label{tab:opwhole} ${\operator}$ on contexts with two holes.}
+\end{table}
+%
+%\paragraph{{Drift  for contexts with two holes}}
+%
+Operator $\operator$ for contexts with two holes is defined by the rules given in Table~\ref{tab:opwhole}.
+%both for contexts with one hole %$\ophole{\context[\cdot]}{\tilde{\NA}}{ \tilde \ND }$
+%(rules prefixed with $\rulename{c-}$) 
+%and for contexts with two holes 
+%%$\opholes{\context[\cdot_1,\cdot_2]}{\tilde{\NA}}{ \tilde{\NB}}{ \tilde \ND}{ \tilde{\NE}}$ 
+%(rules prefixed with $\rulename{c2-}$). 
+In this case, the operator 
+\[
+     \opholes{\context[\cdot_1,\cdot_2]}{\rho_1
+ %\tilde{\NA}
+ }{\rho_2
+ %\tilde{\NB}
+ }{\rho_1'
+ %\tilde \ND
+ }{\rho_2'
+ %\tilde{\NE}
+ }
+ \]
+ takes as arguments a two-hole context, two multisets
+ %lists 
+ of names $\rho_1
+ %\tilde {\NA}
+ $ and $\rho_2
+ %\tilde {\NB}
+ $ representing the names of authorizations which are to be removed and two multisets
+ %lists
+  of names $\rho_1'
+  %\tilde \ND
+  $ and $\rho_2'
+  %\tilde{\NE}
+  $ representing names of authorizations already removed. Multisets indexed with $1$ refer to the $\cdot_1$ hole, and multisets indexed with $2$ refer to the $\cdot_2$ hole.
+  %Lists 
+%$\rho_1
+%\tilde {\NA}
+%$ and $\rho_1'
+%\tilde{\ND}
+%$ refer to the $\cdot_1$ hole while $\rho_2
+%\tilde{\NB}
+%$ and $\rho_2'
+%\tilde{\NE}
+%$ refer to the $\cdot_2$ hole.
+%For the sake of defining reduction, where a pair of interacting processes must be identified, we require a 
+%generalization of the operation to contexts with two holes.
+
+
+In rule \rulename{(c2-spl)} the operator for the two-hole context, where the context is a parallel composition of two one-hole contexts, is decomposed into two operators for one-hole context, considering the multisets of names 
+$\rho_1$ and $\rho_1'$ for the $1$ indexed context, and
+$\rho_2$ and $\rho_2'$ for the $2$ indexed context. The rest of the rules in Table~\ref{tab:opwhole} follow exactly the same lines of the ones for contexts with one hole, where authorization removal addresses left and right hole in a dedicated way.
+%
+%For example,
+We illustrate the applications of the operator for contexts with two holes by the next example.
+
+\begin{example}[$\operator$ for two hole contexts]
+
+\[
+  \begin{array}{l}
+    \opholes{\scope\NB \scope \NA \scope \NA (\, \cdot_1 \parop \cdot_2\,) }{ \NA,\NB}{\NA}{\emptyset}{\emptyset} = \,\cdot_1 \parop \cdot_2 \\
+    \opholes{\scope\NB \scope \NA ( \,\cdot_1 \parop \scope\NA\, \cdot_2\,) }{ \NA,\NB}{\NA}{\emptyset}{\emptyset} = \,\cdot_1 \parop \cdot_2 \\% = \cdot \parop \cdot \\
+    \opholes{\scope\NA\scope\NA  \,\cdot_1 \parop \scope\NA \,\cdot_2 \,}{ \NA,\NA }{\NA}{\emptyset}{\emptyset} = \,\cdot_1 \parop \cdot_2 \\
+    \opholes{\scope\NB\scope\NA ( \,\cdot_1 \parop \cdot_2\,)}{ \NA,\NB}{\NA}{\emptyset}{\emptyset} \text{ is undefined.}\\
+        \opholes{  \scope\NA\cdot_1 \parop  \scope\NA \scope\NB\, \cdot_2}{ \NA,\NB}{\NA}{\emptyset}{\emptyset} \text{ is undefined.} \\
+    \opholes{\scope\NB ( \,\cdot_1 \parop \scope\NA \scope\NA\, \cdot_2\,)}{ \NA,\NB}{\NA}{\emptyset}{\emptyset} \text{ is undefined.} \\
+  \end{array}
+\]
+\end{example}
+
+%
+%Notice that 
+Rule \rulename{(c2-spl)} makes the derivation for the case of two holes to rely % at some point 
+on the derivations for the cases of one hole and is possible only if the axioms for empty contexts hold (cf. \rulename{(c-end)}). 
+Hence, the operator for a two-hole context is undefined if the required authorizations for any of the holes are lacking. Again, when defining the operator, none of the authorizations have been removed and 
+%lists $\tilde{\ND}$ and $\tilde{\NE}$
+multisets $\rho_1'$ and $\rho_2'$ are empty. Therefore, we abbreviate $\ophole{\context[\cdot]}{\rho
+%\tilde{\NA}
+}{ \emptyset }$ with $\operator(\context[\cdot]; \rho
+%\tilde{\NA}
+)
+$ and $\opholes{\context[\cdot_1,\cdot_2]}{
+\rho_1
+%\tilde{\NA}
+}{\rho_2
+%\tilde{\NB}
+}{ \emptyset}{ \emptyset}$ with
+$\optop{\context[\cdot_1,\cdot_2]}{\rho_1
+%\tilde{\NA}
+}{\rho_2
+%\tilde{\NB}
+}$.
+
+%\paragraph{{Reduction rules}}
+\begin{table}[t]
+\[
+\begin{array}[t]{@{}c@{\quad}c@{}}
+{\inferrule[(r-comm)]{\optop{\context[\cdot_1,\cdot_2]}{\NA}{\NA} = \context^-[\cdot_1 ,\cdot_2 ]}
+{\context [\send\NA\role\msg\NB.\PP,\receive\NA\role\msg{x}.\PQ]
+\red
+\context^-[\scope{\NA}\PP,\scope{\NA}\PQ\subst{\NB}{x}]}
+}
+%\multicolumn{2}{c}
+%{\inferrule[(r-rep-comm)]{\new{\context^-[\cdot_1,\cdot]=\operator(\context 
+%[\cdot,\cdot]; \NA;\emptyset)}}
+%{\context [\send\NA\role\msg\NB.\PP,\repreceive\NA\role\msg{x}.\PQ]
+%\red
+%\context^-[\scope{\NA}\PP, \scope{\NA}\PQ\subst{\NB}{x} \parop 
+%\repreceive\NA\role\msg{x}.\PQ])
+%}}
+%\\\\
+&
+{\inferrule[(r-auth)]{
+\optop{\context[\cdot_1,\cdot_2]}{\NA,\NB}{\NA} = \context^-[\cdot_1 ,\cdot_2 ]}
+%\new{\context^-[\cdot,\cdot]=\operator(\context [\cdot ,\cdot ]; \NA,\NB;\NA)}}
+{\context [\sauth\NA\role\msg\NB.\PP,\rauth\NA\role\msg\NB.\PQ]
+\red
+\context^- [\scope{\NA}\PP, \scope{\NA}\scope{\NB}\PQ)]
+}}
+ \vspace{2ex}\\
+\inferrule[(r-stru)]
+{\PP \equiv \PP' \red \PQ' \equiv \PQ}
+{\PP \red \PQ}
+&
+%\inferrule[(r-parc)]
+%{\PP \red \PQ}
+%{\PP \parop \PR \red \PQ \parop \PR}
+%&
+\inferrule[(r-newc)]
+{\PP \red \PQ}
+{\rest\NA \PP \red \rest\NA \PQ}
+%&
+%\inferrule[(r-autc)]
+%{\PP \red \PQ}
+%{\scope\NA \PP \red \scope\NA \PQ}
+\end{array}
+\]
+\caption{\label{tab:Reduction}Reduction rules.}
+\end{table}
+
+At this point, we may now proceed to present the reduction rules. The reduction relation ($\red$) is the least sub-relation of ${\cal \PP}\times{\cal \PP}$ that satisfies the rules shown in Table \ref{tab:Reduction}.
+\begin{itemize}
+\item 
+In rule \rulename{(r-comm)} the two processes can synchronize their dual actions sending and receiving $\NB$  on name $\NA$ only if the actions of both processes are authorized in the context, that is if both are under the scope of, at least one per each process, authorization for name ${\NA}$. The resulting process specifies the context where the two authorizations for $\NA$ have been removed by the $\operator$ operator, and are confined to the continuations of the communication prefixes $\PP$ and $\PQ$.
+%In rule \rulename{(r-rep-comm)} at least one authorization is required only for the process willing to output, replicated input is authorized by the definition. After the reduction another copy of the  process with replicated input is created in parallel, and the operator $\operator$ only deletes one appearance of authorization $\scope{\NA},$ closest to the output prefix.
+\item 
+ Similarly to the previous rule, in \rulename{(r-auth)} the two processes can synchronize delegating and receiving authorization for name $\NB$  on name $\NA$ only if in the context the first hole is scoped with authorizations for $\NB$ and $\NA$, and the second hole is scoped with authorization for $\NA$. %, again, 
+%if both processes are authorized to perform an action on name $\NA$. 
+The resulting process uses the context where the three authorizations 
+have been removed by the $\operator$ operator. %Notice that 
+The authorization for $\NB$ is explicitly exchanged since the operator removes the authorization for the delegating process, while the authorization is confined to the receiving process.
+\item 
+%Finally, 
+In rule \rulename{(r-stru)} the reduction relation is closed under structural congruence relation. 
+\item 
+Finally, in rule  \rulename{(r-newc)} the reduction relation is closed under the restriction construct $\rest\NA$. 
+\end{itemize}
+When compared with the reduction rules for $C_\pi$ given in Table~\ref{tab:Cpi-reduction}, we may notice that here we do not have rules that deal with parallel composition and authorization scoping.  These constructs are already addressed by the %static 
+contexts in \rulename{(r-comm)} and \rulename{(r-auth)}. Similarly to $C_\pi$, here we also have no rule dealing with the replicated input, since using the structural congruence rule \rulename{(sc-rep)}, a single copy of replicated process may be secluded and take a part in a synchronization captured by \rulename{(r-comm)}.
+
+
+
+
+
+We may now show how a general form of replication $\rep\PP$ (used in the previous chapter) can be represented by the replicated input. If we consider process
+\[
+\rest\NA(\scope\NA(\PP \parop \send\NA\role\msg\NA.\inact) \parop \repreceive\NA\role\msg\NX.(\PP \parop \send\NA\role\msg\NA.\inact))
+\]
+where $\NA\not\in\fn\PP$, we may observe that in  %two 
+ one step it reduces to 
+\[
+\PP \parop \rest\NA(\scope\NA(\PP \parop \send\NA\role\msg\NA.\inact) \parop \repreceive\NA\role\msg\NX.(\PP \parop \send\NA\role\msg\NA.\inact)).
+\]
+where in parallel with the original process a copy of process $\PP$ is activated. Hence, this way we may mimic the behavior of process $\rep\PP$.
+%Notice that the usage of name $\NA$ is controlled, and that the process $\scope\NA(\PP \parop \send\NA\role\msg\NA.\inact)$ does not require any further  authorizations on $\NA$.
+
+
+When our work is compared with the previous works for authorizations, one may notice that reduction semantics of~\cite{clar:eke} relies on more standard machinery. Their structural congruence relation is expressive enough to isolate the active prefixes willing to synchronize, while our reduction relation relies on the defintions of static contexts and the $\operator$ operator. However, one may also notice that the LTS of~\cite{clar:eke} is more complex than the one presented in the previous section. As we already discussed, our definition of reduction relation relies on the novel technical machinery so as to cope with the notion of accounting we explore here. These differences are further elaborated with technical insights given in Section~\ref{sec:Bisimulation}. % that lead us to think we cannot state a standard normal form result (in contrast with \cite{clar:eke}). 
+
+
+By an example, we now show a key difference in accounting principles considered in~\cite{clar:eke} and here.
+
+\begin{example}[On authorization accounting]
+\label{ex_machinery}
+As we have noted, reduction semantics of process algebra in~\cite{DBLP:journals/corr/GhilezanJPPV16, clar:eke}  introduces the  structural congruence rule $\scope \NA (P \parop Q)\equiv \scope\NA  P \parop \scope\NA Q$. The logic behind is that an authorization for a name given to a process should make all of its threads authorized to use the name. Now consider that this implies 
+\[
+  \scope\NB( \scope\NA \sauth\NA\role\msg\NB.\PP | \scope\NA \rauth\NA\role\msg\NB.\PQ ) \equiv 
+  \scope\NB \scope\NA \sauth\NA\role\msg\NB.\PP | \scope\NB\scope\NA \rauth\NA\role\msg\NB.\PQ \red 
+  \scope\NA \PP  | \scope \NB \scope\NB\scope\NA.\PQ 
+\]
+where in the original process one authorization for $\NB$ is shared between the two branches, but after applying the mentioned structural congruence rule and authorization delegation we end up in a situation where the rhs branch owns two authorizations for $\NB$.
+This is directly in conflict with our authorization accounting principle, since it allows changing the number of authorizations in the system. % (cf. the discussion in the beginning of Section~\ref{subsec:reduction} and Proposition~\ref{prop:behavior_auth_and?parallel}).  In our interpretation, we have that process
+In our model, process
+\[
+ \scope\NB( \scope\NA \sauth\NA\role\msg\NB.\PP | \scope\NA \rauth\NA\role\msg\NB.\PQ )
+\text{ can evolve in one step to }
+\scope\NA \PP | \scope\NB \scope \NA \PQ
+\]
+where the number of authorizations is stable, since upon delegation the only authorization for $\NB$ is confined to the process on the rhs. 
+%
+%Notice that in the former reduction the number of authorizations for $\NB$ is not stable, in contrast with the latter reduction. 
+%The inconsistency is due to the different interpretations and much better explained by the authorization distribution principle as mentioned now in the concluding remarks (in the paragraph mentioned previously, page 23). 
+\end{example}
+
+
+\subsection{Harmony result}\label{sec:harmony_result}
+In Section~\ref{sec:Cpi-reduction-semantics} we have seen that the result of matching tau transitions of the LTS and reductions of the reduction semantics in $C_\pi$ is simply inherited from the $\pi$-calculus (Theorem~\ref{th:Cpi_harmony}). 
+In this section, we show the analogous result for our calculus of floating authorizations. We aim to prove that a process $\PP$ reduces to $\PQ$ if and only if $\PP$ has fully authorized transition $\tau$ to a process that is structurally equivalent to $\PQ$. To this end we present several auxiliary results.
+Our first auxiliary result allows distinguishing free and bound names of the action.
+
+
+\begin{lemma}[Inversion on labelling]{\label{lemm:free_names}}
+Let $\PP\lts{\alpha}\PQ.$
+\begin{itemize}
+\item[1.] If $\alpha=\scope\NA^i\send\NA\role\msg\NB$ then $\NA,\NB\in\fn\PP.$
+\item[2.] If $\alpha={\scope\NA^i\rest\NB}\send\NA\role\msg\NB$ then $\NA\in\fn\PP$ and $\NB\in\bn\PP.$
+\item[3.] If $\alpha=\scope\NA^i\receive\NA\role\msg\NB$ then $\NA\in\fn\PP.$
+\item[4.] If $\alpha=\scope\NA^i\scope\NB^j\sauth\NA\role\msg\NB$ then $\NA,\NB\in\fn\PP.$
+\item[5.] If $\alpha=\scope\NA^i\rauth\NA\role\msg\NB$ then $\NA,\NB\in\fn\PP.$
+\end{itemize}
+\end{lemma}
+\begin{proof}
+The proof is by induction on the inference of $\PP\lts{\alpha}\PQ$, and it follows the same lines as proof of Lemma~\ref{lemm:fo-and-transitions}.
+\end{proof}
+
+We may now show that the structural congruence relation ``agrees'' with the LTS, in the sense that if a process can perform an action then a structurally equivalent process can perform the same action and the two resulting processes are again related by structural congruence.
+
+\begin{lemma}[LTS and structural congruence] {\label{lemm:lts_struct_congruence}}
+If $\PP\equiv\PP'$ and $\PP\lts{\alpha}\PQ,$ then there exists some $\PQ'$ such that $\PP'\lts{\alpha}\PQ'$ and $\PQ\equiv\PQ'.$
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the length of the derivation of $\PP\equiv\PP'.$ 
+We only detail the case when the last applied rule is \rulename{(sc-res-extr)}, i.e., $\PP_1\parop\rest\NA\PP_2\equiv\rest\NA(\PP_1\parop\PP_2)$, for $\NA\notin\fn{\PP_1}.$ 
+We have two possibilities to derive $\rest\NA(\PP_1\parop\PP_2)\lts{\alpha}\PP'$, and that is by \rulename{(l-res)} and \rulename{(l-open)}.
+\begin{itemize}
+\item \emph{Case} \rulename{(l-res)}: Assume that $\rest\NA(\PP_1\parop\PP_1)\lts{\alpha} \rest\NA\PR,$ where $\NA\notin\n\alpha$ is derived from $(\PP_1\parop\PP_2)\lts{\alpha} \PR.$ Then, the possible transitions for $\PP_1\parop\PP_2$ are:
+	
+	-\rulename{(l-par)}: Assume $\PP_1\parop\PP_2\lts{\alpha}\PP_1\parop\PP_2',$ where $\bn{\alpha}\cap\fn{\PP_1}=\emptyset$, is derived from $\PP_2\lts{\alpha}\PP_2'$. We have that  
+	\[
+	\rest\NA(\PP_1\parop\PP_1)\lts{\alpha} \rest\NA(\PP_1 \parop \PP_2')
+	\]
+	Since $\NA\notin\n\alpha,$ by \rulename{(l-res)} we have $\rest\NA\PP_2\lts{\alpha}\rest\NA\PP_2'$ and by \rulename{(l-par)}we conclude  
+	\[
+	\PP_1\parop\rest\NA\PP_2\lts{\alpha}\PP_1\parop\rest\NA\PP_2'
+	\]
+	If the symmetric case of rule \rulename{(l-par)} is applied, the proof follows the same lines. %If  $\PP_1\parop\PP_2\lts{\alpha}\PP_1'\parop\PP_2,$ where $\bn{\alpha}\cap\fn{\PP_2}=\emptyset$ is derived from $\PP_1\lts{\alpha}\PP_1'$, then, since $\fn{\rest\NA\PP_2}\subseteq\fn{\PP_2},$ by \rulename{(l-par)} we get $\PP_1\parop\rest\NA\PP_2\lts{\alpha}\PP_1'\parop\rest\NA\PP_2.$
+	
+	-\rulename{(l-comm)}: Assume $\PP_1\parop\PP_2\lts{\alpha}\PP_1'\parop\PP_2'$, where $\alpha=\tau_{\omega}$ and $\omega=\scope\NB^{i+j}$, is derived from $\PP_1\lts{\alpha_1}\PP_1'$ and $\PP_2\lts{\alpha_2}\PP_2',$ where $\alpha_1,\alpha_2\in\{\scope\NB^i\send\NB\role\msg\NC, \scope\NB^j\receive\NB\role\msg\NC\}.$ Then, we have
+	\[
+	\rest\NA(\PP_1\parop\PP_1)\lts{\tau_\omega} \rest\NA(\PP_1' \parop \PP_2')
+	\]
+	By Lemma~\ref{lemm:free_names} we conclude $\NB\in\fn{\PP_1,\PP_2}.$ Thus, from $\NA\notin\fn{\PP_1}$ we have that $\NB\not=\NA.$ We now distinguish two cases:
+		
+		 * \emph{if $\NC=\NA$ and  $\alpha_2=\scope\NB^i\send\NB\role\msg\NA$}. By \rulename{(l-open)} $\rest\NA\PP_2\lts{{\scope\NB^i\rest\NA\send\NB\role\msg\NA}}\PP_2'$ and by \rulename{(l-close)} 
+		 \[
+		 \PP_1\parop\rest\NA\PP_2\lts{\tau_\omega}\rest\NA(\PP_1'\parop\PP_2')
+		 \]
+		
+		* \emph{if $\NC\not=\NA$}, then by \rulename{(l-res)} $\rest\NA\PP_2\lts{\alpha_2}\rest\NA\PP_2'$ and by \rulename{(l-comm)} 
+		\[
+		\PP_1\parop\rest\NA\PP_2 \lts{\tau_\omega}\PP_1'\parop\rest\NA\PP_2'
+		\] 
+		
+	- \rulename{(l-close)}: Assume $\PP_1\parop\PP_2\lts{\alpha}\rest\NC(\PP_1'\parop\PP_2')$, where $\alpha=\tau_{\omega}$ and $\omega=\scope\NB^{i+j}%{2-i-j}
+	$, is derived from  $\PP_1\lts{\alpha_1}\PP_1'$ and $\PP_2\lts{\alpha_2}\PP_2',$ where $\alpha_1,\alpha_2\in\{{\scope\NB^i\rest\NC\send\NB\role\msg\NC}, \scope\NB^j\receive\NB\role\msg\NC\}$. Hence, 
+	\[
+	\rest\NA(\PP_1\parop\PP_1)\lts{\tau_\omega} \rest\NA\rest\NC(\PP_1' \parop \PP_2')
+	\] 
+	
+	By Lemma~\ref{lemm:free_names} we have $\NB\in\fn{\PP_1,\PP_2}$.  Since $\NA\notin\fn{\PP_1}$ and assuming all bound names are different, we conclude $\NA\notin\{\NB,\NC\}.$ Thus, by \rulename{(l-res)} $\rest\NA\PP_2\lts{\alpha_2}\rest\NA\PP_2'$ and by \rulename{(l-close)} we conclude 
+	\[
+	\PP_1\parop\rest\NA\PP_2 \lts{\tau_\omega}\rest\NC(\PP_1'\parop\rest\NA\PP_2')
+	\]
+	
+	- \rulename{(l-auth)}: Assume $\PP_1\parop\PP_2\lts{\alpha}\PP_1'\parop\PP_2'$, where $\alpha=\tau_{\omega}$ and $\omega=\scope\NB^{i+j}%{2-i-j}
+	\scope\NC^{k}%{1-k}
+	$, is derived from $\PP_1\lts{\alpha_1}\PP_1'$ and $\PP_2\lts{\alpha_2}\PP_2'$, where $\alpha_1,\alpha_2\in\{\scope\NB^i\scope\NC^k\sauth\NB\role\msg\NC, \scope\NB^j\rauth\NB\role\msg\NC\}$. Thus,
+	\[
+	\rest\NA(\PP_1\parop\PP_1)\lts{\tau_\omega} \rest\NA(\PP_1' \parop \PP_2')
+	\]
+	
+	By Lemma~\ref{lemm:free_names} we have $\NC,\NB\in\fn{\PP_1,\PP_2}.$ Since $\NA\notin\fn{\PP_1}$ we conclude $\NA\notin\{\NB,\NC\}.$ Therefore, by \rulename{(l-res)} $\rest\NA\PP_2\lts{\alpha_2}\rest\NA\PP_2'$ and by \rulename{(l-auth)} 
+	\[
+	\PP_1\parop\rest\NA\PP_2 \lts{\tau_\omega}\PP_1'\parop\rest\NA\PP_2'
+	\]
+
+\item \emph{Case} \rulename{(l-open)}: Assume that $\rest\NA(\PP_1\parop\PP_2)\lts{{\scope\NB^i\rest\NA}\send\NB\role\msg\NA} \PR$ is derived from
+ $\PP_1\parop\PP_2\lts{\scope\NB^i\send\NB\role\msg\NA} \PR,$ where $\NA\not=\NB.$ Since $\NA\notin\fn{\PP_1}$, by Lemma~\ref{lemm:free_names} we conclude $\PP_1\parop\PP_2\lts{\scope\NB^i\send\NB\role\msg\NA} \PR$ could only be derived using rule \rulename{(l-par)}. Hence, $\PR=\PP_1\parop \PP_2'$ and $\PP_2\lts{\scope\NB^i\send\NB\role\msg\NA}\PP_2'$. Then, by \rulename{(l-open)} $\rest\NA\PP_2\lts{{\scope\NB^i\rest\NA}\send\NB\role\msg\NA}\PP_2'$ and by \rulename{(l-par)} we conclude 
+ \[
+ \PP_1\parop\rest\NA\PP_2\lts{{\scope\NB^i\rest\NA}\send\NB\role\msg\NA}\PP_1\parop\PP_2'
+ \]
+\end{itemize}
+\end{proof}
+
+Using the structural congruence relation, static contexts and the operator $\operator$ we can characterize a process performing an action and the process that is the result of the action. This is given in our next result.
+
+\begin{lemma}[Inversion on LTS]{\label{lemm:inv_on_lts}}
+Let $\PP$ and $\PQ$ be processes.
+\begin{itemize}
+\item[1.] If $\PP\lts{{\scope\NA}\send\NA\role\msg\NB}\PQ$ then
+ $\PP\equiv\rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP']$ and $\PQ\equiv\rest{\tilde {\ND}}\context[\scope{\NA}\PP']$ and $\operator(\context[\cdot]; \NA)$ is undefined.
+\item[2.] If $\PP\lts{\send\NA\role\msg\NB}\PQ$ then
+ $\PP\equiv\rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP']$ and $\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope{\NA}\PP'],$ for $\context^-[\cdot]=\operator(\context[\cdot]; \NA)$.
+\item[3.] If $\PP\lts{{\scope\NA}\rest\NB\send\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\rest\NB\context[\send\NA\role\msg\NB.\PP']$ and 
+$\PQ\equiv\rest{\tilde {\ND}}\context[\scope{\NA}\PP']$ and $\operator(\context[\cdot]; \NA)$ is undefined.
+\item[4.] If $\PP\lts{\rest\NB\send\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\rest\NB\context[\send\NA\role\msg\NB.\PP']$ and 
+$\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope{\NA}\PP'],$ for $\context^-[\cdot]=\operator(\context[\cdot]; \NA)$.
+\item[5.] If $\PP\lts{{\scope\NA}\receive\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\context[\receive\NA\role\msg\NX.\PP']$ and 
+$\PQ\equiv\rest{\tilde {\ND}}\context[\scope{\NA}\PP'\subst{\NB}{\NX}]$ and $\operator(\context[\cdot]; \NA)$ is undefined. 
+\item[6.] If $\PP\lts{\receive\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\context[\receive\NA\role\msg\NX.\PP']$ and 
+$\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope{\NA}\PP'\subst{\NB}{\NX}],$ for $\context^-[\cdot]=\operator(\context[\cdot]; \NA)$. 
+\item[7.] If $\PP\lts{{\scope\NB}\sauth\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP']$ and  
+$\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope\NA\PP'],$ for $\context^-[\cdot]=\operator(\context[\cdot]; \NA)$ and  $\operator(\context[\cdot]; \NA,\NB)$ is undefined.
+\item[8.] If $\PP\lts{{\scope\NA}\sauth\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP']$ and  
+$\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope\NA\PP'],$ for $\context^-[\cdot]=\operator(\context[\cdot]; \NB)$ and $\operator(\context[\cdot]; \NA,\NB)$ is undefined.
+\item[9.]  If $\PP\lts{\sauth\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP']$ and  
+$\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope\NA\PP'],$ for $\context^-[\cdot]=\operator(\context[\cdot]; \NA,\NB)$.
+\item[10.] If $\PP\lts{{\scope\NA}\rauth\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\context[\rauth\NA\role\msg\NB.\PP']$ and 
+$\PQ\equiv\rest{\tilde {\ND}}\context[\scope\NA\scope{\NB}\PP']$ and \\
+$\operator(\context[\cdot]; \NA)$ is undefined;
+\item[11.] If $\PP\lts{\rauth\NA\role\msg\NB}\PQ$ then 
+$\PP\equiv\rest{\tilde {\ND}}\context[\rauth\NA\role\msg\NB.\PP']$ and 
+$\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope\NA\scope{\NB}\PP'],$ for $\context^-[\cdot]=\operator(\context[\cdot]; \NA)$.
+\item[12.] If $\PP\lts{\tau}\PQ$ then either
+	\begin{itemize}
+	\item $\PP\equiv \rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP'']$ and 
+	$\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope\NA\PP', \scope\NA\PP''\subst{\NB}{\NX}],$ for $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \NA;\NA),$ or 
+	\item $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP', \rauth\NA\role\msg\NB.\PP'']$ and 
+	$\PQ\equiv \rest{\tilde {\ND}}\context^-[\scope\NA\PP', \scope\NA\scope\NB\PP''],$ for\\ 
+	$\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \NA,\NB;\NA)$.
+	\end{itemize}
+\item[13.] If $\PP\lts{\tau_{\scope\NA}}\PQ$ then either
+	\begin{itemize}
+	\item  $\PP\equiv \rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP'']$ and $\PQ\equiv\rest{\tilde {\ND}}\context^-[\scope\NA\PP', \scope\NA\PP''\subst{\NB}{\NX}],$ for 
+	$\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ];  \NA; \emptyset),$ or $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \emptyset; \NA),$ and 
+	$\operator(\context[\cdot_1, \cdot_2 ]; \NA;\NA)$ is undefined, or
+	\item $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP', \rauth\NA\role\msg\NB.\PP'']$ and $\PQ\equiv \rest{\tilde {\ND}}\context^-[ \scope\NA\PP', \scope\NA\scope\NB\PP''],$ for \\
+	 $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ];\NA,\NB; \emptyset),$ or $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \NB; \NA),$ and
+	 $\operator(\context[\cdot_1, \cdot_2 ]; \NA,\NB;\NA)$ is undefined, or
+	\item $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NB\role\msg\NA.\PP', \rauth\NB\role\msg\NA.\PP'']$ and $\PQ\equiv \rest{\tilde {\ND}}\context^-[\scope\NB\PP', \scope\NB\scope\NA\PP''],$ for \\
+	$\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \NB;\NB)$  and $\operator(\context[\cdot_1, \cdot_2 ]; \NB,\NA;\NB)$ is undefined.
+	\end{itemize}	
+\item[14.] If $\PP\lts{\tau_{\scope\NA \scope\NA}}\PQ$ then either
+	\begin{itemize}
+	\item  $\PP\equiv \rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP'']$ and $\PQ\equiv\rest{\tilde {\ND}}\context[\scope\NA\PP', \scope\NA\PP''\subst{\NB}{\NX}]$ 
+	      and \\
+	      $\operator(\context[\cdot_1, \cdot_2 ]; \NA; \NA)$ is undefined, or
+	\item $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP', \rauth\NA\role\msg\NB.\PP'']$ and $\PQ\equiv \rest{\tilde {\ND}}\context^-[ \scope\NA\PP', \scope\NA\scope\NB\PP''],$ for \\
+	      $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ];\NB; \emptyset),$  and  $\operator(\context[\cdot_1, \cdot_2 ]; \NA, \NB; \NA)$ is undefined, or
+	\item $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NA.\PP', \rauth\NA\role\msg\NA.\PP'']$ and $\PQ\equiv \rest{\tilde {\ND}}\context^-[\scope\NA\PP', \scope\NA\scope\NA\PP''],$ for \\
+	     $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \emptyset;\NA)$ or $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \NA; \emptyset),$
+	     and $\operator(\context[\cdot_1, \cdot_2 ]; \NA, \NA; \NA)$ is undefined.
+	\end{itemize}
+\item[15.] If $\PP\lts{\tau_{\scope\NA \scope\NB}}\PQ$ and $\NA\neq \NB$ then 
+         $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP', \rauth\NA\role\msg\NB.\PP'']$ and\\
+         $\PQ\equiv \rest{\tilde {\ND}}\context^-[ \scope\NA\PP', \scope\NA\scope\NB\PP''],$ for 
+	      $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ];\NA; \emptyset)$ or $\context^-[\cdot_1,\cdot_2]=\operator(\context[\cdot_1, \cdot_2 ]; \emptyset; \NA)$, and $\operator(\context[\cdot_1, \cdot_2 ];  \NA,\NB; \NA)$ is undefined.
+\item[16.] If $\PP\lts{\tau_{\scope{\NA}^2 \scope\NB}}\PQ$ then 
+          $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP', \rauth\NA\role\msg\NB.\PP'']$ and\\ $\PQ\equiv \rest{\tilde {\ND}}\context[ \scope\NA\PP', \scope\NA\scope\NB\PP'']$ 
+	   and $\operator(\context[\cdot_1, \cdot_2 ]; \NA, \NB;\NA)$ is undefined.
+	\end{itemize}
+\end{lemma}
+\begin{proof}
+The proof is by induction on the derivation of $\PP\lts{\alpha}\PQ.$ We comment just on the first two assertions.
+
+$\mathit{1.}$ Suppose $\PP\lts{{\scope\NA}\send\NA\role\msg\NB}\PQ$ and let us show $\PP\equiv\rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP']$, and $\PQ\equiv\rest{\tilde {\ND}}\context[\scope\NA\PP']$, and $\operator(\context[\cdot]; \NA)$ is undefined.
+ The base case follows by rule \rulename{(l-out)} $\send\NA\role\msg\NB\PP\lts{{\scope\NA}\send\NA\role\msg\NB}\scope\NA\PP.$ Here, $\send\NA\role\msg\NB\PP=\context[\send\NA\role\msg\NB\PP]$ and $\scope\NA\PP=\context[\scope\NA\PP],$ where $\context[\cdot]=\cdot.$ The operator $\operator(\context[\cdot]; \NA)$ is undefined since the second parameter of the operator is not an empty multiset. %list.
+For induction steps we have next cases of the last applied rule: \rulename{(l-res)}, \rulename{(l-scope)} and \rulename{(l-par)}. 
+\begin{itemize}
+\item \emph{Case} \rulename{(l-res)}: the proof immediately follows from the induction hypothesis.
+% 
+\item \emph{Case} \rulename{(l-scope)}: here $\PP=\scope\NC\PP_1$ and $\PQ=\scope\NC\PQ_1$ and $\PP\lts{{\scope\NA}\send\NA\role\msg\NB}\PQ$ is derived from $\PP_1\lts{{\scope\NA}\send\NA\role\msg\NB}\PQ_1$, where $\NC\not=\NA.$ By induction hypothesis 
+\[
+\PP_1\equiv\rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP'] \text{ and } \PQ_1\equiv\rest{\tilde {\ND}}\context[\scope\NA\PP'] \text{ and } \operator(\context[\cdot]; \NA) \text{ is undefined.}
+\] 
+Considering all free and bound names are different, by \rulename{(sc-scope-auth)} we conclude $\scope\NC\PP_1\equiv\rest{\tilde {\ND}}\scope\NC\context[\send\NA\role\msg\NB.\PP']$ and $\scope\NC\PQ_1\equiv\rest{\tilde {\ND}}\scope\NC\context[\scope\NA\PP'].$ For $\context'[\cdot]=\scope\NC\context[\cdot]$ we have that  
+\[
+\PP\equiv\rest{\tilde {\ND}}\context'[\send\NA\role\msg\NB.\PP'] \text{ and } \PQ\equiv\rest{\tilde {\ND}}\context'[\scope\NA\PP'] \text{ and } \operator(\context'[\cdot]; \NA) \text{ is undefined }
+\] 
+since $\NC\not=\NA.$
+\item  \emph{Case} \rulename{(l-par)}: follows by similar reasoning.
+\end{itemize}
+
+
+
+
+$\mathit{2.}$ %Consider now $\PP\lts{\send\NA\role\msg\NB}\PQ.$
+The base case follows by rule \rulename{(l-scope-int)}: 
+$\scope\NA\PP\lts{\send\NA\role\msg\NB}\PQ$ is derived from $\PP\lts{{\scope\NA}\send\NA\role\msg\NB}\PQ.$ 
+By statement $1$. of this Lemma we have
+\[
+\PP\equiv\rest{\tilde {\ND}}\context'[\send\NA\role\msg\NB.\PP'] \text{ and } \PQ\equiv\rest{\tilde {\ND}}\context'[\scope\NA\PP'] \text{ and } \operator(\context'[\cdot]; \NA) \text{ is undefined.}
+\]  
+By Lemma~\ref{lemm:free_names} we have $\NA\in \fn\PP$, thus we conclude $\NA\not\in\tilde {\ND}.$ 
+If we define $\context[\cdot]=\scope\NA\context'[\cdot]$, by \rulename{(sc-scope-auth)} we have that $\scope\NA\PP\equiv\rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP'].$ 
+Now we only need to notice that
+\[
+\operator(\context[\cdot]; \NA)=\context'[\cdot]
+\] 
+Again, for the induction step we have that the last applied rule can be \rulename{(l-res)}, \rulename{(l-scope)} or \rulename{(l-par)}, and in all three cases the proof follows similar lines as in the first part.
+\end{proof}
+
+We are now ready to show the first implication of our main statement: if a process has $\tau$ transition, then it can also reduce to the same process.
+
+\begin{lemma}[Harmony: reduction]{\label{lemm:tau_reduction}}
+If $\PP\lts{\tau}\PQ$ then $\PP\red\PQ.$
+\end{lemma}
+\begin{proof}
+The proof is by induction on the derivation $\PP\lts{\tau}\PQ$. We have three base cases.
+\begin{itemize}
+\item \emph{Case} \rulename{(l-comm)}: $\PP_1\parop\PQ_1\lts{\tau}\PP_2\parop\PQ_2$ is derived from $\PP_1\lts{\alpha}\PP_2$ and $\PQ_1\lts{\dual\alpha}\PQ_2,$ where $\alpha,\dual\alpha\in\{\send\NA\role\msg\NB, \receive\NA\role\msg\NB\}.$ By Lemma~\ref{lemm:inv_on_lts} we conclude that
+\[
+\PP_1,\PQ_1\in\{\rest{\tilde {\ND_1}}\context_1[\send\NA\role\msg\NB.\PP_1'], \rest{\tilde {\ND_2}}\context_2[\receive\NA\role\msg\NX.\PQ_1'] \} \quad\text{ and}
+\]
+\[
+\PP_2,\PQ_2\in\{\rest{\tilde {\ND}}\context_1^-[\scope{\NA}\PP_1'], \rest{\tilde {\ND_2}}\context_2^-[\scope{\NA}\PQ_1'\subst{\NB}{\NX}]\}
+\]
+up to structural congruence relation, and where $\context_1^-=\operator(\context_1[\cdot]; \NA)$ and $\context_2^-=\operator(\context_2[\cdot]; \NA).$
+If we define $\context[\cdot_1, \cdot_2]=\context_1[\cdot_1]\parop \context[\cdot_2]$, by \rulename{(sc-res-extr)} we have
+ \[
+ \rest{\tilde {\ND_1}}\context_1[\send\NA\role\msg\NB.\PP_1']\parop \rest{\tilde {\ND_2}}\context_2[\receive\NA\role\msg\NX.\PQ_1'] \equiv \rest{\tilde {\ND_1},\tilde {\ND_2}}(\context[\send\NA\role\msg\NB.\PP_1', \receive\NA\role\msg\NX.\PQ_1']) \quad\text{ and}
+ \]
+ \[\rest{\tilde {\ND_1}}\context_1^-[\scope{\NA}\PP_1']\parop \rest{\tilde {\ND_2}}\context_2^-[\scope{\NA}\PQ_1'\subst{\NB}{\NX}]\equiv \rest{\tilde {\ND_1},\tilde {\ND_2}}\context^-[\scope{\NA}\PP_1',\scope{\NA}\PQ_1'\subst{\NB}{\NX}]
+ \]
+ where  $\context^-[\cdot_1, \cdot_2]=\operator(\context[\cdot_1, \cdot_2];\NA;\NA).$
+ Then, by \rulename{(r-comm)} and \rulename{(r-newc)} we conclude 
+\[
+\rest{\tilde {\ND_1},\tilde {\ND_2}}\context[\send\NA\role\msg\NB.\PP_1', \receive\NA\role\msg\NX.\PQ_1']\red \rest{\tilde {\ND_1},\tilde {\ND_2}}\context^-[\scope{\NA}\PP_1',\scope{\NA}, \PQ_1'\subst{\NB}{\NX}]
+\]
+% 
+% The proof is analogous if  
+% \[
+%\PP_1,\PQ_1\in\{\rest{\tilde {\ND_1}}\context_1[\send\NA\role\msg\NB.\PP_1'], \rest{\tilde {\ND_2}}\context_2[\repreceive\NA\role\msg\NB.\PQ_1'] \}
+%\]
+%and
+%\[
+%\PP_2,\PQ_2\in\{\rest{\tilde {\ND_1}}\context_1^-[\scope{\NA}\PP_1'], \rest{\tilde {\ND_2}}\context_2^-[\scope{\NA}\PQ_1'\subst{\NB}{\NX} \parop \repreceive\NA\role\msg\NB.\PQ_1']\},
+%\]
+%where $\context_1^-[\cdot]=\operator(\context_1[\cdot]; \NA)$ and $\context_2^-[\cdot]=\operator(\context_2[\cdot]; \emptyset)=\context_2[\cdot].$
+%
+\item \emph{Cases} \rulename{(l-close)} and  \rulename{(l-auth)}: follow by similar reasoning. %, where for the second we apply \rulename{(r-auth)} instead of rule \rulename{(r-comm)}.
+\end{itemize}
+We have four cases for the last applied rule.
+\begin{itemize}
+\item \emph{Case} \rulename{(l-res)}: $\rest\NA\PP\lts{\tau}\rest\NA\PQ$ is derived from $\PP\lts{\tau}\PQ.$ By induction hypothesis $\PP\red\PQ$ and by \rulename{(r-newc)} we conclude $\rest\NA\PP\red\rest\NA\PQ$. 
+%We get the proof by induction hypothesis and contextually of $\equiv.$ 
+%
+\item \emph{Case} \rulename{(l-scope-ext)}: $\scope\NA\PP\lts{\tau}\PQ$ is derived from $\PP\lts{\tau_{\scope\NA}}\PQ.$ By Lemma~\ref{lemm:inv_on_lts} we have three cases for the shape of processes $\PP$ and $\PQ$. We only detail the first case, i.e., when 
+\[
+\PP\equiv \rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP''] \text{ and }
+ \PQ\equiv\rest{\tilde {\ND}}\context^-[\scope\NA\PP', \scope\NA\PP''\subst{\NB}{\NX}]
+ \]
+  where $\context^-[\cdot_1, \cdot_2]=\operator(\context[\cdot_1, \cdot_2]; \NA;\emptyset),$ or $\context^-[\cdot_1; \cdot_2]=\operator(\context[\cdot_1, \cdot_2]; \emptyset; \NA),$ and
+  $\operator(\context[\cdot_1, \cdot_2]; \NA; \NA)$ is undefined. By rule
+   \rulename{(sc-scope-auth)} we derive 
+   \[
+   \scope\NA\PP\equiv \rest{\tilde {\ND}}\scope\NA\context[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP'']
+   \]
+Since $\operator(\scope\NA\context[\cdot_1, \cdot_2]; \NA;\NA)=\context^-[\cdot_1, \cdot_2]$, the proof for this case follows. % Thus, by \rulename{(r-comm)}, \rulename{(r-newc)} and \rulename{(r-stru)} we get the proof.
+\item \emph{Case} \rulename{(l-scope)}:  $\scope\NC\PP\lts{\tau}\scope\NC\PQ$ is derived from $\PP\lts{\tau}\PQ$. %or $\PP\parop\PR\lts{\tau}\PQ\parop\PR$ is derived from $\PP\lts{\tau}\PQ.$ By induction hypothesis $\PP\red\PQ.$ 
+By Lemma~\ref{lemm:inv_on_lts} we distinguish two cases. We comment only the first one, i.e., when  
+ \[
+ \PP\equiv \rest{\tilde {\ND}}\context[\send\NA\role\msg\NB.\PP_1, \receive\NA\role\msg\NB.\PP_2] \text{ and } 
+  \PQ\equiv \rest{\tilde {\ND}}\context^-[\scope\NA\PP_1, \scope\NA\PP_2\subst{\NB}{\NA}]
+  \] 
+  where $\context^-[\cdot_1, \cdot_2]=\operator(\context[\cdot_1, \cdot_2]; \NA; \NA)$.
+%   or  $\PP\equiv \rest{\tilde {\ND}}\context[\sauth\NA\role\msg\NB.\PP_1, \rauth\NA\role\msg\NB.\PP_2]$  and 
+%  $\PQ\equiv \rest{\tilde {\ND}}\context^-[\scope\NA\PP_1, \scope\NA\scope\NB\PP_2]$, where $\context^-[\cdot_1, \cdot_2]=\operator(\context[\cdot_1, \cdot_2]; \NA,\NB; \NA)$. 
+Then, by \rulename{(sc-scope-auth)} we have  
+\[
+\scope\NC\PP\equiv \rest{\tilde {\ND}}\scope\NC\context[\send\NA\role\msg\NB.\PP_1, \receive\NA\role\msg\NB.\PP_2] \text{ and } 
+\scope\NC \PQ\equiv \rest{\tilde {\ND}}\scope\NC\context^-[\scope\NA\PP_1, \scope\NA\PP_2\subst{\NB}{\NA}]
+\]
+%or   $\scope\NC\PP\equiv \rest{\tilde {\ND}}\scope\NC\context[\sauth\NA\role\msg\NB.\PP_1, \rauth\NA\role\msg\NB.\PP_2]$ where in the former case we get the proof by \rulename{(r-comm)}, \rulename{(r-newc)} and \rulename{(r-stru)}, and in the latter case we get the proof by \rulename{(r-auth)}, \rulename{(r-newc)} and \rulename{(r-stru)}.
+\item \emph{Case} \rulename{(l-par)}: the proof is analogous as for \rulename{(l-scope)}.
+\end{itemize}
+\end{proof}
+
+To show the other direction of our main result, we need to be able to reason on the structure of the contexts that appear in the reduction rules \rulename{(r-comm)} and \rulename{(r-auth)}, for which the respective $\operator$ operator is defined. In the next result, we characterize the structure of the context for which the $\operator$ of \rulename{(r-comm)} is defined. The proof follows by a non-surprising induction on the structure of the contexts using the definition of the $\operator$ operator and is omitted.
+
+\begin{proposition}[Inversion on $\operator$]{\label{prop:Cases_for_contexts}}
+
+%\begin{itemize}
+%\item[]
+%\item[1.] 
+Let $\optop{\context[\cdot_1, \cdot_2]}{\NA}{\NA}$ be defined and let $\context[\cdot_1, \cdot_2]= \context'[\context_1[\cdot] \parop \context_2[\cdot]]$. Then, we distinguish four cases.
+\begin{itemize}
+\item \emph{Case $\scope \NA$ in $\context_1$ and in $\context_2$}: 
+\[\context_1[\cdot]=\context_1'[\scope\NA \context_1''[\cdot]] \text{ and } \context_2[\cdot]=\context_2'[\scope\NA \context_2''[\cdot]]
+\]
+where $\operator(\context_1''[\cdot]; \NA)$ and $\operator(\context_2''[\cdot]; \NA)$ are undefined.
+%
+\item \emph{Case $\scope \NA$ in $\context_1$ and not in $\context_2$}: 
+\[
+\context_1[\cdot]=\context_1'[\scope\NA \context_1''[\cdot]] \text{ and } \context'[\cdot]=\context_3'[\scope \NA\context_3''[\cdot]]
+\] 
+where $\operator(\context_1''[\cdot]; \NA),$  $\operator(\context_2[\cdot]; \NA)$ and $\operator(\context_3''[\cdot]; \NA)$ are undefined.
+%
+\item \emph{Case $\scope \NA$ in $\context_2$ and not in $\context_1$}: 
+\[
+\context_2[\cdot]=\context_2'[\scope\NA \context_2''[\cdot]] \text{ and } 
+\context'[\cdot]=\context_3'[\scope \NA\context_3''[\cdot]]
+\] 
+where $\operator(\context_2''[\cdot]; \NA),$  $\operator(\context_1[\cdot]; \NA)$ and $\operator(\context_3''[\cdot]; \NA)$ are undefined.
+%
+\item \emph{Case $\scope \NA$ not in $\context_1$ and not in $\context_2$}: 
+\[
+\context'[\cdot]=\context_3[\scope\NA \context_3'[\cdot]] \text{ and } 
+\context_3'[\cdot]=\context_4[\scope\NA \context_4'[\cdot]]
+\]
+where $\operator(\context_1[\cdot]; \NA),$ $\operator(\context_2[\cdot]; \NA),$ $\operator(\context_4[\cdot]; \NA, \NA)$ and 
+ $\operator(\context_4'[\cdot]; \NA)$ are undefined.
+\end{itemize}
+
+%\item[2.]
+%\begin{itemize}
+%\item {\bf(case $\scope \NA, \scope\NB$ in $\context_1$ and $\scope\NA$ in $\context_2$):} $\context_1[\cdot]=\context_1^{1}[\scope\NA \context_1^{2}[\cdot]]$ and $\context_1^{2}[\cdot]=\context_1^{3}[\scope\NB \context_1^{4}[\cdot]],$ and $\context_2[\cdot]=\context_2'[\scope\NA \context_2''[\cdot]],$ where $\operator(\context_1^2[\cdot]; \NA),$ $\operator(\context_1^4[\cdot]; \NB)$ and $\operator(\context_2''[\cdot]; \NA)$ are undefined, or
+%\item {\bf(case $\scope \NA, \scope\NB$ in $\context_1$ and $\scope\NA$ in $\context_2$):} $\context_1[\cdot]=\context_1^{1}[\scope\NB \context_1^{2}[\cdot]]$ and $\context_1^{2}[\cdot]=\context_1^{3}[\scope\NA \context_1^{4}[\cdot]],$ and $\context_2[\cdot]=\context_2'[\scope\NA \context_2''[\cdot]],$ where $\operator(\context_1^2[\cdot]; \NB),$ $\operator(\context_1^4[\cdot]; \NA)$ and $\operator(\context_2''[\cdot]; \NA)$ are undefined, or
+%\item {\bf(case $\scope \NA, \scope\NB$ in $\context_1$ and $\scope\NA$ not in $\context_2$):} $\context_1[\cdot]=\context_1^{1}[\scope\NA \context_1^{2}[\cdot]]$ and $\context_1^{2}[\cdot]=\context_1^{3}[\scope\NB \context_1^{4}[\cdot]],$ and $\context'[\cdot]=\context_3'[\scope \NA\context_3''[\cdot]],$ where $\operator(\context_1^2[\cdot]; \NA),$ $\operator(\context_1^4[\cdot]; \NB),$
+%  $\operator(\context_2[\cdot]; \NA)$ and $\operator(\context_3''[\cdot]; \NA)$ are undefined, or
+%\item {\bf(case $\scope \NA, \scope\NB$ in $\context_1$ and $\scope\NA$ not in $\context_2$):} $\context_1[\cdot]=\context_1^{1}[\scope\NB \context_1^{2}[\cdot]]$ and $\context_1^{2}[\cdot]=\context_1^{3}[\scope\NA \context_1^{4}[\cdot]]$ and $\context'[\cdot]=\context_3'[\scope \NA\context_3''[\cdot]],$ where $\operator(\context_1^2[\cdot]; \NB),$ $\operator(\context_1^4[\cdot]; \NA),$
+%  $\operator(\context_2[\cdot]; \NA)$ and $\operator(\context_3''[\cdot]; \NA)$ are undefined, or
+%\item the rest of 10 cases are analogous.
+%\end{itemize}
+%\end{itemize}
+\end{proposition}
+
+The same kind of property can also be stated for the case of \rulename{(r-auth)}, by considering $\optop{\context[\cdot_1, \cdot_2]}{\NA,\NB}{\NA}$ is defined and $\context[\cdot_1, \cdot_2]= \context'[\context_1[\cdot] \parop \context_2[\cdot]]$. Then, similarly as in the previous proposition, we may distinguish (up to) $14$. cases for the distribution of the three authorizations (depending on if $\NA$ and $\NB$ are different names). 
+
+By the last result and Lemma~\ref{lemm:lts_struct_congruence} we are then able to prove that if a process can reduce it can also have a $\tau$ transition, where the two resulting processes are structurally equivalent. This is attested in our next result.
+
+\begin{lemma}[Harmony: LTS]{\label{lemm:reduction_tau}}
+If $\PP\red\PQ$ then there is $\PQ'$ such that $\PQ\equiv\PQ'$ and $\PP\lts{\tau}\PQ'.$ 
+\end{lemma}
+\begin{proof}
+The proof is by induction on the derivation $\PP\red\PQ.$ We obtain two base cases.
+\begin{itemize}
+\item \emph{Case} \rulename{(r-comm)}: 
+\[
+\context [\send\NA\role\msg\NB.\PP',\receive\NA\role\msg\NX.\PQ']\red\context^- [\scope{\NA}\PP', \scope{\NA}\PQ'\subst{\NB}{\NX} ]
+\] 
+where $\context^-[\cdot_1, \cdot_2]=\operator(\context[\cdot_1, \cdot_2]; \NA;\NA).$ By rules \rulename{(l-out)} and \rulename{(l-in)} we have that 
+\[
+\send\NA\role\msg\NB.\PP'\lts{{\scope\NA}\send\NA\role\msg\NB}\scope\NA\PP' \text{ and } 
+\receive\NA\role\msg\NX.\PQ'\lts{{\scope\NA}\receive\NA\role\msg\NB}\scope{\NA}\PQ'\subst{\NB}{\NX}
+\] 
+ %We use that $\context[\cdot,\cdot]=\context'[\context_1[\cdot]\parop\context_2[\cdot]],$ for some contexts $\context'[\cdot], \context_1[\cdot]$ and $\context_2[\cdot].$ We proceed the proof by induction on the structure of the context $\context[\cdot,\cdot]$ starting with $\context_1[\cdot]$ and $\context_2[\cdot].$
+%If $\context_1[\cdot]=\context_1'[\scope\NA\context_1''[\cdot]]$, and $\context_1''[\send\NA\role\msg\NB.\PP']\lts{\send\NA\role\msg\NB}\context_1''[\scope\NA\PP'].$ Then by \rulename{(l-scope1)} we get  $\scope\NA\context_1''[\send\NA\role\msg\NB.\PP']\lts{\scope\NA\send\NA\role\msg\NB}\context_1''[\scope\NA\PP'].$ Since process $\send\NA\role\msg\NB.\PP'$ is not under the scope of $\scope\NA$ in the context $\context_1''[\cdot]$ we have $\operator(\context_1''[\cdot];\NA)$ is undefined and $\operator(\scope\NA\context_1''[\cdot];\NA)=\context_1''[\cdot].$ 
+%If $\context_1[\cdot]=\context_1'[\scope\NA\context_1''[\cdot]]$, and $\context_1''[\send\NA\role\msg\NB.\PP']\lts{\scope\NA\send\NA\role\msg\NB}\context_1'''[\scope\NA\PP'].$ Then by \rulename{(l-scope2)} we get  $\scope\NA\context_1''[\send\NA\role\msg\NB.\PP']\lts{\scope\NA\send\NA\role\msg\NB}\scope\NA\context_1'''[\scope\NA\PP'].$ But now since process $\send\NA\role\msg\NB.\PP'$ is under the scope of $\scope\NA$ in the context $\context_1''[\cdot]$ we have $\operator(\context_1''[\cdot];\NA)=\context_1'''[\cdot]$ and $\operator(\scope\NA\context_1''[\cdot];\NA)=\scope\NA\context_1'''[\cdot].$ 
+By Proposition~\ref{prop:Cases_for_contexts} we distinguish four cases for the structure of the context $\context[\cdot_1, \cdot_2]=\context'[\context_1[\cdot] \parop \context_2[\cdot]].$ We comment only the case when 
+\[
+\context_1[\cdot]=\context_1'[\scope\NA \context_1''[\cdot]] \text{ and }
+\context_2[\cdot]=\context_2'[\scope\NA \context_2''[\cdot]]
+\] 
+where $\operator(\context_1''[\cdot]; \NA)$ and $\operator(\context_2''[\cdot]; \NA)$ are undefined. Thus, in contexts $\context_1''[\cdot]$ and $\context_2''[\cdot]$ the holes are not in the scope of authorizations $\scope\NA.$ 
+Proceeding by induction on contexts $\context_1''[\cdot]$ and $\context_2''[\cdot]$ using rules \rulename{(l-par)} and \rulename{(l-scope)} we may show that 
+\[
+\context_1''[\send\NA\role\msg\NB.\PP']\lts{{\scope\NA}\send\NA\role\msg\NB}\context_1''[\scope\NA\PP'] \text{ and }
+\context_2''[\receive\NA\role\msg\NX.\PQ']\lts{{\scope\NA}\receive\NA\role\msg\NB}\context_2''[\scope{\NA}\PQ'\subst{\NB}{\NX}]
+\]
+By \rulename{(l-scope-ext)} we obtain
+\[
+\scope\NA\context_1''[\send\NA\role\msg\NB.\PP']\lts{\send\NA\role\msg\NB}\context_1''[\scope\NA\PP']  \text{ and } \scope\NA\context_2''[\receive\NA\role\msg\NX.\PQ']\lts{\receive\NA\role\msg\NB}\context_2''[\scope{\NA}\PQ'\subst{\NB}{\NX}]
+\]
+Again, by induction on contexts $\context_1'[\cdot]$ and $\context_2'[\cdot]$ using rules \rulename{(l-par)} and \rulename{(l-scope)} we have
+\[
+\context_1'[\scope\NA\context_1''[\send\NA\role\msg\NB.\PP']]\lts{\send\NA\role\msg\NB}\context_1'[\context_1''[\scope\NA\PP']] \quad\text{ and }
+\] 
+\[
+\context_2'[\scope\NA\context_2''[\receive\NA\role\msg\NX.\PQ']]\lts{\receive\NA\role\msg\NB}\context_2'[\context_2''[\scope{\NA}\PQ'\subst{\NB}{\NX}]]
+\] 
+By \rulename{(l-comm)} 
+\[
+\context_1'[\scope\NA\context_1''[\send\NA\role\msg\NB.\PP']] \parop \context_2'[\scope\NA\context_2''[\receive\NA\role\msg\NX.\PQ']]\lts{\tau}\context_1'[\context_1''[\scope\NA\PP']] \parop\context_2'[\context_2''[\scope{\NA}\PQ'\subst{\NB}{\NX}]]
+\]
+and again applying induction on the structure of context $\context'[\cdot]$ and using rules \rulename{(l-par)} and \rulename{(l-scope)} we conclude 
+\[
+\context[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PQ']\lts{\tau}
+\context'[\context_1'[\context_1''[\scope\NA\PP']] \parop\context_2'[\context_2''[\scope{\NA}\PQ'\subst{\NB}{\NX}]]]
+\]
+Now we just need to notice that $\optop{\context[\cdot_1, \cdot_2]}{\NA}{\NA}=\context'[\context_1'[ \context_1''[\cdot]]\parop\context_2'[ \context_2''[\cdot]].$ 
+
+%If $\context_1[\cdot]=\context_1'[\scope\NC\context_1''[\cdot]]$ where $\NC\not=\NA,$ or $\context_1[\cdot]=\context_1'[\PR\parop\context_1''[\cdot]]$ we apply rule $\rulename{(l-scope2)}$ or $\rulename{(l-par)},$ which does not change the structure of the context and also in these cases operator $\operator$ does not change the structure of the context.
+
+%The same reasoning is applied considering the structure of the context for the second hole.
+
+%If $\context[\cdot,\cdot]=\context'[\context_1[\cdot]\parop\context_2[\cdot]],$ $\context_1[\send\NA\role\msg\NB.\PP']\lts{\scope\NA^i\send\NA\role\msg\NB}\context_1'[\scope\NA\PP']$ and $\context_2[\receive\NA\role\msg\NX.\PQ']\lts{\scope\NA^j\receive\NA\role\msg\NB}\context_2'[\scope\NA\PQ'\subst{\NB}{x}],$ we have that if $i=0$ ($j=0$) then $\context_1'[\cdot]=\context_1[\cdot]$ ($\context_2'[\cdot]=\context_2[\cdot]$) and $\operator(\context_1[\cdot];\NA)$ is undefined ($\operator(\context_2[\cdot];\NA)$ is undefined) and if $i=1$ ($j=1$) then $\context_1'[\cdot]=\operator(\context_1[\cdot];\NA)$ ($\context_2'[\cdot]=\operator(\context_2[\cdot];\NA)$). By \rulename{(l-comm1)} we get $\context_1[\send\NA\role\msg\NB.\PP']\parop\context_2[\receive\NA\role\msg\NX.\PQ']\lts{\tau_\omega}\context_1'[\scope\NA\PP']\parop\context_2'[\scope\NA\PQ'\subst{\NB}{x}],$ where $\omega=\scope\NA^{2-i-j}$ and $\context_1'[\cdot]\parop\context_2'[\cdot]=\operator(\context'[\cdot_1, \cdot_2]; \tilde\NA;\tilde\NB),$ where $\tilde\NA=\NA$ if $i=0$ and $\tilde{\NA}=\emptyset$ if $i=1$ and $\tilde\NB=\NA$ if $j=0$ and $\tilde{\NB}=\emptyset$ if $j=1.$
+
+%Again, applying the same reasoning as for the contexts with one hole we can conclude that the only LTS rule \rulename{(l-scope1)} is changing the structure of the context by removing two authorizations(one with the closest appearance to the first hole and one with the closets appearance to the second hole), but at the operator $\operator$ is doing the same. Since  $\operator(\context[\cdot_1, \cdot_2]; \NA; \NA)$ is defined, the rule \rulename{(l-scope1)} has to be applied two times, deleting the same authorizations as operator $\operator.$
+\item \emph{Case} \rulename{(r-auth)}: apply similar reasoning.
+\end{itemize}
+
+In the induction step, we have two possibilities for the last applied rule.
+\begin{itemize}
+\item \emph{Case} \rulename{(r-newc)}: $\rest\NA\PP\red\rest\NA\PQ$ is derived from $\PP\red\PQ.$ By induction hypothesis $\PP\lts{\tau}\PQ'$, for $\PQ\equiv\PQ'$. By \rulename{(l-res)} we have $\rest\NA\PP\lts{\tau}\rest\NA\PQ'$. Since $\equiv$ is a congruence, from $\PQ\equiv \PQ'$ we conclude $\rest\NA\PQ\equiv \rest\NA\PQ'.$
+
+\item \emph{Case} \rulename{(r-stru)}: $\PP\red\PQ$ is derived from $\PP\equiv\PP'\red\PQ'\equiv\PQ.$ By induction hypothesis $\PP'\lts{\tau}\PQ'',$ for $\PQ'\equiv\PQ''.$  By Lemma \ref{lemm:lts_struct_congruence} we get $\PP\lts{\tau}\PQ''',$ where $\PQ'''\equiv\PQ''.$ Now we can conclude the case by noting that we have $\PQ'''\equiv\PQ''\equiv \PQ'\equiv \PQ.$
+\end{itemize}
+\end{proof}
+
+We are now ready to state our Harmony result. The proof follows directly from Lemma~\ref{lemm:reduction_tau} and Lemma~\ref{lemm:tau_reduction}.
+
+
+\begin{corollary}[Harmony]\label{cor:red=tau} 
+$\PP\red\PQ$ if and only if $\PP \lts{\tau}\equiv Q.$ 
+\end{corollary}
+
+
+
+
+
+
+
+
+
+
+\subsection{Error processes}\label{sec:auth_errors}
+In this section, we define a notion of an error process, which is a process that uses its resources in an  unauthorized way. 
+In our model, in order for synchronization to take place the proper authorizations are needed. In the case of LTS semantics, a process cannot evolve internally, i.e., have a $\tau$ transition, if the actions are not authorized. In the case of the reduction semantics, a process cannot reduce if it does not have the proper authorizations. This is how we define the \emph{error} processes, as processes that cannot reduce only because of the lack of the required authorizations. 
+%Synchronizations in our model are tightly coupled with the notion of authorization, in the sense that in the absence of the proper authorizations the synchronizations cannot take place. We characterize such undesired configurations, referred to as \emph{error} processes, by identifying the 
+%redexes singled-out in the reduction semantics which are stuck due to the lack of the necessary authorizations. 
+By the closer inspection of the reduction rules, we may notice that this characterization actually says that the premise of the rules \rulename{(r-comm)} and \rulename{(r-auth)} is not satisfied and that the $\operator$ operator is not defined. 
+
+
+\begin{definition}[Error]\label{d:error}
+Process $\PP$ is an error if $P\equiv \rest{\tilde\NC} \context[\alpha_\NA.\PQ, \alpha_\NA'.\PR]$ and 
+\begin{enumerate}
+\item 
+$\alpha_\NA = \send\NA\role\msg\NB$, 
+$\alpha_\NA' = \receive\NA\role\msg\NX$
+and
+$ \optop{\context[\cdot_1,\cdot_2]}{\NA}{\NA}$  is undefined, or 
+\item 
+$\alpha_\NA = \sauth\NA\role\msg\NB$, 
+$\alpha_\NA' = \rauth\NA\role\msg\NB$
+and
+$ \optop{\context[\cdot_1,\cdot_2]}{\NA,\NB}{\NA}$ is undefined.
+\end{enumerate}
+\end{definition}
+
+The definition of the error processes directly relies on the definition of the reduction relation: the structural congruence relation and the definition of contexts are used to identify the prefixes ready to synchronize, for which the respective authorizations are missing as the application of $\operator$ is undefined.
+%The type analysis presented afterwards singles out processes that never incur in   errors, but first we show an alternative characterization of the operational semantics. 
+
+An alternative would be to characterize the error processes using the LTS, as having only incomplete $\tau$ transitions, i.e., $\tau_\omega$ transitions, when $\omega$ is
+different from $\scope\NA^{0}\scope\NB^0$.  
+The rest of this section is devoted to showing this claim is correct. First, we identify some auxiliary results. 
+Our first result shows that if a one-hole context, in which a prefixed process is inserted, does not provide the proper authorization(s), then the action of the overall process will also lack the authorization(s). The proof, which we omit, follows in expected lines by induction on the structure of the context. 
+
+
+\begin{lemma}[Unauthorized processes: external actions]
+\label{lemm:contexts_undefined}
+\leavevmode
+  \begin{itemize}
+    \item[1.] If $\operator(\context[\cdot]; \NA)$ is undefined then
+      \begin{itemize}
+           \item
+                $\context[\send\NA\role\msg\NB.\PP'] \lts{\scope\NA\send\NA\role\msg\NB}\context[\PP'],$ and 
+           \item
+                 $\context[\receive\NA\role\msg\NX.\PP'] \lts{\scope\NA\receive\NA\role\msg\NB}\context[\PP' \subst{\NB}{\NX}],$ and
+           \item
+                $\context[\rauth\NA\role\msg\NB.\PP'] \lts{\scope\NA \rauth\NA\role\msg\NB}\context[\scope\NA\scope\NB\PP'].$
+       \end{itemize}
+    \item[2.] If $\operator(\context[\cdot]; \NA, \NB)$ is undefined then either
+    	\begin{itemize}
+    	\item $\operator(\context[\cdot]; \NA)$ is undefined and $\operator(\context[\cdot];  \NB)$ is undefined and\\
+    	 $\context[\sauth\NA\role\msg\NB.\PP'] \lts{\scope\NA \scope\NB \sauth\NA\role\msg\NB}\context[\scope\NA\PP']$, or 
+    	\item $\operator(\context[\cdot]; \NA)$ is undefined and $\context[\sauth\NA\role\msg\NB.\PP'] \lts{\scope\NA  \sauth\NA\role\msg\NB}\context^-[\scope\NA\PP']$, where\\ 
+    	$\context^-[\cdot]=\operator(\context[\cdot]; \NB)$, or 
+    	\item $\operator(\context[\cdot]; \NB)$ is undefined and $\context[\sauth\NA\role\msg\NB.\PP'] \lts{ \scope\NB \sauth\NA\role\msg\NB}\context^-[\scope\NA\PP']$, where\\  
+    	$\context^-[\cdot]=\operator(\context[\cdot]; \NA)$.
+    	\end{itemize}
+  \end{itemize}
+\end{lemma}
+
+%\begin{proof}
+ % The proof is by induction on the structure of $\context[\cdot].$
+%\end{proof}
+
+We are ready to characterize the internal actions of the process obtained by inserting two prefixed processes in a two-hole context that does not provide the proper authorizations. Our first result focuses on the case when the internal action is a result of name passing.
+
+\begin{lemma}[Unauthorized processes: name passing]
+\label{lemm:error_tau1}
+\leavevmode
+  %Let $\PP \equiv \rest{\tilde\NC} \context[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP''].$ 
+  \begin{itemize}
+
+  \item[(i)] 
+    If $\optop{\context[\cdot_1, \cdot_2]}{\NA}{\NA}$, $\optop{\context[\cdot_1, \cdot_2]}{\NA}{\emptyset}$,  and $\optop{\context[\cdot_1, \cdot_2]}{\emptyset}{\NA}$  are all three undefined then   %$P\lts{\tau_\omega}Q$
+       $\context[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP'']\lts{\tau_\omega}\PQ$, for some $\PQ$ and  $\omega = \scope\NA \scope\NA.$
+  \item[(ii)]  
+  If $\optop{\context[\cdot_1, \cdot_2]}{\NA}{\NA}$, and only one of $\optop{\context[\cdot_1, \cdot_2]}{\NA}{\emptyset}$ or $\optop{\context[\cdot_1, \cdot_2]}
+      {\emptyset}{\NA}$  are undefined then   %$P\lts{\tau_\omega}Q$
+       $\context[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP'']\lts{\tau_\omega}Q$, for some $\PQ$  and  $\omega = \scope\NA.$
+ \end{itemize}
+ \end{lemma}
+\begin{proof} 
+      The proof proceeds by induction on the structure of context $\context[\cdot_1,\cdot_2].$ We detail only the first assertion.
+      \begin{itemize}
+      \item \emph{Case}
+            $\context[\cdot_1,\cdot_2] = \context_1[\cdot_1]\parop\context_2[\cdot_2]:$ 
+            by rule \rulename{(c2-spl)} we observe that both $\operator(\context_1[\cdot_1],\NA)$ and $\operator(\context_2[\cdot_2],\NA)$ are undefined.
+            By Lemma~\ref{lemm:contexts_undefined}, we have that
+            \[
+              \context_1[\send\NA\role\msg\NB.\PP'] \lts{\scope\NA\send\NA\role\msg\NB}\context_1[\PP'] \text{ and }
+              \context_2[\receive\NA\role\msg\NX.\PP''] \lts{\scope\NA\receive\NA\role\msg\NB}\context_2[\PP'' \subst{\NB}{\NX}]
+            \]
+            By rule \rulename{(l-comm)}, we conclude 
+            \[
+              \context_1[\send\NA\role\msg\NB.\PP'] \parop  \context_2[\receive\NA\role\msg\NX.\PP''] 
+               \lts{\tau_{\scope\NA \scope\NA}}
+              \context_1[\PP']  \parop  \context_2[\PP'' \subst{\NB}{\NX}]
+            \]
+             %and successive application of \rulename{(l-res)} completes the proof. 
+             %Notice that in the other two cases not detailed here $\omega= \scope\NA.$
+             \item \emph{Case}
+             $\context[\cdot_1,\cdot_2] = \context_1[\cdot_1, \cdot_2] \parop \PR:$ 
+             by \rulename{(c2-par)} we may observe 
+             $\optop{\context_1[\cdot_1, \cdot_2]}{\NA}{\NA}$, $\optop{\context_1[\cdot_1, \cdot_2]}{\NA}{\emptyset}$,  and $\optop{\context_1[\cdot_1, \cdot_2]}{\emptyset}{\NA}$  are all three undefined. 
+             %$\optop{\context_1[\cdot_1,\cdot_2] \parop R}{\NA}{\NA}$  is undefined  if  $\optop{\context_1[\cdot_1,\cdot_2] }{\NA}{\NA}$ is undefined. 
+             %By \Cref{d:error}, $\context_1[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP'']$ is an error. 
+             By induction hypothesis, $\context_1[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP''] \lts{\tau_\omega} Q$, for some $\PQ$ and  $\omega= \scope\NA \scope\NA.$
+             Finally, by \rulename{(l-par)} we derive 
+             %$\rest{\tilde\NC} \left(\context_1[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP''] | R\right) \lts{\tau_\omega} \rest{\tilde\NC} (Q|R),$
+             $\context_1[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP''] | R \lts{\tau_\omega} Q|R.$
+              % and successive application of \rulename{(l-res)}.
+              \item \emph{Case}
+             $\context[\cdot_1,\cdot_2] = \scope\NC \context_1[\cdot_1, \cdot_2]$ and $\NA\neq \NC$: by \rulename{(c2-skip)}, $\optop{\context_1[\cdot_1, \cdot_2]}{\NA}{\NA}$, $\optop{\context_1[\cdot_1, \cdot_2]}{\NA}{\emptyset}$,  and $\optop{\context_1[\cdot_1, \cdot_2]}{\emptyset}{\NA}$  are all three undefined.
+             %$\optop{\context_1[\cdot_1,\cdot_2]}{\NA}{\NA}$ is undefined.
+             By induction hypothesis, $\context_1[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP''] \lts{\tau_\omega} Q$, for some $Q$ and $\omega=\scope\NA \scope\NA.$  Applying \rulename{(l-scope)} the proof completes. % and successive application of \rulename{(l-res)}.
+             %\item \emph{Case}
+             %$\context[\cdot_1,\cdot_2] = \scope\NA \context_1[\cdot_1, \cdot_2]$: 
+             %by \rulename{(c2-rem-l)} and \rulename{(c-rem-r)} we conclude  $\optop{\context_1[\cdot_1, \cdot_2]}{\NA}{\emptyset}$ and $\optop{\context_1[\cdot_1, \cdot_2]}{\emptyset}{\NA}$ are both undefined. This implies $\optop{\context_1[\cdot_1, \cdot_2]}{\NA}{\NA}$ is also undefined.  Hence, 
+             %$\context_1[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP''] \lts{\tau_\omega}Q$ for some $\PQ$  and  $\omega = \scope\NA \scope\NA$, by induction hypothesis. By \rulename{(l-scope-int)}, 
+             %$\scope\NA \context_1[\send\NA\role\msg\NB.\PP', \receive\NA\role\msg\NX.\PP''] \lts{\tau_{\scope\NA}}Q.$
+         \end{itemize}
+\end{proof}
+
+A similar result can be stated for the reduction that is a result of authorization delegation. The proof of our next lemma follows similar reasoning as the proof of Lemma~\ref{lemm:error_tau1}.
+
+
+\begin{lemma}[Unauthorized processes: delegation]
+\label{lemm:error_tau2}
+   %Let  $\PP \equiv \rest{\tilde\NC} \context[\sauth\NA\role\msg\NB.\PQ, \rauth\NA\role\msg\NB.\PR].$ 
+   If  $\optop{\context[\cdot_1,\cdot_2]}{\NA,\NB}{\NA}$  is undefined then %$\PP\lts{\tau_\omega}Q$ for some $\PQ$
+   $\context[\sauth\NA\role\msg\NB.\PQ, \rauth\NA\role\msg\NB.\PR]\lts{\tau_\omega}\PQ$  and  %$\omega \in \{\scope\NA, \scope\NA \scope\NA, \scope\NA\scope\NA\scope\NB\}.$
+   $\omega=\scope\NA^i\scope\NB^j$, where $i+j\geq 1$.
+ \end{lemma}
+
+We can now state the main result.
+
+\begin{proposition}[Error Transitions]
+\label{th:error_lts}
+  Process $P$ is an error if and only if $P\lts{\tau_\omega}Q$ for some $\PQ$  and  $\tau_\omega \neq \tau$.
+ \end{proposition}
+ \begin{proof}
+ ($\Leftarrow)$
+     The proof follows directly from cases $13.$-$16.$ of  Lemma~\ref{lemm:inv_on_lts}.\\
+($\Rightarrow$)
+      If $\PP$ is an error, then, by Definition~\ref{d:error}, $P\equiv \rest{\tilde\NC} \context[\alpha_\NA.\PP', \alpha_\NA'.\PP'']$, where we distinguish two cases:
+\begin{enumerate}
+\item 
+$\alpha_\NA = \send\NA\role\msg\NB$, 
+$\alpha_\NA' = \receive\NA\role\msg\NX$
+and
+$ \optop{\context[\cdot_1,\cdot_2]}{\NA}{\NA}$  is undefined. By Lemma~\ref{lemm:error_tau1} we have that  
+$\context[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP'']\lts{\tau_\omega}Q$, for some $\PQ$ and  $\omega \in\{\scope\NA, \scope\NA \scope\NA\}.$ By successive application of \rulename{(l-res)}  
+\[
+\rest{\tilde\NC}\context[\send\NA\role\msg\NB.\PP',  \receive\NA\role\msg\NX.\PP'']\lts{\tau_\omega}\rest{\tilde\NC}\PQ,
+\]
+and by Lemma~\ref{lemm:lts_struct_congruence} we conclude $\PP\lts{\tau_\omega}\PQ'$, for some $\PQ'$ such that $\PQ'\equiv\rest{\tilde\NC}\PQ$.
+\item 
+$\alpha_\NA = \sauth\NA\role\msg\NB$, 
+$\alpha_\NA' = \rauth\NA\role\msg\NB$
+and
+$ \optop{\context[\cdot_1,\cdot_2]}{\NA,\NB}{\NA}$ is undefined. Follows the same reasoning as the previous case, by application of Lemma~\ref{lemm:error_tau2}.
+\end{enumerate} 
+      
+    %  The proof follows directly from   \Cref{lemm:error_tau1} and  \Cref{lemm:error_tau2}.
+ \end{proof}
+
+
+
+
+We remark that we adopt Definition~\ref{d:error} for the purpose of our typing analysis. %, which is nevertheless \new{equated with the LTS in the following result}.
+The labeled transition system and the reduction semantics inform differently on our model. %As usual, the LTS is 
+%more directly explicit, but the more compact reduction semantics 
+%allows for a more global view of authorization manipulation.
+The labeled transition system is more explicit when considering authorization manipulation, while the reduction semantics explicitly identifies the two processes ready to synchronize, which makes the latter more suitable to be used in Section~\ref{sec:Types} in the proofs of our typing system.  %and is therefore useful to identify communication errors in a direct way and more amenable to use in the proofs of our typing results. 
+
+
+
+

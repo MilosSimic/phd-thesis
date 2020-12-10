@@ -1,0 +1,160 @@
+\documentclass[
+12pt, % The default document font size, options: 10pt, 11pt, 12pt
+b5paper,
+%draft,
+%oneside, % Two side (alternating margins) for binding by default, uncomment to switch to one side
+english, % ngerman for German
+%singlespacing, % Single line spacing, alternatives: onehalfspacing or doublespacing
+%draft, % Uncomment to enable draft mode (no pictures, no links, overfull hboxes indicated)
+%nolistspacing, % If the document is onehalfspacing or doublespacing, uncomment this to set spacing in lists to single
+%liststotoc, % Uncomment to add the list of figures/tables/etc to the table of contents
+%toctotoc, % Uncomment to add the main table of contents to the table of contents
+%parskip, % Uncomment to add space between paragraphs
+]{book}
+%
+%
+\usepackage{amsmath,amssymb}
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usepackage{mathtools}
+\usepackage{mathpartir}
+\usepackage[T1]{fontenc} 
+\usepackage{textcomp}
+\usepackage[table]{xcolor}
+\usepackage{stmaryrd}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{prooftree}
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan 
+}
+\usepackage[nottoc,chapter]{tocbibind}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{listings}
+\lstset{
+  numbers=left,
+  stepnumber=1,    
+  firstnumber=1,
+  numberfirstline=true,
+  %xleftmargin=0.5cm,
+  basicstyle= \ttfamily
+}
+\usepackage{babel}
+\usepackage{titlesec}
+\setcounter{secnumdepth}{3}
+\usepackage[final]{pdfpages}
+\usepackage{acronym}
+\usepackage{geometry}
+
+\RequirePackage{geometry}
+\geometry{
+	paper=b5paper, % Default paper size, change to "letterpaper" for US Letter (you'll need to adjust margins after)
+	inner=1in, % The inner margin (beside binding)
+	outer=1in, % The outer margin (opposite binding)
+	top=1in, % Top margin
+	bottom=1in, % bottom margin
+	headsep=.5in, % Header separation
+	footnotesep=.5in,
+	includehead,
+	includefoot
+}
+
+\raggedbottom
+
+%----------------------------------------------------------------------------------------
+%	PENALTIES
+%----------------------------------------------------------------------------------------
+
+\doublehyphendemerits=10000 % No consecutive line hyphens
+\brokenpenalty=10000 % No broken words across columns/pages
+\widowpenalty=9999 % Almost no widows at bottom of page
+\clubpenalty=9999 % Almost no orphans at top of page
+\interfootnotelinepenalty=9999 % Almost never break footnotes
+%
+%
+\makeatletter
+\def\arcr{\@arraycr}
+\makeatother
+%
+%
+\input{macros}
+\title{Formal modeling and analysis of resource usage and sharing in distributed software systems}
+\author{Milo\v s Simi\' c\\\\
+Faculty of Technical Sciences\\
+University of Novi Sad}
+\date{\vfill Novi Sad}
+%
+%
+\begin{document}
+%
+%
+\pagestyle{empty}
+%
+%
+\frontmatter
+%
+%
+\includepdf[pages=-]{naslovna.pdf}\cleardoublepage 
+\includepdf[pages=-]{kljucna.pdf}
+\pagestyle{empty}
+\input{acknowledgement}\cleardoublepage 
+%
+%
+\pagestyle{plain}
+\pagenumbering{roman} \setcounter{page}{1}
+%
+%
+\phantomsection
+\addcontentsline{toc}{chapter}{Abstract}
+\input{abstract}\cleardoublepage
+%
+%
+\phantomsection
+\addcontentsline{toc}{chapter}{Rezime}
+\input{rezime}\cleardoublepage 
+ %
+ %
+\renewcommand{\contentsname}{Table of Contents}
+\tableofcontents \cleardoublepage 
+\listoffigures
+\listoftables
+%
+%
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{List of Abbreviations}
+\vspace*{1.95cm} \hspace*{-1cm} %,88
+\textbf{{\huge List of Abbreviations}\\}
+\vspace*{1cm}	
+\begin{acronym}[WWWW]
+	\acro{EPEI}{Every Part Every Interval}
+	\acro{TPS}{Toyota Production System}
+	\acro{TSP}{Transport Service Provider}
+\end{acronym}
+%
+%
+\mainmatter
+\pagenumbering{arabic} \setcounter{page}{1}
+%
+%
+\input{introduction}
+\input{Cpi-calculus}
+\input{Cpi-expressiveness}
+\input{auth-calculus}
+\input{auth-bisimulations}
+\input{auth-types}
+\input{auth-BYOL_example_and_Go_example}
+\input{conclusions}
+%
+%
+\bibliographystyle{abbrv}
+\bibliography{bib}
+%
+%
+\end{document}

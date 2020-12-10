@@ -1,0 +1,1315 @@
+%!TEX root =  main.tex
+
+\section{Type analysis}\label{sec:Types}
+
+Thus far, we have identified the syntax and semantics of our process algebra aiming to model floating authorizations. We also recognized undesired configurations as error processes (Definition~\ref{d:error})  in which resources are used in an unauthorized way. In that perspective, a natural question arises if there is a way of identifying processes in which all possible usages of channels are properly authorized. 
+In this section, we introduce a typing discipline that can statically identify \emph{safe} processes, that are not errors and never reduce to errors. 
+This section is divided into five parts. In Section~\ref{sec:types_background} we give a brief overview of the background on type theory and type systems. Section~\ref{sec:types_intro_examples} presents the idea of our types by means of examples. The type system is then formalized in Section~\ref{sec:typing_discipline}, and the results are given in Section~\ref{sec:results_types}. We further elaborate on our typing principles in Section~\ref{sec:examples_after_types}. In Section~\ref{sec:TypeChecking} we propose another type system that allows for a more efficient type-checking procedure, and we show the equivalence of the two type systems in Section~\ref{sec:correspondence_result}.
+
+\subsection{Background on types}\label{sec:types_background}
+
+Type theory, in computer science also referred to as type systems, covers the wide field of mathematics, logic and computer science. The first type system appears at the beginning of the 20th century in the work of Whitehead and Russel~\cite{WhiteheadRussell1910}, presenting the ramified type theory as a response to Russell's paradox. The core idea there was to avoid interpreting mathematical entities as sets, but instead to assign a \emph{type} to any mathematical entity. The idea of using the type theory as an alternative to the set theory as a fundamental of mathematics has been explored also by Chwistek and Ramsey in work on the simple theory of types~\cite{chwistek1925theory, ramsey1926foundations}, Church in the simply typed lambda calculus~\cite{Church40}, Martin-L\" of in the intuitionistic type theory~\cite{MartinLof84}, Coquand in the calculus of constructions~\cite{DBLP:journals/iandc/CoquandH88}, the homotopy-type theory~\cite{hottbook}, etc. 
+ 
+In computer science, type systems are extensively studied in many aspects. An important direction in the study of type systems is the Curry-Howard correspondence, that connects the two distinct research fields: computation and logic~\cite{ DBLP:journals/mscs/CairesPT16, curry1934functionality,  girard1989proofs, howard1980formulae, DBLP:journals/cacm/Wadler15}. Type theories have also been used as foundations for developing programming languages. For instance, Agda~\cite{DBLP:conf/tphol/BoveDN09} is based on the unified theory of depended types~\cite{DBLP:books/daglib/0078470}, that is an extension of Martin-L\" of's type theory. Also, an interactive theorem prover Coq~\cite{DBLP:series/txtcs/BertotC04} works within Coquand's calculus of constructions.   
+
+Another application directed field of the study of type systems is within the programming languages field. Many programming languages have integrated type systems that ensure programs do not go wrong. The type system is responsible for excluding bad behaviors called \emph{type errors}. A typing system maps the language terms into types and ``can be regarded
+as calculating a kind of static approximation to the run-time behaviors of the
+terms in a program''~\cite{DBLP:books/daglib/0005958}. A type system should offer the \emph{safety} guarantee, i.e., that a typable program does not produce errors at run-time. Another guarantee, called \emph{completeness},  ensures that a type system does not discard any programs that behave well at run time, but is sometimes hard or not worthwhile to obtain (e.g., because of the cost). 
+Let us notice that a type system does not prevent all possible bad behaviors, but only specific ones.
+The design of the type system heavily depends on the kind of errors one wants to eliminate. 
+When compared to traditional programs,  concurrent programs may introduce new kinds of errors, e.g., races and deadlocks, which can be hard to deal with.
+
+Various type systems have been proposed for the $\pi$-calculus based process models. The first one is a sorting system~\cite{DBLP:conf/concur/Milner92} proposed by Milner, developed to deal with arity mismatch errors in the polyadic $\pi$-calculus. After that, types have been used to impose control on the usages of the $\pi$-calculus channels, including: linearity~\cite{DBLP:journals/toplas/KobayashiPT99}, groups~\cite{cardelli05}, i/o types~\cite{DBLP:journals/mscs/PierceS96}, etc. Later on, more sophisticated type disciplines appeared, where types  more precisely inform on how the channels are to be used. Such types are also referred to as behavioral types~\cite{bettyreport}, which includes session types~\cite{DBLP:conf/concur/CarboneHY08, DBLP:conf/esop/HondaVK98,  DBLP:journals/pacmpl/ScalasY19} and conversation types~\cite{DBLP:journals/tcs/CairesV10}. 
+
+The type systems usually use a notion of a type assignment, typing environment, and a typing judgment. 
+By writing $\NA: T$ we mean that a type $T$  has been assigned to name $\NA$. A typing environment $\Delta$ is a finite collection of the type assignments, and writing $\Delta(\NA)=T$, or equivalently $\Delta \vdash \NA:T$, we mean that in environment $\Delta$ type $T$ has been assigned to name $\NA$. A typing judgment $\Delta \vdash \PP$ means that process $\PP$ uses its channels as prescribed by $\Delta$. These notions are used in what follows. 
+
+
+\subsection{Introducing types by examples}\label{sec:types_intro_examples}
+To informally introduce our type analysis we return to the university scenario presented in Section~\ref{subsec:examples}. Let us consider process
+$$
+\scope{\mathit{exam}}\scope{\mathit{minitest}}
+\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg{x}.
+\send{x}\role\msg{\mathit{value}}. \inact
+%\parop 
+%\scope{\mathit{bob}}\receive{\mathit{bob}}\role\msg{x}.
+%\receive{x}\role\msg{\mathtt{Task}}. \mathit{DoTask})
+$$
+that can receive a channel and afterwards output $\mathit{value}$ on the received channel. The reception on $\mathit{alice}$ is authorized directly, since the respective authorization is present. On the other hand, the later output action is authorized only for names $\mathit{exam}$ and $\mathit{minitest}$. If on channel $\mathit{alice}$ only $\mathit{exam}$ or $\mathit{minitest}$ can be received, then the two specified authorizations suffice. 
+%where there are available authorizations 
+% for $\mathit{exam}$ and for $\mathit{minitest}$,
+%and where $\mathit{alice}$ is waiting to receive the channel on 
+%which she will send $\mathit{task}$.
+%Assuming that she can only receive $\mathit{exam}$ or 
+%$\mathit{minitest}$ the authorizations specified are sufficient. 
+Depending on the received name, one of the authorizations can be used.  
+%Which authorization will actually be used depends
+%on the received name, so the authorization is implicitly taken
+%when the received channel is used. However, 
+If a name 
+$\mathit{viva}$ is received % to the student 
+then the two authorizations obviously cannot authorize the later output action. 
+
+We may conclude the above process is authorization safe if it is 
+placed in a context that matches the assumptions for names communicated in $\mathit{alice}$. 
+This is the information our types record: which are the names that can be safely communicated in a channel. 
+For the process above, we may say that only names $\mathit{exam}$ and $\mathit{minitest}$ 
+can be communicated in channel $\mathit{alice}$. Furthermore, 
+if we take that %consider that 
+%$\mathit{alice}$ %is a name not subject to instantiation and that 
+$\mathit{exam}$ and $\mathit{minitest}$
+can only receive values that are not subject to authorization control,  then 
+ $ \{\mathit{alice}\}( \{\mathit{exam},\mathit{minitest}\} ( \emptyset ))$ can represent the type of channel
+$\mathit{alice}$. Here, the type registers that $\mathit{alice}$ is a final name (cf. type of $x$ below), and
+that the channel can be used to communicate names $\mathit{exam}$ and $\mathit{minitest}$. The last information the above type carries is that $\mathit{exam}$ and $\mathit{minitest}$
+cannot be used for communication (typed with $\emptyset$). 
+Thus, the type
+information 
+can ensure that the above process is safe since all names
+that will possibly be used for communications are \emph{contextually authorized}. 
+
+We now return to analyze the use of the input variable $\mathit{x}$. Considering that $x$ can be 
+substituted by either $\mathit{exam}$ or $\mathit{minitest}$ (that, as noted above, are not to be used for
+channel communication) the type of $x$ is $\{\mathit{exam},\mathit{minitest}\} ( \emptyset )$.
+Here, we need to consider all possible replacements of a name, so as to uniformly
+address names that are bound in inputs. Our types, denoted $\ttype(T)$, are having two parts, one 
+addressing possible replacements of the name identity itself ($\ttype$), and the other 
+informing on the (type of the) names that may be exchanged in the channel ($T$).
+%
+The type assignment 
+\[
+    { \mathit{alice}: \{\mathit{alice}\}( \{\mathit{exam},\mathit{minitest}\} ( \emptyset ))}
+\]
+provides the information on the contexts in which the process above can be safely placed. For example,
+we may compose the above process with 
+$\scope{\mathit{alice}}\send{\mathit{alice}}\role\msg{minitest}$
+%\scope{\mathit{minitest}}\send{minitest}\role\msg{\mathtt{Task}}$ 
+where on $\mathit{alice}$ name $\mathit{minitest}$ can be sent, since $\mathit{minitest}$
+is one of the names expected on $\mathit{alice}$.
+Let us now consider process
+%
+\begin{equation}
+\label{ex:intro}
+\scope{exam}\scope{minitest}
+(\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg{x}.
+\send{x}\role\msg{\mathit{value}}. \inact
+\parop 
+\scope{\mathit{bob}}\receive{\mathit{bob}}\role\msg{x}.
+\send{x}\role\msg{\mathit{value}}. \inact)
+\end{equation}
+%
+%\noindent
+where authorizations for $\mathit{exam}$ and $\mathit{minitest}$ are now shared between the two threads, that both receive a name and then output a value on the received name. This process is also safe if the
+typing assignments
+\[
+{\mathit{alice}: \{\mathit{alice}\}( \{\mathit{exam}\} ( \emptyset )) \text{ and }
+\mathit{bob}: \{\mathit{bob}\}( \{\mathit{minitest}\} ( \emptyset ))}
+\]
+are respected also by the context in which process is inserted.
+The assumptions in types specifies what a process anticipates from a (typed) context. 
+%Notice that 
+Thus, we may also type the  process \eqref{ex:intro}  with assumptions 
+\[
+\mathit{alice}: \{\mathit{alice}\} ( \{\mathit{minitest}\} ( \emptyset ))\text{ and }\mathit{bob}: \{\mathit{bob}\} ( \{\mathit{exam}\} ( \emptyset )). 
+\]
+where now context should provide only $\mathit{minitest}$ is to be sent on $\mathit{alice}$ and $\mathit{exam}$ is to be sent on $\mathit{bob}$.
+
+We remark that the information of which student will be using which 
+authorization
+is something that is not statically prescribed in the system, since the students share the authorizations. However, if
+both names $\mathit{exam}$ and $\mathit{minitest}$ are used by the two students we may ensure that the system is authorization safe, since the students will grab the corresponding authorizations (one per each student). 
+%
+Each of the typing specifications above ensures that only $\mathit{exam}$ and $\mathit{minitest}$ can be received by the students, but also clearly provide a specific association between which name
+can be received by each student ($\mathit{Alice}$ can receive $\mathit{exam}$ and that $\mathit{Bob}$ can receive $\mathit{minitest}${, or with the order reversed}).
+% and a symmetric
+%association is also admissible.
+
+\subsection{Typing discipline}\label{sec:typing_discipline}
+
+Following the intuition provided in the previous section, in this section we formalize our typing system.
+%In this section, we present a type discipline that allows to statically identify \emph{safe} processes, hence that do not exhibit unauthorized actions (cf.~Definition \ref{d:error}). As mentioned before, our typing analysis addresses configurations where authorizations can be granted contextually.
+ %\comment{H: Maybe move the following to the introduction, if }
+Before that, 
+%which talks about the names that can be safely communicated on channels, 
+we first introduce some auxiliary notions that deal with name generation: \emph{symbol} annotations and \emph{well-formedness}.
+
+We may observe that our process model includes name restrictions and our types carry name identifiers. Since bound names are subject to $\alpha$-conversion, we introduce a symbolic representation of bound names when they are carried in type specifications. Without loss of generality, we refine the process model for the purpose of the type analysis by adding an explicit symbolic representation of name restrictions. This allows us to avoid more involved handling of bound names in typing environments. 
+
+To this end, we introduce a countable set of symbols $\cal{S}$, disjoint with the set of names $\N$. We let $\NR, \NS, \NT, \ldots$ range over $\cal{S}$. Also, we introduce a special symbol $\nub$, that is not in $\N\cup\cal{S}.$ We introduce a unique association of restricted names and symbols, by refining the syntax of the construct $\rest \NA\PP$ with two constructs 
+\[
+   {\rest{\NA: \NR}\PP \quad \text{ and } \quad \rest{\NA: \nub}\PP}
+ \]
+ tagged with a symbol from $\cal{S}$ or with symbol $\nub,$ respectively. By $\sym\PP$ we denote the set of all symbols from $\cal{S}$ in process $\PP.$ Names associated with symbols from $\cal{S}$ may be provided contextual authorizations (cf. rule \rulename{(t-new)} below), while names associated with symbol $\nub$ may not (cf. rule \rulename{(t-new-rep)} below). 
+%The latter can be communicated in a more flexible way since on the receiver side there can be no 
+%expectation of relying on contextual authorizations.
+
+In this section, we adopt the reduction semantics, which we adapt here to consider decorated name restrictions. We refine definition of structural congruence by omitting axiom \rulename{(sc-res-inact)} 
+$\rest\NA\inact\equiv\inact$
+and we decorate name restriction accordingly in rules \rulename{(sc-res-swap)}, \rulename{(sc-res-extr)} and \rulename{(sc-scope-auth)}---e.g., $\PP\parop\rest{\NA: \NR}\PQ\equiv\rest{\NA: \NR}(\PP\parop\PQ)$ and $\PP\parop\rest{\NA: \nub}\PQ\equiv\rest{\NA: \nub}(\PP\parop\PQ)$ keeping the condition $\NA\notin\fn\PP$. We remark that omitting of \rulename{(sc-res-inact)} is not new in process models where name restriction carries a type information (cf.~\cite{Boreale2010}). 
+
+Since we want symbols from ${\cal S}$ to uniquely represent restricted channels, we are actually interested only in processes that have unique occurrences of such symbols. 
+%The \emph{well-formed} processes we are interested in have unique occurrences of symbols from $\cal{S}$, and no occurrences of symbols from $\cal{S}$ in the body of replicated inputs.
+\begin{definition}[Well-formedness]
+A process is \emph{well-formed} %processes we are interested in 
+if it has unique occurrences of symbols from $\cal{S}$, and no occurrences of symbols from $\cal{S}$ in the body of replicated inputs.
+\end{definition}
+%if it does not contain two occurrences of the same symbol from $\cal{S}$ and for any replicated input 
+%$\PP''$ subprocess of $\PP$ it is the case that $\sym{\PP'}=\emptyset.$ 
+%Typable processes are well-formed (cf. Proposition~\ref{lemm:error.freedom}), and 
+We may now show that well-formedness is invariant with respect to (adapted) structural congruence and reduction.
+
+
+\begin{proposition}[Preservation of well-formedness]\label{lemm:well-formed}
+If $\PP$ is well-formed and $\PP\equiv\PQ$ or $\PP\red\PQ$ then $\PQ$ is also well-formed and $\sym{\PP}=\sym{\PQ}$.
+\end{proposition}
+\begin{proof}
+The proof is by induction on the derivations, performing the case analysis on the last rule applied. We detail only the case when the last applied reduction rule is \rulename{(r-newc)}. Let $\PP=\rest{\NA: \NR}\PP',$ $\PQ=\rest{\NA: \NR}\PQ',$ and $\PP\red\PQ$ be derived from $\PP'\red\PQ'.$ Since $\PP$ is well-formed $\NR\notin\sym{\PP'}$ and $\PP'$ is well-formed. By induction hypothesis we have that $\PQ'$ is well-formed and $\sym{\PP'}=\sym{\PQ'}.$ Thus, $\NR\notin\sym{\PQ'},$ $\PQ$ is well-formed and $\sym{\PP}=\sym{\PQ}.$
+\end{proof}
+
+%\new{\begin{definition}[Syntax of  types]
+The syntax of types is formally defined as
+%We may now introduce the type language, 
+%whose syntax is given by 
+\[
+\ttype ::=   \varphi  \parop \nub \quad \text{ and }
+\quad T ::= \ttype(T) \parop \emptyset
+\]
+where $\varphi\subset\N\cup{\cal S}$.
+%\end{definition}}
+%in Table~\ref{tab:syntax_type}, 
+Types inform on safe instantiations of names that are subject to contextual authorizations.
+Type $\ttype$ stands for a subset of $\N\cup\cal{S}$, in which case is denoted with $\varphi$, or symbol $\nub$.
+%and when names are not subject to contextual authorizations ($\nub$).
+%, which stands for a set $\varphi$ or the symbol $\nub$, 
+In $\ttype(T)$ type $T$ characterizes the names that can be communicated in the channel, and type $\emptyset$ represents names that cannot be used for communication. 
+A typing environment $\Delta$ is a set of typing assumptions of the form $ \NA: T$. 
+If $\NA:\ttype(T)$, then for $\ttype=\varphi$ the set $\ttype$ characterizes with what names $\NA$ may be instantiated. If instead $\ttype=\nub$, then $\NA$ is not subject to 
+contextual authorizations.
+By $\mathit{names}(T)$ we denote the set of names that occur in $T$ and by $\mathit{names}(\Delta)$ the set of names that occur in all entries of $\Delta$.
+
+
+\begin{table}[!t]
+\[
+\begin{array}[t]{@{}c@{}}
+\inferrule[(t-stop)]
+	{}
+	{ \Delta\vdash_\rho \inact } 
+\qquad
+\inferrule[(t-par)]
+	{ \Delta\vdash_{\rho_1} \PP_1  \quad  \Delta\vdash_{\rho_2} \PP_2 \quad \sym{\PP_1}\cap\sym{\PP_2}=\emptyset }
+	{ \Delta\vdash_{\rho_1\uplus\rho_2}  \PP_1 \parop \PP_2 }
+\vspace{1ex}\\
+\inferrule[(t-new)]
+	{ \Delta, \NA: \{\NA\}(T)\vdash_\rho \PP  \quad  \Delta'=\Delta\subst{\NR}{\NA} \quad \NR\notin\sym{\PP} \quad   \NA\notin\rho,\mathit{names} (T)}
+	{ \Delta'\vdash_\rho \rest{\NA: \NR}\PP }
+%\vspace{1ex}
+\vspace{1ex}\\	
+\inferrule[(t-new-rep)]
+	{ \Delta, \NA:\nub (T)\vdash_\rho \PP  \quad   \NA\notin\rho, \mathit{names} (T, \Delta) }
+	{ \Delta\vdash_\rho \rest{\NA: \nub}\PP }
+	\qquad
+	\inferrule[(t-auth)]
+	{ \Delta\vdash_{\rho\uplus\{\NA\}} \PP }
+	{ \Delta\vdash_{\rho} \scope{\NA}\PP }
+\vspace{1ex}
+\\
+\inferrule[(t-out)]
+	{ \Delta\vdash_\rho \PP  \quad \Delta(\NA)=\ttype(\ttype'(T)) \quad \Delta(\NB)=\ttype''(T) 	 \quad  \ttype''\subseteq \ttype' \quad  \NA\notin\rho \Rightarrow \ttype \subseteq\rho}
+	{ \Delta\vdash_{\rho} \send\NA\role\msg\NB.\PP }
+\vspace{1ex}
+\\
+\inferrule[(t-in)]
+	{ \Delta,\NX:T\vdash_\rho \PP  \quad \Delta(\NA)=\ttype(T) \quad \NX\notin\rho,\mathit{names}( \Delta) \quad \NA\notin\rho \Rightarrow \ttype\subseteq\rho}
+	{ \Delta\vdash_{\rho} \receive\NA\role\msg\NX.\PP }
+\vspace{1ex}
+\\
+\inferrule[(t-rep-in)]
+	{ \Delta,\NX:T\vdash_{\{\NA\}} \PP  \quad \Delta(\NA)=\ttype(T) \quad 
+	  \NX \notin \rho, \mathit{names}(\Delta)\quad \sym{\PP}=\emptyset }
+	{ \Delta\vdash_\rho\; \repreceive\NA\role\msg\NX.\PP }
+\vspace{1ex}
+\\
+\inferrule[(t-deleg)]
+	{ \Delta\vdash_\rho \PP \quad \Delta(\NA)=\ttype(T) \quad \NA\notin\rho \Rightarrow \ttype \subseteq\rho}
+	{ \Delta\vdash_{\rho\uplus\{\NB\}} \sauth\NA\role\msg\NB.\PP }
+%
+%\qquad
+\vspace{1ex}
+\\
+\inferrule[(t-recep)]
+	{ \Delta\vdash_{\rho\uplus\{\NB\}} \PP  \quad \Delta(\NA)=\ttype(T) \quad \NA\notin\rho \Rightarrow \ttype\subseteq\rho}
+	{ \Delta\vdash_{\rho} \rauth\NA\role\msg\NB.\PP }
+
+\end{array}
+\]
+\caption{\label{tab:Typing rules} Typing rules.}
+\end{table}
+
+%\begin{table}[t]
+%$$ \ttype ::= \;  \varphi  \; \parop \; \nub
+%\qquad \qquad 
+%T ::= \; \ttype(T) \; \parop \; \emptyset
+%$$
+%\caption{Syntax of types}\label{tab:syntax_type}
+%\vspace{-30pt}
+%\end{table}
+ 
+
+ 
+
+
+
+
+%\paragraph{Typing rules}
+%%%%%
+%The type system %, defined inductively in the
+%structure of processes, 
+%is defined by the rules given in 
+Table~\ref{tab:Typing rules} shows the rules for our typing system. A typing judgment
+$
+    \Delta\vdash_\rho \PP
+$
+%where $\rho$ denotes a multiset of names and $\rrec::= \rec \parop \nrec$. 
+ states that $\PP$ uses channels as prescribed by $\Delta$ and that $\PP$ is safe if it is placed in a context that provides the authorizations given in $\rho$, which is a multiset of names (from $\N$). 
+To illustrate why a notion of multiset is required consider that process  
+%The use of a multiset can be motivated by considering process 
+ %$\sauth\NA\role\msg\NA.0$ and 
+ $ \send\NA\role\msg\NB.0 \parop \receive\NA\role\msg\NX.0$ can be typed with
+ $
+  % a: \{a\} (\{a\}) \vdash_{a,a } \sauth\NA\role\msg\NA.0 \qquad 
+   \NA:\{\NA\}(\{\NB\}(\emptyset)), \NB: \{\NB\}(\emptyset)\vdash_{\rho} \send\NA\role\msg\NB.0 \parop \receive\NA\role\msg\NX.0
+ $
+ where certainly  $\{a,a\}$ is contained in $\rho$, identifying that the process can only be inserted in contexts that provide two authorizations on name $\NA$, for one sending and the other for receiving on $\NA$.
+
+ 
+
+%
+
+We now describe the typing rules.
+\begin{itemize}
+\item Axiom \rulename{(t-stop)} asserts that a terminated process can be typed by any $\Delta$ and $\rho$.
+%\item 
+\item In rule \rulename{(t-par)} processes $\PP_1$, $\PP_2$ and their  parallel composition are typed using the same $\Delta$. % then $\PP_1 \parop \PP_2$ is typed under $\Delta$ as well.  
+Furthermore, if $\PP_1$ and $\PP_2$ are safe when inserted in contexts that provide authorizations $\rho_1$ and $\rho_2,$ respectively, then $\PP_1 \parop \PP_2$ is safe if inserted in the context that provides the sum of authorizations from $\rho_1$ and $\rho_2$. 
+%\del{By $\rho_1\uplus\rho_2$ we represent the addition operation for multisets which sums the frequencies of the elements.} 
+The well-formedness is ensured with $\sym{\PP_1}\cap\sym{\PP_2}=\emptyset$.
+%\item 
+%\item
+
+\item In rule \rulename{(t-new)} process $\PP$ is typed with an environment that includes an entry for $\NA,$ and process
+%the process with restricted name 
+$\rest{\NA: \NR}\PP$ is typed by removing that entry and replacing each occurrence of name $\NA$ in the environment by the corresponding symbol $\NR.$
+We use $\Delta\subst{\NR}{\NA}$ to denote the environment obtained by substituting $\NA$ by $\NR$ in every assumption in $\Delta$, hence in every type. %, excluding when $\NA$ has an entry in $\Delta$. 
+The well-formedness is ensured by $\NR\notin\sym\PP$. Condition $\NA\notin\rho, \mathit{names}(T)$ claims that the context cannot provide authorization for name $\NA$ and ensures consistency of the typing assumption.
+ 
+\item The only difference of rule \rulename{(t-new-rep)} with respect to rule \rulename{(t-new)} is that no replacement is performed in $\Delta$ and that $\NA$ is also not mentioned in the environment. The environment must already refer to symbol $\nub$ in whatever pertains to the restricted name. For instance, process $\rest{\NB: \nub}\scope\NA\send\NA\role\msg\NB.\inact$ can be typed only if the assumption for $\NA$ is $\ttype(\nub(T))$, for some $\ttype$ and $T$, where $\nub$ represents that the names communicated in $\NA$ (hence, including $\NB$) are never subject to contextual authorizations.
+%%%%%%
+\item In rule \rulename{(t-auth)} processes $\scope{\NA}\PP$ and $\PP$ are typed using the same $\Delta$, since authorization scoping is non-binding construct.
+If $\PP$ is safe when the context provides  authorizations $\rho\uplus \{\NA\},$ then 
+$\scope{\NA}\PP$ can be safely placed in a context that provides authorizations 
+$\rho$.
+%%%%%%
+\item In rule  \rulename{(t-out)} process $\PP$ is typed using an environment 
+with entries for $\NA$ and $\NB$. In the type of $\NB$ all possible instantiations for the name (identified in $\ttype''$) are safe to be communicated on name $\NA$ (formalized by $\ttype''\subseteq\ttype'$, where $\ttype'$ is from the type of $\NA$). Furthermore, the continuation type $T$ of $\NB$ must be the same as $T$ given in the type of $\NA$. Then, process $\send\NA\role\msg\NB.\PP$ is typed using the same environment.
+% $\Delta$ and it proceeds in the context providing the same authorizations, 
+The rule specifies two ways in which the action on $\NA$ is authorized: $(1)$ authorization is provided by the context directly ($\NA\in\rho$); 
+$(2)$ authorizations for all instantiations of name $\NA$ are provided by the context ($\ttype \subseteq\rho$).
+To illustrate case $(1)$ consider that in $\scope\NB\receive\NB\role\msg\NA.\scope\NA\send\NA\role\msg\NC.\inact$ the latter output is authorized regardless of name replacements. For case $(2)$, consider that
+if we  assume $\NA$ can be replaced only by $\ND$,
+processes $\scope\NB\receive\NB\role\msg\NA.\scope\ND\send\NA\role\msg\NC.\inact$ and $\scope\NB\scope\ND\receive\NB\role\msg\NA.\send\NA\role\msg\NC.\inact$ are safe, while $\scope\NB\receive\NB\role\msg\NA.\scope\NE\send\NA\role\msg\NC.\inact$ and $\scope\NB\scope\NE\receive\NB\role\msg\NA.\send\NA\role\msg\NC.\inact$ are not.  
+The option given in case $(2)$ is fundamental to address contextual authorizations. Notice that the condition  $\ttype \subseteq\rho$ implies $\ttype$ contain only names and no symbols, since $\rho$ is defined as a multiset of names. 
+\item Rule
+%\item
+ \rulename{(t-in)}
+follows similar principles as the previous one.
+
+%\item
+\item In rule \rulename{(t-rep-in)} process $\PP$ is typed under an environment with an entry for $\NX$ and
+% that $\rho=\{\NA\}$, which specifies 
+the process is safe if inserted in a context that provides one authorization for $\NA$. Then, the replicated input is typed by removing the entry for $\NX$ from the environment, which must precisely match the specification given in the type of $\NA$. The input variable should not be mentioned in any type,  provided with $\NX\notin\rho,\mathit{names}(\Delta)$. The restriction that $\PP$ contains no symbols from $\cal{S}$ ensures the unique association of symbols and names when copies of the replicated process are activated
+ (see example (\ref{example:error.rep}) in Section~\ref{sec:examples_after_types}).  Process $\repreceive\NA\role\msg\NX.\PP$ can be inserted in any context that conforms with $\Delta$ and provides any authorizations. 
+%We believe this approach can be extended to deal with restricted names that are subject to contextual authorizations in the context of infinite behavior, for instance considering generated symbols are not exposed in the communication interface (i.e., 
+%$\sym\PP \cap \sym\Delta = \emptyset$ instead of $\sym\PP=\emptyset$). However, this would require further tuning of the process model to ensure uniqueness of symbols.  %\marginpar{H: I have mixed feelings about such a sentence that we may add here}
+
+\item In rules  \rulename{(t-deleg)} and \rulename{(t-recep)} 
+ the typing environment does not change from premises to conclusion.
+The authorization(s) required to use the subject name $\NA$ is(are) addressed in the same way as in rules \rulename{(t-out)} and \rulename{(t-in)}. The authorization for $\NB$ in rule \rulename{(t-recep)} is handled as in rule \rulename{(t-auth)}. In rule \rulename{(t-deleg)}, the authorization for $\NB$ is added to $\rho$, as the context in which the process may be inserted needs to provide an additional authorization for this name. %Notice that in such way no contextual authorizations can be provided for delegation, but the generalization is direct.
+\end{itemize}
+%
+{
+We may now observe that the symbolic representation of a bound name in the typing environment reflects the fact that a contextual authorization cannot be provided by the process that receives such (unforgeable) name via name extrusion. 
+For instance, process $\scope\NA\scope\ND\receive\NA\role\msg\NX.\send\NX\role\msg\NC.\inact \parop \rest{\NB: \NR}\scope\NA\send\NA\role\msg\NB.\inact$ is not safe, as regardless of provided contextual authorization (that includes $\scope\NA$ and $\scope\ND$) for the received name in the left branch, the name sent by the right branch is fresh and necessary different from all names of the mentioned authorizations.  This process is excluded by our type analysis since the assumption for the type of channel $\NA$ carries a symbol (e.g., $\NA: \{\NA\}(\{\NR\}(\emptyset))$) for which no contextual authorizations can be provided. Notice that the typing of the process in the scope of the restriction uniformly handles the name, which leaves open the possibility of considering contextual authorizations for the name within the scope of the restriction.
+ %If process is typed under assumption that it can be used as sub-term of a body of replicated input ($\rrec=\rec$) then $\NA:\rest\NA(T),$ ensuring that bound names prefixed with replicated input behaves as bound name even in the part of the process where it is free. (See Example~\ref{example_typable_rep_input} below.)
+%\item
+}
+
+\subsection{Type safety}\label{sec:results_types}
+%For the sake of presenting the results, we say  process $\PP$ is well-typed if $\Delta\vdash_\emptyset \PP$ and $\Delta$ only contains assumptions of the form $\NA: \{\NA\}(T)$ or $\NA: \nub(T)$. 
+In this section, we provide a proof that a typed process is safe, i.e., that it is not an error and that it never reduces to an error. First, we assert that a typed process is always well-formed.
+The proof follows directly from the typing rules.
+
+\begin{proposition}[Typed implies well-formed]
+If $\Delta\vdash_\rho \PP$ then $\PP$ is well-formed.
+\end{proposition}
+
+We now introduce a notion of \emph{well-typed} processes.
+
+\begin{definition}[Well-typed processes]\label{def:well-typed_processes}
+Process $\PP$ is well-typed if $\Delta\vdash_\emptyset \PP$ and $\Delta$ only contains assumptions of the form $\NA: \{\NA\}(T)$ or $\NA: \nub(T)$. 
+\end{definition}
+The assumption that a typed process is at top level also well-typed, used in the later results, should seem as natural. 
+Entries of the typing environment are associated only to free names of the typed process, that at top level are all names of channels. Hence, names are typed by the assumption $\NA: \{\NA\}(T)$ (cf. \rulename{(t-new)}), or by $\NA: \nub(T)$ (cf, \rulename{(t-new-rep)}). % which says that $\NA$ cannot be granted contextual authorizations. For example, process $\scope\NA\send\NA\role\msg\NB.\inact \parop \scope\NA\scope\NB\receive\NA\role\msg\NX.\send\NX\role\msg\NC.\inact$ is typable under the assumption that name $\NB$ has type $\{\NB\}(\{\NC\}(\emptyset))$, while it is not typable under the assumption $\nub(\{\NC\}(\emptyset))$.
+%:\rrec.$ 
+Also, at top-level, a typed process should own enough authorizations for all of his actions. In that case, no authorizations need to be provided by the context ($\rho=\emptyset$). % means that the process $\PP$ is self-sufficient in terms of authorizations.
+
+We now proceed to present our results. First we identify the properties that follow directly from the typing rules.
+
+
+\begin{lemma}[Inversion on typing]\label{lemm:Inv.Lemma}
+Directly from Table~\ref{tab:Typing rules} we have the following.
+\begin{itemize}
+\item[1.] If $ \Delta\vdash_\rho \rest{\NA: \NR}\PP$ then  $ \Delta', \NA:\{\NA\}(T)\vdash_\rho \PP ,$ where $\Delta=\Delta'\subst{\NR}{\NA}$ and $\NR\notin \sym{\PP}$ and $\NA\notin\rho, \mathit{names} (T).$ 
+\item[2.] If $ \Delta\vdash_\rho \rest{\NA: \nub}\PP$ then  $ \Delta, \NA:\nub(T)\vdash_\rho \PP ,$ where  $\NA\notin\rho, \mathit{names} (T, \Delta).$ 
+\item[3.] If $ \Delta\vdash_\rho \scope\NA\PP$ then $ \Delta\vdash_{\rho\uplus \{\NA\}} \PP.$ 
+\item[4.] If $ \Delta\vdash_\rho \send\NA\role\msg\NB.\PP$ then $ \Delta\vdash_{\rho} \PP,$ where $\Delta(\NA)=\ttype(\ttype'(T)),$ $\Delta(\NB)=\ttype''(T),$ 	 $\ttype''\subseteq \ttype'$ and if $\NA\notin\rho$ then $\ttype\subseteq\rho.$
+\item[5.] If $ \Delta\vdash_\rho \receive\NA\role\msg\NX.\PP$ then $ \Delta, \NX:T \vdash_{\rho} \PP,$ where $\Delta(\NA)=\ttype(T),$ $\NX\notin\rho, \mathit{names}(\Delta)$ and if $\NA\notin\rho$ then $\ttype\subseteq\rho.$
+\item[6.] If $ \Delta\vdash_\rho \repreceive\NA\role\msg\NX.\PP$ then $ \Delta, \NX: T \vdash_{\{\NA\}} \PP$ where $\sym{\PP}=\emptyset$ and $\Delta(\NA)=\ttype(T)$ and $\NX \notin \rho, \mathit{names}(\Delta).$
+\item[7.] If $\Delta\vdash_\rho \sauth\NA\role\msg\NB.\PP$ then $\Delta\vdash_{\rho'} \PP,$ $\Delta(\NA)=\ttype(T),$ where $\rho=\rho'\uplus\{\NB\}$ and if $\NA\notin\rho'$ then $\ttype \subseteq\rho'.$
+\item[8.] If $ \Delta\vdash_\rho \rauth\NA\role\msg\NB.\PP$ then $ \Delta\vdash_{\rho\uplus\{\NB\}} \PP,$ where $\Delta(\NA)=\ttype(T)$ and if $\NA\notin\rho$ then $\ttype \subseteq\rho.$
+\item[9.] If $ \Delta\vdash_{\rho} \PP_1 \parop\PP_2$ then $ \Delta\vdash_{\rho_1}\PP_1$ and $ \Delta\vdash_{\rho_2} \PP_2,$ where $\rho=\rho_1\uplus\rho_2$ and $\sym{\PP_1} \cap \sym{\PP_2}=\emptyset.$
+\end{itemize}
+\end{lemma}
+
+The following two results (Weakening and Strengthening) are fundamental to prove Subject Congruence, which in turn is crucial to prove Subject Reduction. The Weakening result shows how in the typing judgment the typing environment $\Delta$ can be enlarged by an entry, and, also, that the multiset $\rho$ can be enlarged. The Strengthening result shows how in the typing judgment an entry in the typing environment $\Delta$ can be removed.
+We write $\NA \leftrightarrow \NR$ (resp. $\NA \leftrightarrow \nub$) to denote that name $\NA$ is bound in the process, or the process is in a context were the name $\NA$ is bound with $\rest{\NA :\NR}$ (resp. $\rest{\NA: \nub}$). 
+
+%\comment{H: Please merge the weakening Lemmas (following two), this way we have only one weakening label ;) - you can add a separate statement, hence separate proof, or you can combine the statements and prove separately}
+\begin{lemma}[Weakening]\label{lemm:Weakening_Lemma}
+Let $ \Delta\vdash_\rho \PP$.
+\begin{enumerate}
+\item  If $\NA\notin\fn{\PP}\cup\rho$, then
+\begin{itemize}
+\item [$(a)$] $\NA \leftrightarrow \NR$ and $\NR\notin\sym{\PP}$ and $\Delta'=\Delta\subst{\NA}{\NR}$ implies $ \Delta', \NA: \{\NA\}(T) \vdash_\rho \PP;$
+\item [$(b)$] $\NA \leftrightarrow \nub$ implies $ \Delta, \NA: \nub(T) \vdash_\rho \PP.$
+\end{itemize}
+\item  $ \Delta\vdash_{\rho\uplus\rho'} \PP.$
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the depth of the derivation $ \Delta\vdash_\rho \PP.$
+\\
+$\mathit{1.}$ We detail only two cases, when the last applied rule is \rulename{(t-out)} or \rulename{(t-rep-in)}. 
+\begin{itemize}
+\item \emph{Case} \rulename{(t-out)}: Let $ \Delta\vdash_\rho \send\NB\role\msg\NC.\PP$ be derived from $ \Delta\vdash_{\rho} \PP,$ where $\Delta(\NB)=\ttype(\ttype'(T')),$ $\Delta(\NC)=\ttype''(T'),$ 	 $\ttype''\subseteq \ttype'$, and if $\NB\notin\rho$ then $\ttype \subseteq\rho.$ 
+Then, we distinguish two cases.
+
+$(a)$: If $\NA \leftrightarrow \NR$ and $\NR\notin \sym{\PP}$ and $\Delta'=\Delta\subst{\NA}{\NR}$, by induction hypothesis $ \Delta', \NA: \{\NA\}(T) \vdash_\rho \PP$. By $\Delta'(\NB)=(\ttype(\ttype'(T')))\subst{\NA}{\NR}$ and $\Delta'(\NC)=(\ttype''(T'))\subst{\NA}{\NR},$ we conclude $\ttype''\subst{\NA}{\NR}\subseteq \ttype'\subst{\NA}{\NR}$. Since $\NB\notin\rho$ implies $\ttype \subseteq\rho,$ and $\rho$ is a multiset of names, then $\NR\in\ttype$  implies $\NB \in\rho.$ If $\NR \notin \ttype$ then $\ttype\subst{\NA}{\NR}=\ttype.$ Thus, by \rulename{(t-out)} we may conclude $ \Delta', \NA: \{\NA\}(T) \vdash_\rho \send\NB\role\msg\NC.\PP.$
+
+$(b)$: If $\NA \leftrightarrow \nub$ then by induction hypothesis $ \Delta, \NA: \nub(T) \vdash_\rho \PP.$ Since $\Delta$ is not changed, the result follows directly by \rulename{(t-out)}.
+
+\item \emph{Case} \rulename{(t-rep-in)}: Let $ \Delta\vdash_{\rho} \repreceive\NB\role\msg\NX\PP$ be derived from $ \Delta, \NX: T' \vdash_{\{\NB\}}\PP,$ with  $\Delta(\NB)=\ttype(T'),$ where without loss of generality we can assume that $\NX\not=\NA.$ Again, we have two cases.
+
+$(a)$: If $\NA \leftrightarrow \NR$ and $\NR\notin \sym{\PP}$ and $\Delta'=\Delta\subst{\NA}{\NR}$, by induction hypothesis $\Delta', \NX:T'\subst{\NA}{\NR}, \NA: \{\NA\}(T) \vdash_{\{\NB\}} \PP.$ Since $\Delta'(\NB)=(\ttype(T'))\subst{\NA}{\NR}$ by \rulename{(t-rep-in)} we may conclude $ \Delta', \NA: \{\NA\}(T) \vdash_{\rho} \repreceive\NB\role\msg\NX\PP.$
+
+$(b)$: If $\NA \leftrightarrow \nub$ then by induction hypothesis $ \Delta, \NX: T', \NA: \nub(T) \vdash_{\{\NB\}} \PP.$ Again, by \rulename{(t-rep-in)} the proof for this case follows.
+%\htv{maybe distinguish the case when $b=a$ explicitly?}
+%\comment{I: I don't think we need this case, I added a condition $\NA\notin\fn{\PP}$ to exclude this case \htv{OK!}}
+%\end{proof}
+
+
+\end{itemize}
+$\mathit{2.}$ We detail only the case when the last applied rule is \rulename{(t-in)}. Let $ \Delta\vdash_\rho \receive\NA\role\msg\NX.\PP$ be derived from $ \Delta, \NX:T \vdash_{\rho} \PP,$ where $\Delta(\NA)=\omega(T),$ $\NX\notin\rho, \mathit{names}(\Delta)$ and $\NA\notin\rho$ implies $\omega \subseteq\rho.$ By induction hypothesis $ \Delta, \NX: T \vdash_{\rho\uplus\rho'} \PP.$ Without loss of generality we can assume that $\NX$ is new to $\rho',$ i.e. $\NX\notin\rho'.$ Observing that $\NA\notin\rho\uplus\rho'$ implies $\omega \subseteq\rho\uplus\rho',$ by \rulename{(t-in)} we conclude $ \Delta\vdash_{\rho\uplus\rho'} \receive\NA\role\msg\NX.\PP.$
+\end{proof}
+
+\begin{lemma}[Strengthening]\label{lemm:Strength.Lemmma}
+Let $\NA\notin\fn\PP \cup \rho$.
+\begin{itemize}
+\item [$(a)$]If $ \Delta, \NA: \{\NA\}(T) \vdash_{\rho} \PP$  and $\NA \leftrightarrow \NR$ and $\NR\notin \sym{\PP}$ then $ \Delta'\vdash_{\rho} \PP,$ where $\Delta'=\Delta\subst{\NR}{\NA}.$
+\item [$(b)$] If $ \Delta, \NA: \nub (T) \vdash_{\rho} \PP$ then $ \Delta\vdash_{\rho} \PP.$ 
+\end{itemize}
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the depth of the derivation $ \Delta\vdash_\rho \PP.$ We comment only the case when the last applied rule is \rulename{(t-in)}. We distinguish two cases.
+\begin{itemize}
+\item [$(a)$] Let $\NA \leftrightarrow \NR$ and $\NR\notin \sym{\PP}$ and $\Delta'=\Delta\subst{\NR}{\NA},$ and $ \Delta,\NA: \{\NA\} (T) \vdash_\rho \receive\NB\role\msg\NX.\PP.$ 
+Since $\NA\notin\fn{\receive\NB\role\msg\NX\PP},$ and without loss of generality, we can conclude $\NA\not=\NB$ and $\NA\not=\NX.$ 
+By Lemma \ref{lemm:Inv.Lemma} we have that $ \Delta,\NA: \{\NA\}(T),\NX: T' \vdash_{\rho} \PP$ and $\Delta(\NB)=\ttype(T'),$ and $\NB\notin\rho$ implies $\ttype \subseteq\rho.$ 
+By induction hypothesis we have $ \Delta',\NX: T'\subst{\NR}{\NA} \vdash_{\rho} \PP.$
+Since $\NA \notin\rho$ then $\NA\in \ttype$ implies $\NB\in \rho.$ If $\NA\notin \ttype$ then $\ttype\subst{\NR}{\NA}=\ttype.$ Thus, by \rulename{(t-in)} we derive $ \Delta' \vdash_\rho \receive\NB\role\msg\NX.\PP.$
+%
+\item [$(b)$] If $\NA \leftrightarrow \nub$ and $ \Delta,\NA: \{\NA\} (T) \vdash_\rho \receive\NB\role\msg\NX.\PP.$ 
+Using the same arguments as in the first part of the proof, we can again assume $\NA\not=\NB$ and $\NA\not=\NX.$ 
+By Lemma \ref{lemm:Inv.Lemma} we again have that $ \Delta,\NA: \nub(T),\NX: T' \vdash_{\rho} \PP$ and $\Delta(\NB)=\ttype(T'),$ and $\NB\notin\rho$ implies $\ttype \subseteq\rho.$ 
+By induction hypothesis $ \Delta,\NX: T' \vdash_{\rho} \PP.$
+Thus, by \rulename{(t-in)} we derive $ \Delta \vdash_\rho \receive\NB\role\msg\NX.\PP.$
+\end{itemize}
+\end{proof}
+
+Our next result shows that typing is preserved under
+ the structural congruence.
+
+\begin{lemma}[Subject congruence]\label{lemm:Subject_congruence}
+If $ \Delta\vdash_\rho \PP$ and $\PP\equiv \PQ$ then $ \Delta\vdash_\rho \PQ.$
+%\htv{what about $\inact \equiv \rest{\NA: \_} \inact$ ($\Rightarrow$)? I would also add the rule for replication
+%(folding direction)}
+\end{lemma}
+\begin{proof}
+The proof is by induction on the depth of the derivation $\PP\equiv \PQ.$ We comment only three cases, when the last applied rule is \rulename{(sc-par-inact)}, \rulename{(sc-res-extr)} or \rulename{(sc-rep)}.
+\begin{itemize}
+\item \emph{Case} $\PP\parop\inact\equiv\PP$. Assume $ \Delta\vdash_\rho \PP\parop\inact$. By Lemma~\ref{lemm:Inv.Lemma} we have $ \Delta\vdash_{\rho_1} \PP $ and $ \Delta\vdash_{\rho_2} \inact,$ where $\rho_1 \uplus\rho_2=\rho.$ By Lemma~\ref{lemm:Weakening_Lemma} we get $ \Delta\vdash_\rho \PP.$
+
+Now assume $ \Delta\vdash_\rho \PP$. By \rulename{(t-stop)} we obtain $ \Delta\vdash_\emptyset \inact$ and by \rulename{(t-par)} we conclude $ \Delta\vdash_\rho \PP\parop\inact.$
+
+\item \emph{Case} $\PP\parop \rest{\NA: \NR}\PQ \equiv \rest{\NA: \NR}(\PP\parop\PQ)$ or $\PP\parop \rest{\NA: \nub}\PQ \equiv \rest{\NA: \nub}(\PP\parop\PQ),$ if $\NA\notin\fn\PP.$ 
+
+To show implication from right to the left we have two cases.
+\begin{itemize}
+\item [$(a)$] If $\NA \leftrightarrow \NR$ then from $ \Delta\vdash_\rho \PP\parop \rest{\NA: \NR}\PQ$ by Lemma~\ref{lemm:Inv.Lemma} we have that 
+\[ 
+\Delta\vdash_{\rho_1} \PP \text{ and } \Delta\vdash_{\rho_2}  \rest{\NA: \NR}\PQ
+\] 
+where $\rho_1\uplus\rho_2=\rho$, and $\sym{\PP} \cap \sym{\rest{\NA: \NR}\PQ}=\emptyset.$  
+Applying Lemma~\ref{lemm:Inv.Lemma} again we obtain 
+\[ 
+\Delta',\NA:\{\NA\}(T)\vdash_{\rho_2} \PQ
+\] 
+where $\Delta'=\Delta\subst{\NA}{\NR}$ and $\NA\notin\rho_2$ and $\NR\notin\sym{\PQ}.$ Since $\sym{\PP} \cap \sym{\rest{\NA: \NR}\PQ}=\emptyset$ we conclude $\NR\notin\sym{\PP}$, and from $\NA\notin\fn\PP$ and $\NA\in\bn{\rest{\NA : \NR}\PQ}$ without loss of generality can conclude $\NA\notin\rho_1.$ Then, by Lemma~\ref{lemm:Weakening_Lemma} we have 
+\[
+\Delta',\NA:\{\NA\}(T)\vdash_{\rho_1}\PP
+\] 
+where $\Delta'=\Delta\subst{\NA}{\NR}.$ 
+By \rulename{(t-par)} we obtain $ \Delta',\NA:\{\NA\}(T)\vdash_\rho \PP\parop\PQ$ and by \rulename{(t-new)} we conclude $ \Delta\vdash_\rho \rest{\NA: \NR}(\PP\parop\PQ).$
+%
+%
+\item [$(b)$] If $\NA \leftrightarrow \nub$ then from $ \Delta\vdash_\rho \PP\parop \rest{\NA: \nub}\PQ$ by Lemma~\ref{lemm:Inv.Lemma} we have 
+\[ 
+\Delta\vdash_{\rho_1} \PP \text{ and } \Delta\vdash_{\rho_2}  \rest{\NA: \nub}\PQ
+\] 
+where $\rho_1\uplus\rho_2=\rho.$ 
+By Lemma~\ref{lemm:Inv.Lemma} again  
+\[
+\Delta,\NA:\nub(T)\vdash_{\rho_2} \PQ
+\] 
+where $\NA\notin\rho_2.$ 
+By Lemma~\ref{lemm:Weakening_Lemma} we have $ \Delta,\NA:\nub(T)\vdash_{\rho_1}\PP.$ 
+By \rulename{(t-par)} we derive $ \Delta,\NA:\nub(T)\vdash_\rho \PP\parop\PQ$ and by \rulename{(t-new-rep)} we conclude $ \Delta\vdash_\rho \rest{\NA: \nub}(\PP\parop\PQ).$
+\end{itemize}
+
+
+To show implication from left to the right we again have two cases.
+\begin{itemize}
+\item [$(a)$] If $\NA \leftrightarrow \NR$ then from $ \Delta\vdash_\rho \rest{\NA: \NR} ( \PP\parop \PQ)$ by Lemma~\ref{lemm:Inv.Lemma} we obtain $ \Delta', \NA: \NA(T)\vdash_{\rho} \PP \parop \PQ$, where $\Delta'=\Delta\subst{\NA}{\NR}$ and $\NR \notin\sym{\PP\parop \PQ}$ and $\NA\notin \rho.$ By Lemma~\ref{lemm:Inv.Lemma} 
+\[ 
+\Delta', \NA:\{\NA\}(T)\vdash_{\rho_1} \PP \text{ and } \Delta', \NA: \{\NA\}(T)\vdash_{\rho_2}  \PQ
+\] 
+where $\rho_1\uplus\rho_2=\rho$ and $\sym{\PP} \cap \sym{\PQ}=\emptyset.$  Since $\NA\notin\fn{\PP}\cup \rho_1$ and $\NR\notin \sym{\PP}$ by Lemma~\ref{lemm:Strength.Lemmma} we have $\Delta \vdash_{\rho_1} \PP.$ 
+Using $\NR\notin\sym{\PQ}$ and $\NA\notin\rho_2$ by \rulename{(t-new)} we derive $ \Delta \vdash_{\rho_2}  \rest{\NA: \NR}\PQ,$ and by \rulename{(t-par)} follows $\Delta \vdash_\rho \PP \parop \rest{\NA: \NR} \PQ.$
+%
+\item [$(b)$] If $\NA \leftrightarrow \nub$ then from $ \Delta\vdash_\rho \rest{\NA: \nub} ( \PP\parop \PQ)$ by Lemma~\ref{lemm:Inv.Lemma} we have $ \Delta, \NA: \nub(T)\vdash_{\rho} \PP \parop \PQ$ where $\NA\notin \rho.$ By Lemma~\ref{lemm:Inv.Lemma} 
+\[ 
+\Delta, \NA: \{\NA\}(T)\vdash_{\rho_1} \PP \text{ and } \Delta, \NA: \{\NA\}(T)\vdash_{\rho_2}  \PQ
+\] 
+where $\rho_1\uplus\rho_2=\rho.$ Since $\NA\notin\fn{\PP}\cup \rho_1$ by Lemma~\ref{lemm:Strength.Lemmma} we obtain $ \Delta \vdash_{\rho_1} \PP.$ 
+Using \rulename{(t-new-rep)} we have $ \Delta \vdash_{\rho_2}  \rest{\NA: \nub}\PQ,$ and by \rulename{(t-par)} $ \Delta \vdash_\rho \PP \parop \rest{\NA: \nub} \PQ.$
+\end{itemize}
+
+
+\item \emph{Case} $\repreceive\NA\role\msg\NX.\PP \equiv \repreceive\NA\role\msg\NX.\PP \parop \scope\NA\receive\NA\role\msg\NX.\PP.$ We show only one implication. Assume $ \Delta\vdash_\rho \repreceive\NA\role\msg\NX.\PP \parop \scope\NA\receive\NA\role\msg\NX.\PP.$ By Lemma~\ref{lemm:Inv.Lemma} we have 
+\[ 
+\Delta\vdash_{\rho_1} \repreceive\NA\role\msg\NX.\PP \text{ and } \Delta\vdash_{\rho_2} \scope\NA\receive\NA\role\msg\NX.\PP
+\] 
+where $\rho_1\uplus\rho_2=\rho.$ By the same Lemma we derive $\sym{\PP}=\emptyset$ and $\Delta, \NX: T\vdash_{\{\NA\}} \PP,$ where $\Delta(\NA)=\ttype(T)$ and $\NX \notin \rho_1, \mathit{names}(\Delta).$ By \rulename{(t-rep-in)} we conclude $ \Delta\vdash_{\rho} \repreceive\NA\role\msg\NX.\PP.$
+
+\end{itemize}
+\end{proof}
+
+
+In order to prove that reduction preserves typing we also need another auxiliary result that connects a typing and name substitutions of a process.
+\begin{lemma}[Substitution]\label{lemm:Substitution_lemma}
+
+Let $ \Delta,\NX:\ttype(T)\vdash_\rho \PP$ and $\NX\notin\mathit{names}(\Delta)$. 
+\begin{itemize}
+\item[$1$.] If $\Delta(\NA)=\{\NA\}(T)$  and $\NA\in \ttype$ then $\Delta\vdash_{\rho\subst{\NA}{\NX}} \PP\subst{\NA}{\NX}.$
+\item[$2$.] If $\Delta(\NA)=\nub(T)$  and $\nub=\ttype$ then $\Delta\vdash_{\rho\subst{\NA}{\NX}} \PP\subst{\NA}{\NX}.$
+\end{itemize}
+
+\end{lemma}
+\begin{proof}
+The proof is by induction on the depth of the derivation $ \Delta\vdash_\rho\PP.$ We detail two cases:
+\begin{itemize}
+\item \emph{Case} $ \Delta,\NX:\ttype(\ttype'(T))\vdash_\rho \send\NX\role\msg\NB.\PP.$ 
+By Lemma \ref{lemm:Inv.Lemma} we have $ \Delta, \NX:\ttype(\ttype'(T))\vdash_{\rho}\PP,$ where $\Delta(\NB)=\ttype''(T)$ and $\ttype''\subseteq\ttype'$, and $\NX\notin\rho$ implies $\ttype\subseteq\rho.$ 
+By induction hypothesis 
+$
+\Delta\vdash_{\rho\subst{\NA}{\NX}} \PP\subst{\NA}{\NX}
+$. We now distinguish two cases.
+\begin{itemize}
+\item [$1$.]  $\Delta(\NA)=\{\NA\}(\ttype'(T))$ and $\NA\in \ttype$. Then, $\NX\in\rho$ implies $\NA\in\rho\subst{\NA}{\NX}$, and if $\NX\not\in\rho$ by $\ttype\subseteq\rho$ we again derive $\NA\in\ttype\subseteq\rho=\rho\subst{\NA}{\NX}.$ 
+\item [$2$.]  $\Delta(\NA)=\nub(\ttype'(T))$ and $\nub=\ttype$. Since $\rho$ is a multiset of names, we conclude  $\NX\in\rho$ must hold. Hence, $\NA\in\rho\subst{\NA}{\NX}.$
+\end{itemize}
+In both cases by \rulename{(t-out)} we conclude $ \Delta\vdash_{\rho\subst{\NA}{\NX}} (\send\NX\role\msg\NB.\PP)\subst{\NA}{\NX}.$
+
+\item \emph{Case} $ \Delta,\NX:\ttype(T)\vdash_\rho \send\NB\role\msg\NX.\PP.$ 
+By Lemma \ref{lemm:Inv.Lemma} we have $ \Delta, \NX:\ttype(T)\vdash_{\rho}\PP,$ where $\Delta(\NB)=\ttype'(\ttype''(T))$, and $\ttype\subseteq\ttype''$, and $\NB\notin\rho$ implies $\ttype\subseteq\rho.$ 
+By induction hypothesis $ \Delta\vdash_{\rho\subst{\NA}{\NX}} \PP\subst{\NA}{\NX}.$ Again, we distinguish two cases.
+\begin{itemize}
+\item [$1$.]  $\Delta(\NA)=\{\NA\}(\ttype'(T))$ and $\NA\in \ttype$. Then, $\NA\in\ttype\subseteq\ttype''$.
+\item [$2$.]  $\Delta(\NA)=\nub(\ttype'(T))$ and $\nub=\ttype$. Then, $\nub=\ttype\subseteq\ttype''.$
+\end{itemize}
+Thus, in both cases by \rulename{(t-out)} we derive $ \Delta\vdash_{\rho\subst{\NA}{\NX}} (\send\NB\role\msg\NX.\PP)\subst{\NA}{\NX}.$
+\end{itemize}
+\end{proof}
+  
+We may notice that, even though subtyping is not present, the last result uses an inclusion principle ($\NA \in \ttype$) that already hints on substitutability. Our next results shows that if two processes that both need authorization for the same name are placed in a two-hole context and then typed with $\rho=\emptyset$, then the two authorizations are present in the context and the corresponding $\operator$ operator is consequently defined. The proof of next lemma follows in expected lines by induction on the structure of the context and here is omitted.
+
+
+\begin{lemma}[Authorization Safety]
+\label{lem:authpresent}
+If $\Delta \vdash_\emptyset \context[\PP_1,\PP_2]$ and 
+$\Delta \vdash_{\rho_1} \PP_1$ and $\Delta \vdash_{\rho_2} \PP_2$
+and $\NA\in\rho_1 \cap \rho_2$ then $ \optop{\context[\cdot_1,\cdot_2]}{\NA}{\NA}$ is defined.
+\end{lemma}
+
+We can now show that a well-typed process is not an error.
+For the rest of the section, we use $\rest{\tilde\NC: \tilde{\Omega}}$ to abbreviate $\rest{\NC_1: \Omega_1}\ldots\rest{\NC_n: \Omega_n}$, where $\Omega$ ranges over symbols from $\cal{S}$
+and $\nu$.
+\begin{lemma}[Interaction Safety]\label{lemm:error.free}
+Let $\PP$ be well-typed with $\Delta\vdash_\emptyset \PP$.
+\begin{itemize}
+%\item[]{}
+\item[$1$.] If $\PP\equiv \rest{\tilde\NC: \tilde{\Omega}}\context[\send\NA\role\msg\NB.\PP_1, \receive\NA\role\msg\NX.\PP_2]$ then $ \optop{\context[\cdot_1,\cdot_2]}{\NA}{\NA}$ is defined and for $\context'[\cdot_1, \cdot_2]= \optop{\context[\cdot_1,\cdot_2]}{\NA}{\NA}$ and $\PQ\equiv \rest{\tilde\NC: \tilde{\Omega}}\context'[\scope\NA\PP_1, \scope\NA\PP_2\subst{\NB}{\NX}]$ we have that $ \Delta\vdash_\emptyset \PQ.$
+\item[$2$.] If $\PP\equiv \rest{\tilde\NC: \tilde{\Omega}}\context[\sauth\NA\role\msg\NB.\PP_1, \rauth\NA\role\msg\NB.\PP_2]$ then $ \optop{\context[\cdot_1,\cdot_2]}{\NA, \NB}{\NA}$ is defined and for $\context'[\cdot_1, \cdot_2]= \optop{\context[\cdot_1,\cdot_2]}{\NA, \NB}{\NA}$ and $\PQ\equiv \rest{\tilde\NC: \tilde{\Omega}}\context'[\scope\NA\PP_1, \scope\NA\scope\NB\PP_2]$ we have that $ \Delta\vdash_\emptyset \PQ.$
+\end{itemize}
+
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the structure of the context $\context[\cdot_1, \cdot_2].$ We detail only the first statement. If $ \Delta\vdash_\emptyset \PP$ by Lemma~\ref{lemm:Subject_congruence} we have  
+\[ \Delta\vdash_\emptyset \rest{\tilde\NC: \tilde{\Omega}}\context[\send\NA\role\msg\NB.\PP_1, \receive\NA\role\msg\NX.\PP_2]
+\] 
+and by consecutive application of Lemma ~\ref{lemm:Inv.Lemma}. $1$ and $2$, we derive 
+\[
+ \Delta'\vdash_\emptyset \context[\send\NA\role\msg\NB.\PP_1, \receive\NA\role\msg\NX.\PP_2]
+\]
+where $\Delta'= \Delta, \Delta''$, and for each $\NC\in\mathit{dom}(\Delta'')$ we have that $\Delta''(\NC)=\NC(T)$ or $\Delta''(\NC)=\nub(T).$ By consecutive application of Lemma~\ref{lemm:Inv.Lemma}. $3$ and $9$ 
+\[
+ \Delta'\vdash_{\rho_1} \send\NA\role\msg\NB.\PP_1 \quad \text{and} \quad  \Delta'\vdash_{\rho_2} \receive\NA\role\msg\NX.\PP_2
+\]
+for some multisets of names $\rho_1, \rho_2.$ 
+By the same Lemma again 
+\[
+ \Delta'\vdash_{\rho_1} \PP_1 \quad \text{and} \quad  \Delta', \NX:\ttype(T)\vdash_{\rho_2}\PP_2
+\]
+where $\Delta'(\NA)=\{\NA\}(\ttype(T))$ or $\Delta'(\NA)=\nub(\ttype(T))$, and, thus, we may conclude $\NA\in\rho_1,$ $\NA\in\rho_2.$  Furthermore, we may observe that $\Delta'(\NB)=\{\NB\}(T)$ or $\Delta'(\NB)=\nub(T),$ and $\NB\in\ttype$  and $\NX\notin\rho_2\cup\mathit{names}(\Delta')$. Hence, we have $\rho_2\subst{\NB}{\NX}=\rho_2,$ and by Lemma~\ref{lemm:Substitution_lemma} we obtain $\Delta'\vdash_{\rho_2}\PP_2\subst{\NB}{\NX}.$
+By \rulename{(t-auth)} we derive
+\[
+ \Delta'\vdash_{\rho_1'} \scope\NA \PP_1 \quad \text{and} \quad  \Delta'\vdash_{\rho_2'} \scope \NA\PP_2\subst{\NB}{\NX},
+\]
+where $\rho_1=\rho_1'\uplus\{\NA\}$ and $\rho_2=\rho_2'\uplus\{\NA\}.$
+
+Since $ \Delta'\vdash_\emptyset \context[\send\NA\role\msg\NB.\PP_1, \receive\NA\role\msg\NX.\PP_2],$ and $\NA\in\rho_1\cap\rho_2$, by Lemma~\ref{lem:authpresent} we conclude
+ $\optop{\context[\cdot_1,\cdot_2]}{\NA}{\NA}$ is defined.
+%
+Thus, by Proposition~\ref{prop:Cases_for_contexts} we distinguish four cases for the structure of the context 
+\[
+\context[\cdot_1, \cdot_2]=\context''[\context_1[\cdot_1] \parop \context_2[\cdot_2]]
+\] 
+We comment only the case when $\context_1[\cdot]=\context_1'[\scope\NA \context_1''[\cdot]]$ and $\context_2[\cdot]=\context_2'[\scope\NA \context_2''[\cdot]],$ where $\operator(\context_1''[\cdot]; \NA)$ and $\operator(\context_2''[\cdot]; \NA)$ are undefined.  The latter implies that in contexts $\context_1''[\cdot]$ and $\context_2''[\cdot]$ the holes are not in the scope of authorizations $\scope\NA.$  
+By consecutive application of \rulename{(t-par)} and \rulename{(t-auth)} we derive 
+\[ 
+\Delta' \vdash_{\rho_1''} \scope\NA \context_1''[\send\NA\role\msg\NB.\PP_1] \text{ and } \Delta' \vdash_{\rho_2''} \scope\NA \context_2''[\receive\NA\role\msg\NX.\PP_2]
+\] 
+and also 
+\[ 
+\Delta' \vdash_{\rho_1''}  \context_1''[\scope\NA\PP_1] \text{ and } \Delta' \vdash_{\rho_2''}  \context_2''[\scope\NA\PP_2\subst{\NB}{\NX}]
+\] 
+for some $ \rho_1''$ and $\rho_2''.$ 
+Since $\context'[\cdot_1, \cdot_2]=\context''[\context_1'[\context_1''[\cdot_1]] \parop \context_2'[\context_2''[\cdot_2]]]$, by consecutive application of \rulename{(t-par)} and \rulename{(t-auth)} we have $\Delta'\vdash_\emptyset \context'[\scope\NA\PP_1, \scope\NA\PP_2\subst{\NB}{\NX}]$. Then, by consecutive application of \rulename{(t-new)} and \rulename{(t-new-rep)} we have 
+\[
+\Delta\vdash_\emptyset \rest{\tilde\NC: \tilde{\Omega}}\context'[\scope\NA\PP_1, \scope\NA\PP_2\subst{\NB}{\NX}]
+\]
+By Lemma~\ref{lemm:Subject_congruence} we conclude $\Delta\vdash_\emptyset \PQ.$
+\end{proof}
+
+Since errors involve redexes, the proof of Lemma~\ref{lemm:error.free} is intertwined with the proof of the error absence property. As a direct consequence of Lemma~\ref{lemm:error.free} we get the soundness of our typing analysis.
+
+%, stating typability implies well-formedness and error absence (cf. Definition~\ref{d:error}) . 
+
+\begin{proposition}[Type Soundness]\label{lemm:error.freedom}
+If $\PP$ is well-typed then $\PP$ is not an error.
+\end{proposition}
+%
+We may also show that reduction also preserves typing. 
+
+\begin{theorem}[Subject Reduction]\label{theorem:Subject_reduction}
+If $\PP$ is well-typed, $ \Delta\vdash_\emptyset\! \PP$ and $\PP\!\red\!\PQ$ then $ \Delta\vdash_\emptyset \PQ.$
+\end{theorem}
+\begin{proof}
+The proof follows by induction on the derivation of $\PP\red\PQ$.
+We have two base cases by rules \rulename{(r-comm)} or \rulename{(r-auth)}, both of which follow directly by Lemma~\ref{lemm:error.free}. 
+For the induction steps we have two cases.
+\begin{itemize}
+\item If the last applied rule is \rulename{(r-newc)} we again distinguish two cases.
+	\begin{itemize}
+	\item [$(a)$] $\rest{\NA: \NR} \PP' \red \rest{\NA: \NR} \PQ'$ is derived from $ \PP' \red  \PQ'.$ Let $ \Delta\vdash_\emptyset \rest{\NA: \NR} \PP'.$ By Proposition~\ref{lemm:well-formed} we conclude $\rest{\NA: \NR} \PQ'$ is well-formed, thus $\NR\notin\sym{\PQ'}$.
+By Lemma~\ref{lemm:Inv.Lemma} we have that $ \Delta', \NA: \{\NA\}(T) \vdash_\emptyset \PP',$ where  $\NR\notin\sym{\PP'}$ and $\Delta'=\Delta\subst{\NA}{\NR}.$ By induction hypothesis $ \Delta', \NA: \{\NA\}(T) \vdash_\emptyset \PQ',$ and by \rulename{(t-new)} we derive $ \Delta\vdash_\emptyset \rest{\NA: \NR} \PQ'.$ 
+	\item [$(b)$] $\rest{\NA: \nub} \PP' \red \rest{\NA: \nub} \PQ'$ is derived from $ \PP' \red  \PQ'.$Follows similar reasoning, by application of rule \rulename{(t-new-rep)}.
+	\end{itemize} 
+\item If the last applied rule is \rulename{(r-struc)} then $ \PP \red \PQ$ is derived from $ \PP' \red  \PQ',$ where $\PP\equiv \PP'$ and $\PQ\equiv \PQ'.$ Let $ \Delta\vdash_\emptyset \PP.$ By Lemma~\ref{lemm:Subject_congruence} we have $ \Delta\vdash_\emptyset \PP'.$ By induction hypothesis $ \Delta\vdash_\emptyset \PQ'$ and again by Lemma~\ref{lemm:Subject_congruence} we conclude $ \Delta\vdash_\emptyset \PQ.$
+\end{itemize}
+\end{proof}
+
+
+
+Combining Proposition~\ref{lemm:error.freedom} and Theorem~\ref{theorem:Subject_reduction} we may observe that a well-typed process is not an error and also that it never reduces to an error, which is the main result of this section.
+ 
+%\vspace{-4pt}
+\begin{corollary}[Type Safety]\label{cor:Type_Safety}
+If $\PP$ is well-typed and $\PP\red^*\PQ$ then $\PQ$ is not an error.
+\end{corollary}
+%\vspace{-4pt}
+%Hence type safety ensures that well-typed processes will never incur in a configuration where the necessary authorizations to carry out the communications are lacking.  
+
+
+
+
+
+\subsection{Illustrating typing rules by examples}\label{sec:examples_after_types}
+In this section, we further explain the principles behind our typing discipline by extending the example given in Section~\ref{sec:types_intro_examples}.
+Let us consider that the first process shown in Section~\ref{sec:types_intro_examples} is 
+composed with another process
+ willing to send a name along $\mathit{alice}$, specifically
+\begin{equation}\label{example:sending.exam}
+\scope{\mathit{alice}}\send{\mathit{alice}}\role\msg{exam}. \inact \parop
+%\scope{\mathit{exam}}\scope{minitest}
+%\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg{x}.
+%\receive{x}\role\msg{\mathtt{Task}}. %\mathit{DoTask}.
+\scope{\mathit{exam}}\scope{\mathit{minitest}}
+\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg{x}.
+\send{x}\role\msg{\mathit{value}}. \inact
+\end{equation}
+Considering assignments $\mathit{alice} :\{\mathit{alice}\}( \{\mathit{exam}, \mathit{minitest}\} (\{ \mathit{value} \}(\emptyset)))$ and $\mathit{exam}: \{\mathit{exam}\} ( \{\mathit{value}\}(\emptyset) )$, by rule \rulename{(t-out)} we may observe that sending name $\mathit{exam}$ on $\mathit{alice}$ is safe, for %$\{\mathit{exam}\}$ is contained in $\{\mathit{exam},\mathit{minitest}\}$, 
+the only replacement of $\mathit{exam}$ given in its type (which is the name itself)  is also specified as safe to be communicated in $\mathit{alice}$ (since it is included in $\{\mathit{exam}, \mathit{minitest}\}$).
+%
+To exemplify the symbolic representation of names in types, let us consider process (\ref{example:sending.exam}) is placed in the context that 
+ restricts $\mathit{exam}$: 
+\begin{equation}\label{example:restricted.name}
+\rest{\mathit{exam}:\NR}(\scope{\mathit{alice}}\send{\mathit{alice}}\role\msg{exam}. \inact \parop
+\scope{\mathit{exam}}\scope{\mathit{minitest}}
+\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg{x}.
+\send{x}\role\msg{\mathit{value}}. \inact)
+\end{equation}
+The assignment given above for $\mathit{alice}$ changes to $\{\mathit{alice}\}( \{\NR, \mathit{minitest}\} (\{ \mathit{value} \}(\emptyset)))$, by rule \rulename{(t-new)}. The introduced symbol represents that a restricted name can be communicated in $\mathit{alice}$, and that the restricted process cannot be composed with others that rely on contextual authorizations for names exchanged in $\mathit{alice}$.
+%This follows from the fact that the multiset of provided authorizations $\rho$ by definition can contain only names and not symbols. 
+Nevertheless, the process in~(\ref{example:restricted.name}) can be composed with processes $\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg{\NX}.\scope\NX\send\NX\role\msg{\mathit{value}}$ and $\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg{\NX}.\rauth{\mathit{alice}}\role\msg\NX\send\NX\role\msg{\mathit{value}}$, in which the name received in $\mathit{alice}$ is authorized directly.
+%
+Let us now consider replicated process 
+\begin{equation}\label{example:rep.in.with.r}
+\repreceive{{\mathit{license}}}\role\msg\NX.\rest{\mathit{exam}: \NR}(\scope\NX\send\NX\role\msg{\mathit{exam}}.\inact \parop \scope\NX\scope{\mathit{exam}}\receive\NX\role\msg\NY.\send\NY\role\msg{\mathit{value}}.\inact)
+\end{equation}
+that can serve as a model of a server repeatedly available to receive a name and then,  on the received name to receive (in the left thread) and/or to send a fresh name (in the right thread). This process is rejected by our typing analysis since a symbol ($\NR$) appears in the body of a replicated input (cf. \rulename{(t-rep-in)}). In fact, this process can reduce to an error. For instance, the process in~(\ref{example:rep.in.with.r}) can receive $\mathit{alice}$ twice, activating two copies of the replicated process
+%To show why names bound inside a replicated input cannot be subject to contextual authorizations, even 
+%inside the scope of the restriction (like in~(\ref{example:restricted.name})), consider that 
+%(\ref{example:rep.in.with.r}) may evolve to:
+\begin{equation}\label{example:error.rep}
+\begin{array}{c}
+\rest{\mathit{exam_1}: \NR}(\scope{\mathit{alice}}\send{\mathit{alice}}\role\msg{\mathit{exam_1}}.\inact \parop \scope{\mathit{exam_1}}\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg\NY.\send\NY\role\msg{\mathit{value}}.\inact) 
+\\
+\parop
+\rest{\mathit{exam_2}: \NR}(\scope{\mathit{alice}}\send{\mathit{alice}}\role\msg{\mathit{exam_2}}.\inact \parop \scope{\mathit{exam_2}}\scope{\mathit{alice}}\receive{\mathit{alice}}\role\msg\NY.\send\NY\role\msg{\mathit{value}}.\inact) 
+\end{array}
+\end{equation}
+The two ``copies'' of the restricted name $\mathit{exam}$ are actually different names. Since both names can be sent on $\mathit{alice}$ the error can be reached if the received name does not match the contextual authorization (e.g., $\scope{\mathit{exam_2}}\scope{\mathit{alice}}\send{\mathit{exam_1}}\role\msg{\mathit{value}}.\inact$). 
+
+Our typing analysis ensures that names created inside replicated input are distinguished with special symbol $\nub$. The symbol represents that the associated name is never subject to contextual authorizations, not even within the restriction scope (cf. \rulename{(t-new-rep)}). Now, if we consider $\nub$ instead of $\NR$ annotation in the process given in (\ref{example:rep.in.with.r}) %concretely:
+%\vspace{-8pt}
+%\begin{equation}\label{example:rep.in.with.nu}
+%\repreceive{{\mathit{license}}}\role\msg\NX.\rest{\mathit{exam}: \nu}
+%(\scope\NX\send\NX\role\msg{\mathit{exam}}.\inact \parop \scope\NX\scope{\mathit{exam}}
+%\receive\NX\role\msg\NY.\send\NY\role\msg{\mathit{task}}.\inact)
+%\vspace{-8pt}
+%\end{equation}
+we again obtain a process that cannot be typed, but now the reason can be found explicitly in the replicated process: we are trying to rely on the contextual authorizations for name marked with $\nub$, which is not allowed.
+%does not yield it typable, since a contextual authorization is expected for name $\mathit{exam}$ and may  lead to an error like before. % the one shown in~(\ref{example:error.rep}).
+% 
+Hence, for names created in the body of replicated inputs  we cannot rely on contextual authorizations in any part of the process. Still, process
+\begin{equation}\label{example:rep.in.ok}
+\repreceive{{\mathit{license}}}\role\msg\NX.\rest{\mathit{exam}: \nub}\scope{\mathit{alice}}\send{\mathit{alice}}\role\msg{\mathit{exam}}.\inact
+\end{equation}
+can be typed, e.g., using assumption $\mathit{alice}: \{\mathit{alice}\}(\nub(\{\mathit{value}\}(\emptyset) )$. Thus, the process can be composed with processes that do not rely on contextual authorizations for names communicated in $\mathit{alice}$.
+We may observe that the carried type $\{\mathit{value}\}(\emptyset) $ does not change regardless of type $\nub$, and that channels communicated in $\mathit{alice}$ can in turn only be used to communicate $\mathit{value}$.
+%.
+
+
+In our model we can directly represent servers that allow for an infinite authorization generation. For instance, process 
+$$
+\repreceive{{\mathit{public}}}\role\msg{x}.(\scope{x}\sauth{\mathit{public}}\role\msg{x}.\inact \parop \scope{\mathit{public}}\send{\mathit{public}}\role\msg{\mathit{x}}.\inact)
+$$
+can delegate an unbounded number of authorizations for a received name, through delegation on channel $\mathit{public}$. 
+Composing the above process in parallel with $\scope{\mathit{public}}\send{\mathit{public}}\role\msg{\mathit{comm}}.\inact$ yields a process that can generate infinite number of copies of 
+$\scope{\mathit{public}}\scope{comm}\sauth{\mathit{public}}\role\msg{comm}.\inact$.  For this, anyone authorized to use $\mathit{public}$ can also be authorized to use $\mathit{comm}$.  
+%
+Using assumption $\mathit{public}: \{\mathit{public}\}(\ttype(T))$, for some $\ttype$, we can type the authorization generator process, and assuming $\mathit{comm} \in \ttype$ we may also type the composition using $\mathit{comm}: \{\mathit{comm}\}(T)$.
+
+
+
+
+
+
+
+\subsection{Type-checking}{\label{sec:TypeChecking}}
+
+%In this section we present the type checking system, a system suitable for the implementation. There are two main reasons why the typing rules presented in the previous section could not be implemented. The first problem is while introducing a new name to the typing environment in rule \rulename{(t-new)} (see Table \ref{tab:Typing rules}), we have to guess the type associated to that name. We solve this problem by assigning to each name restriction constructor $\rest\NA$ a type of that name $\rest{\NA:\NA(\varphi)}.$ The second problem is splitting the multiset $\rho$ in the rule for parallel composition (see rule \rulename{(t-par)} in Table \ref{tab:Typing rules}). To overcome this problem instead of splitting in the parallel composition we pass on the entire multiset of names of provided authorizations to the left branch, and the part that is unused (by the left branch) to the right branch.
+
+The type analysis presented in the last section can single out processes that are authorization safe, i.e.,  are not errors and do not evolve to errors. However, we may notice that it raises some questions on the applicability of  the induced type-checking procedure.
+This section presents a refined type system that deals with some of the issues
+and in Section~\ref{sec:correspondence_result} we show the two typing systems are equivalent in what concerns typability of processes.
+%\marginpar{H: I'm splitting the three problems given they are of different nature and of different relevance: ``old'' (1) is a classic solution to a hard 
+%problem, (2a) is an interesting solution to a non-trivial problem (2b) is a direct solution to a more trivial problem}
+
+The first problem we can observe is the inference of the type of a bound name in rules \rulename{(t-new)} and \rulename{(t-new-rep)}. We solve this issue in the usual way by adding the type information to name restrictions.
+%
+Therefore, we now write 
+\[
+  {\rest{\NA :\NR(T)}\text{ and }\rest{\NA : \nub(T)},}
+\] 
+ instead of $\rest{\NA :\NR}$ and $\rest{\NA : \nub}$, respectively.
+%
+The second problem is efficiency of guessing how to split the multiset $\rho$ to the branches in rule \rulename{(t-par)}. %so as to check the parallel branches raises questions of efficiency,
+We tackle this problem by refining the type discilpine following the idea of~\cite{DBLP:journals/iandc/Vasconcelos12}. %where also a type-system and a refinement towards type-checking are presented.
+%$(1)$ splitting the multiset $\rho$ in two multisets and $(2)$ determining the sets of symbols for both parallel process,
+%We address problem $(1)$ in a standard way, we change the syntax of our process model by 
+%further expanding the annotations in the name restrictions, and make explicit the type 
+%of any name directly in the name restriction construct. 
+
+The idea is instead of dividing the multiset $\rho$ in two randomly, 
+we first pass the whole $\rho$ to the left branch, after which the part of $\rho$ that is unused by the left branch is passed to the right branch.
+%Then, after typing the left branch, we verify the right branch considering the part of $\rho$ that was not used in the verification of the left branch. 
+Our first attempt to implement this idea is to  extend  
+the typing judgment $\Delta \vdash_\rho \PP$ to 
+$\Delta \vdash_\rho \PP ; \rho',$ where  $\rho'$ represents the multiset of names of authorizations that are not used by $\PP$, and that, hence, serves as  the ``output'' of the algorithm. 
+%i.e., $\rho'$ is part of $\rho$ that is unused when verifying $\PP$.
+Following this intuition, let us try to type process $\scope\NA(\scope\NB \inact \parop \PP)$.
+We may observe that both authorizations $\scope\NA$ and $\scope\NB$ are scoping the left branch 
+and that both are unused by the process there (process $\inact$).  Hence, the intuition says to consider
+%authorizations 
+names $\NA$ and $\NB$ as part of the output multiset when typing $\inact$ and pass them on to
+the right branch (process $\PP$) in the verification. This leads us to a situation in which authorization $\scope\NB$ can be used for the verification of the process $\PP$ without even scoping over the process.
+Therefore, we further refine the typing judgment by splitting the multiset $\rho$ in two, obtaining 
+$\Delta; \rho_1:\rho_2\vdash \PP ; \rho'$,
+where $\rho_1$ represents a multiset of names of authorizations that can be considered to be passed as unused, and names of authorizations in $\rho_2$ cannot be passed ($\rho'$ does not change). 
+Following this intuition and considering again the same process $\scope\NA(\scope\NB \inact \parop \PP)$ 
+we would have that when verifying process $\inact$, 
+%authorization
+name $\NA$ is in $\rho_1$, while $\NB$ is in $\rho_2$ (not to be passed), resulting in $\rho'=\{\NA\}$.
+
+The third problem of the typing rules given in the last section is also connected to rule \rulename{(t-par)}: we need to deduce if the two sets of symbols mentioned in the two branches are disjoint. We use similar reasoning as before, and once again refine the typing judgment to 
+\[
+   {\Delta; \rho_1:\rho_2; \usedsym\vdash \PP ; \rho'; \usedsym',}
+\] 
+where 
+$\usedsym$
+%\marginpar{we need to fix this overloading... let us use small $s$ for the latter?}
+%\marginpar{\new{I: we use small $s$ as one of the symbols. I will use $\usedsym$, we can change it later.}}
+%\marginpar{H: Changed from $\sigma$ to $\usedsym$}
+%\marginpar{I: We use $\varphi$ in the syntax of types, check page 16.}
+%\marginpar{H: What about $\xi$?}
+is a set that incrementally collects all used symbols from $\cal S$ mentioned in the process, and $\usedsym'$ is 
+the output of the algorithm, which in this case is the set of used symbols. 
+%
+The idea is to use set $\usedsym$ to collect used symbols, that are then passed in the output $\usedsym'$. Hence, when parallel composition is considered, starting set if symbols $\usedsym$ should be first passed to the left branch. Then, all symbols discovered in the verification of the left branch are added to $\usedsym$ and passed to the right branch in the output $\usedsym'$. % When type-checking the parallel composition,
+%we consider the set of symbols that have been discovered by the algorithm to that point in the verification of the left branch.
+%Then, we consider the output set obtained in the verification of the left branch (which consists in the starting set of symbols together 
+%with the symbols used in the left branch) to verify the right branch, which result is also the one for
+%the parallel composition process. 
+%In this way, we have that the output $\usedsym'$ always contain all symbols of the type-checked process.
+We remark that there are no changes in the interpretation of the typing environment $\Delta$ with respect to typing discipline given in Section~\ref{sec:Types}.
+
+
+We noted that in the typing judgment multiset $\rho_1$ represents authorizations that can be passed to a process placed in parallel and typed afterwards, while $\rho_2$ represents authorizations that are not for passing. Consider now process  $\send\NA\role\msg\NB.\send\NA\role\msg\NC.\inact$ is typed with $\rho_1=\{\NA,\NA\}$ and $\rho_2=\emptyset$. When typing the first output one authorization in $\rho_1$ should be considered as used, and hence, not to be considered as to be passed. However, the authorization should be considered as  still available for the second output of the process (representing the confinement of the operational semantics). To this end, while typing the first output we need only to transfer one name from $\rho_1$ to $\rho_2$. Then, the second output is typed with $\rho_1=\NA$ and $\rho_2=\NA$, in which case no transfer is needed as one $\NA$ is already in $\rho_2$ (representing the fairness).
+We formalize this idea by introducing an auxiliary operation, called $\transfer$, dedicated for transferring names between multisets. 
+
+Similar to operator $\operator$ from Section~\ref{subsec:reduction}, operator $\transfer$ also has a twofold meaning. On one hand, $\transfer(\rho_1:\rho_2,\NB)$ represents
+the transfer of name $\NB$ from multiset $\rho_1$ to multiset $\rho_2$, provided the name 
+is not already contained in $\rho_2$ in the first place. If the name is contained in $\rho_2$ the operation is idempotent. 
+On the other hand, if the name is not present in both multisets, i.e., if $\NB\notin\rho_1\uplus\rho_2$, the operator is undefined, signaling insufficient authorizations.   
+
+\begin{definition}[Operator $\transfer$]\label{def:operator_move}
+Operator $\transfer$ takes as 
+arguments a pair of multisets $\rho_1:\rho_2$ and a name $\NB$ and is defined as follows
+\[
+\transfer(\rho_1:\rho_2,\NB)=\rho_1\setminus(\{\NB\}\setminus\rho_2):\rho_2\uplus(\{\NB\}\setminus\rho_2),
+ \text{ if }  \NB\in\rho_1\uplus\rho_2  \text{ (undefined otherwise)}.
+\]
+%\marginpar{H: maybe we should add 
+%``(if $\NB\in\rho_1\uplus\rho_2$)'' as otherwise the definition is incomplete}
+%Hence, operator $\transfer$ checks weather the authorization for name $\NA$ is present 
+%in one of the multisets and if the name is contained only in $\rho_1$ moves it to $\rho_2$.
+%This transference is necessary for the authorization that is used by the process and hence cannot be considered as unused anymore.
+%Rule \rulename{(a-out-2)} follows the same lines, except that now we consider that authorizations from set $\ttype$ are all needed to authorize the action. 
+Operator $\transfer$ is directly generalized for the case of transferring a set of names $\ttype$, 
+by transferring it name by name, namely if $\ttype=\NB,\ttype'$ then
+for arbitrary %some 
+multisets $\rho_1$ and $\rho_2$, we  write 
+$\transfer(\rho_1: \rho_2, \ttype)=\transfer(\transfer(\rho_1:\rho_2,\NB),\ttype')$.
+\end{definition}
+
+\begin{table}
+\[
+\begin{array}[t]{@{}c@{}}	
+%{\small
+\inferrule[(a-stop)]
+	{}
+	{ \Delta; {\rho_1:\rho_2}; \usedsym\vdash \inact ; \rho_1; \usedsym }
+%} 
+\qquad	
+%{\small
+\inferrule[(a-auth)]
+	{ \Delta; \rho_1: \rho_2\uplus\{\NA\}; \usedsym\vdash \PP;\rho'; \usedsym' }
+	{ \Delta; \rho_1: \rho_2 ; \usedsym\vdash \scope{\NA}\PP;\rho'; \usedsym' }
+%\vspace{2ex}\\
+%}
+	\\ 
+%{\small
+\inferrule[(a-par)]
+	{ \Delta; {\rho_1\uplus\rho_2: \emptyset}; \usedsym\vdash \PP_1 ;\rho_3; \usedsym'   \quad  \Delta; \rho_3: \emptyset; \usedsym'\vdash \PP_2; \rho_4; \usedsym'' }
+	%\quad \sym{\PP_1}\cap\sym{\PP_2}=\emptyset 
+	{ \Delta; {\rho_1: \rho_2}; \usedsym\vdash  \PP_1 \parop \PP_2; \rho_1\cap \rho_4; \usedsym'' }
+%}
+	\\ 
+%{\small
+\inferrule[(a-new)]
+	{ \Delta, \NA: \{\NA\}(T); \rho_1: \rho_2; \usedsym\cup \NR \vdash \PP; \rho';\usedsym'  \quad  \Delta'=\Delta\subst{\NR}{\NA} \quad \NR\notin \usedsym \quad   \NA\notin\rho_1,\rho_2,\mathit{names} (T)}
+	{ \Delta'; \rho_1: \rho_2; \usedsym \vdash \rest{\NA: \NR(T)}\PP; \rho';\usedsym' }
+%\vspace{1ex}
+%}
+ \\
+%{\small
+\inferrule[(a-new-rep)]
+	{ \Delta, \NA:\nub (T); \rho_1: \rho_2; \usedsym\vdash \PP; \rho';\usedsym'  \quad   \NA\notin\rho_1,\rho_2, \mathit{names} (T, \Delta) }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \rest{\NA: \nub(T)}\PP; \rho';\usedsym' }
+%\vspace{2ex}
+\end{array}
+\]
+%\vspace{-2ex}
+\caption{\label{tab:Algorithmic type-checking1} Type-checking rules (part 1).}
+\end{table}
+ 
+We may now present the type-checking rules. Table~\ref{tab:Algorithmic type-checking1} presents the rules for typing non-prefixing language constructs, explained next reading from conclusion to premises.
+
+\begin{itemize}
+\item 
+In rule \rulename{(a-stop)} multiset of names $\rho_1$ and the set of symbols $\usedsym$ 
+are passed as the output, while $\rho_2$ is discarded. 
+\item 
+In \rulename{(a-auth)} the name of authorization that scopes over process $\PP$,
+ is added to multiset $\rho_2$ since after type-checking the process $\PP$ the 
+authorization should not be considered as available outside of this scope.
+\item 
+In \rulename{(a-par)} multisets of names of authorizations $\rho_1$ and $\rho_2$ given for the parallel composition
+are passed to the left branch (process $\PP_1$) as authorizations that can 
+be passed (to the right branch). The second multiset of names, which refers to authorizations exclusively scoping  the left branch, is empty. 
+In the same way, the starting set of symbols $\usedsym$ is passed to process $\PP_1$.
+The part of $\rho_1\uplus\rho_2$ that is unused in the verification of process $\PP_1$
+is given in $\rho_3$ and is thus passed to the verification of the right branch (process $\PP_2$). 
+Also, the set of symbols $\usedsym'$, which is $\usedsym$ enlarged with symbols from $\PP_1$, is passed to the verification of $\PP_2$.
+The output of the checking the parallel composition is: 
+a multiset $\rho_1\cap\rho_4$, which is a multiset of names of authorizations that are unused 
+by both $\PP_1$ and $\PP_2$ obtained in the verification of the right branch ($\rho_4$), and originally considered to be passed as unused for the parallel composition process ($\rho_1$); the 
+set of symbols $\usedsym''$, obtained as the result of the verification of the right branch ($\usedsym$ with symbols from $\PP_1$ and $\PP_2$). 
+\item 
+The only novelty in rule \rulename{(a-new)} is that the symbol associated with restricted name is added to the set of used symbols, and rule \rulename{(a-new-rep)} follows exactly the same lines as \rulename{(t-new-rep)} (except using the explicit types given in the syntax).
+\end{itemize}
+ 
+ 
+\begin{table}
+\[
+\begin{array}[t]{@{}c@{}}
+\inferrule[(a-out-1)]
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \PP; \rho';\usedsym'  \quad \Delta(\NA)=\ttype(\ttype'(T)) \quad \Delta(\NB)=\ttype''(T)  \quad  \ttype''\subseteq \ttype' 
+	\\
+	\vspace{1ex}
+	  \NA\in\rho_2  \vee  \ttype\subseteq\rho_2 
+    }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \send\NA\role\msg\NB.\PP; \rho';\usedsym' }
+%}
+%\vspace{2ex}
+	\\ 
+%{\small
+\inferrule[(a-out-2)]
+	{ \Delta; \rho_1': \rho_2'; \usedsym\vdash \PP; \rho';\usedsym'  \quad \Delta(\NA)=\ttype(\ttype'(T)) \quad \Delta(\NB)=\ttype''(T) \quad  \ttype''\subseteq \ttype'	
+	\\
+	\vspace{1ex} 
+   	 \NA\not\in\rho_2  \wedge  \ttype\not\subseteq\rho_2 \quad \beta=\NA \vee \beta=\ttype \quad \rho_1':\rho_2'=\transfer(\rho_1: \rho_2, \beta)
+   }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \send\NA\role\msg\NB.\PP; \rho';\usedsym' }
+%}
+%\vspace{2ex}
+	\\ 
+%{\small
+\inferrule[(a-in-1)]
+	{ \Delta,\NX:T; \rho_1: \rho_2; \usedsym\vdash \PP; \rho';\usedsym'  \quad \Delta(\NA)=\ttype(T) \quad \NX\notin\rho_1,\rho_2,\mathit{names}( \Delta)
+	\\
+	\vspace{1ex} 
+     \NA\in\rho_2  \vee  \ttype\subseteq\rho_2 
+   }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \receive\NA\role\msg\NX.\PP; \rho';\usedsym' }
+%}
+%\vspace{2ex}
+	\\ 
+%{\small
+\inferrule[(a-in-2)]
+	{ \Delta,\NX:T; \rho_1': \rho_2'; \usedsym\vdash \PP; \rho';\usedsym'  \quad \Delta(\NA)=\ttype(T) \quad \NX\notin\rho_1,\rho_2,\mathit{names}( \Delta)  
+	\\
+	\vspace{1ex} 
+	 \NA\not\in\rho_2  \wedge  \ttype\not\subseteq\rho_2 \quad \beta=\NA \vee \beta=\ttype \quad \rho_1':\rho_2'=\transfer(\rho_1: \rho_2, \beta)
+   }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \receive\NA\role\msg\NX.\PP; \rho';\usedsym' }
+%}
+%\vspace{2ex}
+	\\ 
+%{\small
+\inferrule[(a-rep-in)]
+	{ \Delta,\NX:T;\emptyset: \{\NA\} ; \emptyset \vdash \PP; \emptyset; \emptyset  \quad \Delta(\NA)=\ttype(T) \quad 
+	  \NX \notin \rho_1, \rho_2, \mathit{names}(\Delta) }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash\; \repreceive\NA\role\msg\NX.\PP; \rho_1;\usedsym }
+%\vspace{1ex}
+%}
+
+	\\ 
+%{\small
+\inferrule[(a-deleg-1)]
+	{ \Delta; \rho_1': \rho_2'; \usedsym\vdash_\rho \PP; \rho';\usedsym' \quad \Delta(\NA)=\ttype(T) \quad \rho_1':(\rho_2'\uplus\{\NB\})=\transfer(\rho_1: \rho_2, \NB)
+		\\
+	\vspace{1ex} 
+	 \NA\in\rho_2'  \vee  \ttype\subseteq\rho_2'
+   }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \sauth\NA\role\msg\NB.\PP; \rho';\usedsym' }
+%}
+	
+	\\ 
+%{\small
+\inferrule[(a-deleg-2)]
+	{ \Delta; \rho_1': \rho_2'; \usedsym\vdash_\rho \PP; \rho';\usedsym' \quad \Delta(\NA)=\ttype(T) \quad \rho_1'':(\rho_2''\uplus\{\NB\})=\transfer(\rho_1: \rho_2, \NB)
+		\\
+	\vspace{1ex} 
+	\NA\not\in\rho_2''  \wedge  \ttype\not\subseteq\rho_2'' \quad \beta=\NA \vee \beta=\ttype \quad \rho_1':\rho_2'=\transfer(\rho_1'': \rho_2'', \beta)
+   }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash \sauth\NA\role\msg\NB.\PP; \rho';\usedsym' }
+%}
+
+	\\
+%{\small
+\inferrule[(a-recep-1)]
+	{ \Delta; \rho_1: \rho_2\uplus\{\NB\}; \usedsym\vdash \PP; \rho';\usedsym'  \quad \Delta(\NA)=\ttype(T) 
+		\quad \NA\in\rho_2  \vee  \ttype\subseteq\rho_2 
+   }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash_{\rho} \rauth\NA\role\msg\NB.\PP; \rho';\usedsym' }
+%}
+	\\ 
+	
+%{\small
+\inferrule[(a-recep-2)]
+	{ \Delta; \rho_1': \rho_2'\uplus\{\NB\}; \usedsym\vdash \PP; \rho';\usedsym'  \quad \Delta(\NA)=\ttype(T) 
+		\quad \NA\not\in\rho_2  \wedge  \ttype\not\subseteq\rho_2 
+		\\
+		\vspace{1ex} 
+		\beta=\NA \vee \beta=\ttype \quad \rho_1':\rho_2'=\transfer(\rho_1: \rho_2, \beta)
+   }
+	{ \Delta; \rho_1: \rho_2; \usedsym\vdash_{\rho} \rauth\NA\role\msg\NB.\PP; \rho';\usedsym' }
+%}
+
+\end{array}
+\]
+%\vspace{-2ex}
+\caption{\label{tab:Algorithmic type-checking2} Type-checking rules (part 2).}
+\end{table}
+
+
+
+Table~\ref{tab:Algorithmic type-checking2} introduces typing prefixes.
+\begin{itemize}
+\item 
+In \rulename{(a-out-1)} the output process is typed if names of authorizations required for the output ($\NA$ or $\ttype$), are contained in the multiset of names $\rho_2$, hence authorizations that are not considered to be passed. In this case, the continuation process $\PP$ is typed under the unchanged conditions.
+%no changes on multisets $\rho_1$ and $\rho_2$ are necessary.
+\item In \rulename{(a-out-2)} the process is typed if the names of authorizations required for the output are not contained in $\rho_2$ (hence \rulename{(a-out-1)} cannot be applied), but are contained in $\rho_1\uplus\rho_2$.
+%If the names of the authorizations required to perform the output are not contained in $\rho_2$,  but contained in $\rho_1\uplus\rho_2$, rule \rulename{(a-out-2)} is applied.
+This is the case when name $\NA$ or (a subset of) names $\ttype$ included in 
+$\rho_1\setminus\rho_2$, should not be considered as to be passed anymore (for they are used by the prefix) and thus must be transferred 
+from $\rho_1$ to $\rho_2$ by operator $\transfer$. 
+%
+This means that for $\beta=\NA$ the name is transferred from $\rho_1$ to $\rho_2$, and for  $\beta=\ttype$ only names from $\ttype$ that are in $\rho_1$ but are not in $\rho_2$ are transferred from $\rho_1$ to $\rho_2$.
+%
+\item 
+     Rules \rulename{(a-in-1)} and \rulename{(a-in-2)} follow the same lines as rules 
+\rulename{(a-out-1)} and \rulename{(a-out-2)}. 
+%
+\item 
+     In rule \rulename{(a-rep-in)} only one authorization for $\NA$ is specified as available for the process $\PP$. % is checked considering only one authorization $\scope\NA$ is  provided. 
+     The process $\PP$ must contain no symbols, as the input and the output set of symbols are empty. In conclusion, the input multiset of names $\rho_1$ and the set of symbols $\usedsym$ are both passed to the output directly.
+   %  The input and the output set of symbols for $\PP$ are both empty, reflecting that in $\PP$ there are no   symbols from $\cal S$. The output of the original process then consists in the multiset of names $\rho_1$, that are initially considered for passing, and the starting set of symbols $\usedsym$.
+\item 
+     In both rules \rulename{(a-deleg-1)} and \rulename{(a-deleg-2)} the name of the delegated 
+authorization must be present in $\rho_1\uplus\rho_2$ by application of operator $\transfer$. The operator moves $\NB$ from $\rho_1$ to $\rho_2$ if not already present in the former.
+As the authorization is to be delegated away by the prefix, the name $\NB$ is then taken out from the last multiset. %, since the authorization is to be considered as no longer available (due to the delegation).
+After that, name(s) of authorization(s) required for the action on $\NA$ is(are) manipulated following the same reasoning as in \rulename{(a-out-1)} and \rulename{(a-out-2)}.
+\item 
+Rules \rulename{(a-recep-1)} and \rulename{(a-recep-2)} follow the same lines as \rulename{(a-deleg-1)} and \rulename{(a-deleg-2)}, except that the name $\NB$ is not taken out but added to the multiset of names that are directly scoping the process, and hence, not considered to be passed (as in \rulename{(a-auth)}).
+\end{itemize}
+
+We remark that rule \rulename{(a-out-2)} is non-deterministic 
+in the case when both $\NA$ and also (a subset) of $\ttype$ are contained in $\rho_1\setminus\rho_2$, as both options of transferring via $\transfer$ are left open. Furthermore, the non-determinism appears only if also the name $\NA$ is not considered as final in its type, i.e., if $\ttype\not=\NA$ and $\ttype\not=\nub$.
+%, since when both options are available ($\transfer$ is defined in both cases) which one of them is actually transferred is left open ($\beta=\NA \vee \beta=\ttype$). 
+%Notice also this is only an issue when the two options are distinct (i.e., $\{\NA\} \neq \ttype$), hence it is never an issue for 
+%names that are not subject to instantiation (e.g., typed with $\NA: \{\NA\}(T)$).
+Notice that a similar condition ($\NA\notin\rho\Rightarrow \ttype\in\rho$) offering a choice is also present in the original system in rule \rulename{(t-out)}, but here we actually must commit to one of them so as to ``mark'' which names are used. 
+%
+For the purpose of the induced verification procedure, we need to check both possibilities in every application of the rule, up to the point the verification is successful or all options have been explored. 
+
+
+Nevertheless, the type-checking procedure following rules given in Table~\ref{tab:Algorithmic type-checking1} and Table~\ref{tab:Algorithmic type-checking2} is  more efficient than the one following the original rules shown in Table~\ref{tab:Typing rules}. We may observe that rule \rulename{(t-par)} requires the exploration of all possible decompositions of $\rho$, for which a direct implementation is exponential on the size of $\rho$. On the other hand, the rules \rulename{(a-out-2)}, \rulename{(a-in-2)}, \rulename{(a-deleg-2}) and \rulename{(a-recep-2)} also involve some exploration (because of premise $\beta=\NA \vee \beta=\ttype$). In these rules we have two options for $\beta$ when $\transfer$ is defined for both $\NA$ and $\ttype$ and we need to explore both of options to determine typability. In case $\transfer$ is defined only for one option no further exploration is necessary. 
+Therefore, if a program is not typable we need to explore all such options, as for the decompositions of rule \rulename{(t-par)}, for which the exponential complexity can be reached. Still, we can show the efficiency is improved by observing that: 
+\begin{itemize}
+\item the two options for $\beta$ in the mentioned rules are present only once for each name in between applications of the rule for parallel composition, since we can rely on rule \rulename{(a-out-1)} once a choice has already been taken, and 
+\item  the number of possible decompositions of the set $\{a\}\cup \ttype$ is smaller than the number of possible decompositions of $\rho$, since the former is necessarily contained in the latter. 
+\end{itemize} 
+%Thus, exploring the options for decomposing $\rho$ is less efficient w.r.t. exploring the options for $\beta$. 
+
+Furthermore, moving away from the worst case analysis, since we are only interested in well-typed processes (see Definition~\ref{def:well-typed_processes}), we have that at top level all assumptions in $\Delta$ are of the form $\NA:\NA(T)$ or $\NA:\nub(T)$ and also that rules \rulename{(a-new)} and \rulename{(a-new-rep)} only introduce such assumptions. We also have that typing prefixes with subject names with types of the form $\NA:\NA(T)$ or $\NA:\nub(T)$ do not involve such exploration (since $\beta = \ttype = \NA$ in one case and in the other case $\nub$ is not a valid option).
+Hence, only when typing a prefix with a variable $\NX$ as a subject may originate the exploration, and only in very specific cases. In particular, only when construct $\scope\NX$ and/or $\rauth\NA\role\msg\NX$ are present in addition to authorizations for all possible instantiations for $\NX$ (given by the type), of which some are scoping over parallel composition(s). Consider also that even in the case when $\scope\NX$ and/or $\rauth\NA\role\msg\NX$ and authorizations for all instantiations for $\NX$ are present, but none of these are scoping over a parallel composition, the operator $\transfer$ is idempotent so no exploration is necessary.
+
+
+
+Even more important than the argued improvement of the efficiency is that the rules of Table~\ref{tab:Algorithmic type-checking1} and Table~\ref{tab:Algorithmic type-checking2} pave the way for a polynomial type-checking procedure. 
+The idea here is to change the rules to consider only one option, regardless if both are available. We believe this would have a minimal affect on the expressiveness. However, this change would affect our result that the two type systems directly correspond, as shown in the next section. %but fails our purpose here to precisely capture the original type system. 
+Informally, by changing the rules the complexity should be polynomial, since: the rules of Table~\ref{tab:Algorithmic type-checking1} and Table~\ref{tab:Algorithmic type-checking2} are syntax-directed (except for the alerted condition $\beta=\NA \vee \beta=\ttype$), where all elements in the premises are operationally obtained considering the elements in the conclusion and where rules are mutually exclusive. 
+Any two typing rules for the same prefix are also mutually exclusive, e.g.,  $\NA\in\rho_2  \vee  \ttype\subseteq\rho_2$ in rule \rulename{(a-in-1)} and $ \NA\not\in\rho_2  \wedge  \ttype\not\subseteq\rho_2$ in rule \rulename{(a-in-2)}. And finally, consider that all operations, such as environment access and update, (multi)set union, intersection and inclusion may be implemented with polynomial complexity. 
+
+
+\subsubsection{Correspondence result}\label{sec:correspondence_result}
+
+In this section, we show that the type system given in Section~\ref{sec:typing_discipline} is equivalent to the type system given in Section~\ref{sec:TypeChecking}. %, for the purpose of type-checking. 
+% is equivalent to the type system introduced in the previous section. 
+In order to compare the two type systems, we first need to compare the two syntaxes considered, one only with symbols and the other with full type annotations in the name restriction constructs. To this end, we define
+ function $\erase(\PP)$ that removes the extra annotations.
+
+\begin{definition}[Erasing type annotations]
+%Hence, 
+Function $\erase$ is defined as a homomorphism except for 
+\begin{enumerate}
+\item $\erase(\rest{\NA :\NR(T)}\PP)=\rest{\NA :\NR}\erase(\PP)$
+\item $\erase(\rest{\NA : \nub(T)}\PP)= \rest{\NA : \nub}\erase(\PP)$
+\end{enumerate}
+\end{definition}
+
+In order to show the correspondence of the two type systems, we first establish the correlation between the input and the output information when typing process with the refined type system. Namely, the output multiset of names is always contained in the multiset of names that are considered as to be passed, while the output set of symbols always contains the input set.
+
+\begin{lemma}[%\del{Algorithmic}
+Monotonicity]{\label{lemm:algorithmic_monotonicity}}
+If $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP; \rho'; \usedsym'$ then
+\begin{itemize}
+\item [$1.$] $\sym{\PP}= \usedsym'\setminus \usedsym$ and $\usedsym \subseteq \usedsym'$,
+\item [$2.$] $\rho'\subseteq \rho_1$.
+\end{itemize}
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the depth of the type checking derivation.
+\begin{enumerate}
+\item We detail only when the last applied rules is \rulename{(a-new)} or \rulename{(a-rep-in)}.
+%
+\begin{itemize}
+\item 
+\emph{Case} \rulename{(a-new)}: Let $\Delta'; \rho_1: \rho_2; \usedsym \vdash \rest{\NA: \NR(T)} \PP; \rho'; \usedsym'$ be derived from $\Delta, \NA:\{\NA\}(T); \rho_1: \rho_2; \usedsym\cup \NR \vdash \PP; \rho'; \usedsym'$, where $\Delta'=\Delta\subst{\NR}{\NA}$, $\NR\notin \usedsym$ and $\NA \notin \rho_1, \rho_2, \mathit{names} (T)$. 
+By induction hypothesis we have $\usedsym'\setminus (\usedsym\cup \NR)= \sym{\PP}$ and $\usedsym \cup \NR \subseteq \usedsym'$. 
+Then, $\usedsym'\setminus \usedsym =\sym{\PP} \cup \{\NR\}= \sym{\rest{\NA: \NR(T)} \PP}$ and $\usedsym \subseteq \usedsym'$.
+\item 
+\emph{Case} \rulename{(a-rep-in)}: Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \repreceive\NA\role\msg\NX.\PP; \rho_1; \usedsym$ be derived from $\Delta, \NX: T; \emptyset: \{\NA\}; \emptyset \vdash \PP; \emptyset; \emptyset$,  $\Delta(\NA)=\ttype(T)$ and $\NX\notin \rho_1, \rho_2, \mathit{names}(\Delta)$. 
+By induction hypothesis $\sym{\PP}=\emptyset\setminus \emptyset=\emptyset$ and since $\sym{\PP}=\sym{\repreceive\NA\role\msg\NX.\PP}$, we can conclude $\usedsym \setminus \usedsym= \emptyset =\sym{\repreceive\NA\role\msg\NX.\PP}$.
+\end{itemize}
+
+\item We detail only when the last applied rule is \rulename{(a-out-1)} or \rulename{(a-par)}.
+%
+\begin{itemize}
+\item
+\emph{Case} \rulename{(a-out-2)}: Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \send\NA\role\msg\NB.\PP; \rho'; \usedsym'$ be derived from $\Delta; \rho_1': \rho_2'; \usedsym \vdash \PP; \rho'; \usedsym'$, where $\rho_1': \rho_2'=\transfer (\rho_1: \rho_2; \beta)$, $\Delta(\NA)=\ttype(\ttype'(T))$, $\Delta(\NB)=\ttype''(T)$, $\NA\not\in\rho_2  \wedge  \ttype\not\subseteq\rho_2$, $\beta=\NA \vee \beta=\ttype$, and $\ttype''\subseteq \ttype'$. 
+By induction hypothesis we have $\rho' \subseteq \rho_1'$. 
+By the definition of the operator $\transfer$ we may conclude $\rho_1' \subset \rho_1$. Hence, $\rho' \subseteq \rho_1$. 
+\item
+Case \rulename{(a-par)}: Directly, since $\rho_1\cap \rho_4 \subseteq \rho_1$.
+\end{itemize}
+\end{enumerate}
+\end{proof}
+
+We may now show one direction of our correspondence result: if a process is typed using the refined system then the corresponding process obtained by the application of the $\erase$ function can also be typed with the original type system.
+
+
+
+
+
+\begin{lemma}[Typing correspondence: soundness]{\label{lemm:algorithmic_soundness}}
+If $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP; \rho'; \usedsym'$, then $\Delta \vdash_{\rho} \erase(\PP)$, where $\rho=(\rho_1\uplus\rho_2)- \rho'$.
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the depth of the type checking derivation. We detail only the base case obtained by rule \rulename{(a-stop)}, and, for the induction step, only when the last applied rule is \rulename{(a-par)} or \rulename{(a-rep-in)}.
+\begin{itemize}
+\item
+\emph{Case} \rulename{(a-stop)}: Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \inact; \rho_1; \usedsym$. 
+By \rulename{(t-stop)} we can directly derive $\Delta \vdash_{\rho_2} \inact$.
+%
+%
+\item
+\emph{Case} \rulename{(a-par)}: Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP_1 \parop \PP_2; \rho_1 \cap \rho_4; \usedsym''$ be derived from 
+\[
+\Delta; \rho_1\uplus \rho_2: \emptyset; \usedsym \vdash \PP_1; \rho_3; \usedsym'  \text{ and } \Delta; \rho_3: \emptyset ; \usedsym' \vdash \PP_2; \rho_4; \usedsym''
+\]
+By Lemma~\ref{lemm:algorithmic_monotonicity} we have $\sym{\PP_1}=\usedsym'\setminus \usedsym$ and $\usedsym \subseteq \usedsym'$ and $\rho_3 \subseteq \rho_1\uplus\rho_2$, but also $\sym{\PP_2}=\usedsym''\setminus \usedsym'$ and $\usedsym' \subseteq \usedsym''$ and $\rho_4\subseteq \rho_3$. 
+Hence, we may conclude that $\sym{\PP_1}\cap \sym{\PP_2}=\emptyset$. 
+By induction hypothesis we have 
+$$\Delta \vdash_{(\rho_1\uplus\rho_2)-\rho_3} \erase(\PP_1) \quad \mbox{and} \quad \Delta \vdash_{\rho_3-\rho_4} \erase(\PP_2).$$ 
+Since $\sym{\PP_1}\cap \sym{\PP_2}=\emptyset$, by \rulename{(t-par)} we obtain $\Delta \vdash_{(\rho_1\uplus \rho_2)-\rho_4} \erase(\PP_1 \parop \PP_2)$. 
+By Lemma~\ref{lemm:Weakening_Lemma}, we conclude 
+$$\Delta \vdash_{(\rho_1\uplus\rho_2)-(\rho_1\cap \rho_4)} \erase(\PP_1 \parop \PP_2).$$
+%
+%
+\item
+\emph{Case} \rulename{(a-rep-in)}: Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \repreceive\NA\role\msg\NX.\PP; \rho_1; \usedsym$ be derived from $\Delta, \NX: T; \emptyset: \{\NA\}; \emptyset \vdash \PP; \emptyset; \emptyset$. 
+By Lemma~\ref{lemm:algorithmic_monotonicity} we have $\sym{\PP}= \emptyset$. 
+By induction hypothesis we obtain $\Delta, \NX: T \vdash_{\{\NA\}} \erase(\PP)$. 
+Since $\sym{\PP}= \emptyset$, by \rulename{(t-rep-in)} follows $\Delta \vdash_{\rho_2} \erase(\repreceive\NA\role\msg\NX.\PP)$.
+\end{itemize}
+\end{proof}
+
+
+
+To obtain the completeness result we first show a form of Weakening result for the refined type system (cf. Lemma~\ref{lemm:Weakening_Lemma}).
+
+\begin{lemma}[%\del{Algorithmic}
+Weakening]{\label{lemm:algorithmic_weakening}}%\marginpar{H: I think the repetition is not a problem}
+If $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP ; \rho'; \usedsym'$ then $\Delta; \rho_1\uplus\rho; \rho_2; \usedsym \vdash  \PP ; \rho'\uplus \rho; \usedsym'$.
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the depth of the type checking derivation. We detail only the base case, given by \rulename{(a-stop)}, and the case of \rulename{(a-par)}.
+\begin{itemize}
+\item
+\emph{Case} \rulename{(a-stop)}: Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \inact ; \rho_1; \usedsym$. By the same rule we may also observe $\Delta; \rho_1\uplus\rho: \rho_2; \usedsym \vdash \inact ; \rho_1\uplus \rho; \usedsym$.
+%
+%
+\item
+\emph{Case} \rulename{(a-par)}:
+Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP_1 \parop \PP_2; \rho_1\cap \rho_4; \usedsym''$ be derived from 
+\[
+\Delta; \rho_1\uplus\rho_2; \emptyset; \usedsym \vdash \PP_1; \rho_3; \usedsym' \text{ and }  \Delta; \rho_3: \emptyset; \usedsym' \vdash \PP_2 ; \rho_4; \usedsym''
+\]
+By induction hypothesis we have 
+\[
+\Delta; \rho_1\uplus\rho_2\uplus\rho: \emptyset; \usedsym \vdash \PP_1 ; \rho_3\uplus \rho; \usedsym' \quad \mbox{and} \quad \Delta; \rho_3\uplus\rho; \emptyset; \usedsym' \vdash \PP_2; \rho_4\uplus\rho; \usedsym''
+\]
+Then, by \rulename{(a-par)} we derive 
+\[
+\Delta; \rho_1\uplus \rho: \rho_2; \usedsym \vdash \PP_1 \parop \PP_2; (\rho_1\uplus \rho)\cap (\rho_4 \uplus \rho); \usedsym''
+\] 
+which concludes the proof since $(\rho_1\uplus \rho)\cap (\rho_4 \uplus \rho)=(\rho_1\cap \rho_4)\uplus \rho$.
+\end{itemize}
+\end{proof}
+
+The completeness result shows that if a process is typed with the original system, then it can also be typed with the refined one (again, up to the $\erase$ function).
+
+\begin{lemma}[Typing correspondence: completeness]{\label{lemm:alogtithmic_completness}}
+
+If $\Delta \vdash_\rho \erase(\PP)$ then for any $\rho_1, \rho_2$ multisets of names, and any $\usedsym, \usedsym'$ sets of symbols from $\cal{S}$, such that $\rho_1\uplus\rho_2=\rho$ and %$\usedsym \cap \sym{\PP}=\emptyset$,
+$\usedsym'\setminus\usedsym=\sym{\PP}$, we have that $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP; \rho'; \usedsym'$, for some $\rho'$.% and $\usedsym'$.
+\end{lemma}
+
+\begin{proof}
+The proof is by induction on the derivation of the original type system. We detail the base case, induced by \rulename{(t-stop)}, and for the induction step  we detail only the cases of \rulename{(t-par)} and \rulename{(t-in)}.
+\begin{itemize}
+\item
+\emph{Case} \rulename{(t-stop)}:
+Let $\Delta \vdash_\rho \inact$. 
+By \rulename{(a-stop)} we can derive $\Delta; \rho_1: \rho_2; \usedsym \vdash \inact ; \rho_1; \usedsym$, for any $\rho_1,  \rho_2$ and $\usedsym$, such that $\rho_1\uplus\rho_2=\rho$.
+%
+%
+\item
+\emph{Case} \rulename{(t-par)}: Let $\Delta \vdash_{\rho} \erase (\PP_1 \parop \PP_2)$ be derived from $\Delta \vdash_{\rho'} \erase(\PP_1)$ and $\Delta \vdash_{\rho''} \erase(\PP_2)$ where $\rho'\uplus\rho''=\rho$ and $\sym{\PP_1}\cap\sym{\PP_2}=\emptyset$.
+By induction hypothesis we can derive
+\[
+\Delta; \rho': \emptyset; \usedsym_1 \vdash \PP_1; \rho_1'; \usedsym_2  \text{ and }  \Delta; \rho'': \emptyset; \usedsym_2 \vdash \PP_2; \rho_2'; \usedsym_3
+\]
+for any $\usedsym_1, \usedsym_2$ and $\usedsym_3$, such that $\usedsym_2\setminus\usedsym_1=\sym{\PP_1}$, $\usedsym_3\setminus\usedsym_2=\sym{\PP_2}$, and where $\usedsym_1 \cap \sym{ \PP_2}=\emptyset$. Using $\usedsym_2$ to type process $\PP_2$  is possible since  $\usedsym_2\cap\sym{\PP_2}=\emptyset$ holds by $\usedsym_1 \cap \sym{ \PP_2}=\emptyset$ and the assumption $\sym{\PP_1}\cap\sym{\PP_2}=\emptyset$.
+%By Lemma~\ref{lemm:algorithmic_monotonicity} we get $\sym{\PP_1}=\usedsym_2\setminus \usedsym_1$. 
+%Since $\sym{\PP_1}\cap\sym{\PP_2}=\emptyset$ and $\usedsym_1 \cap \sym{\PP_2}=\emptyset$ we have $\usedsym_2 \cap \sym{\PP_2}=\emptyset$. 
+%Hence, by Lemma~\ref{lemm:algorithmic_monotonicity} again we conclude $\sym{\PP_2}=\usedsym_3 \setminus \usedsym_2$ and $\usedsym_1 \subseteq \usedsym_2$ and $\usedsym_2 \subseteq \usedsym_3$.
+By Lemma~\ref{lemm:algorithmic_weakening} we derive 
+\[
+\Delta; \rho: \emptyset; \usedsym_1 \vdash \PP_1; \rho_1'\uplus \rho''; \usedsym_2 \text{ and } \Delta; \rho''\uplus \rho_1': \emptyset; \usedsym_2 \vdash \PP_2; \rho_2'\uplus \rho_1'; \usedsym_3
+\]
+and by \rulename{(a-par)} we conclude
+\[
+\Delta; \rho_1: \rho_2; \usedsym_1 \vdash \PP_1 \parop \PP_2; \rho_1 \cap (\rho_2'\uplus \rho_1'); \usedsym_3
+\]
+%
+%
+\item
+\emph{Case} \rulename{(t-out)}: Let $\Delta \vdash_\rho \erase(\send\NA\role\msg\NB.\PP)$ be derived from $\Delta \vdash_\rho \PP$, where $\Delta(\NA)=\ttype(\ttype'(T))$, $\Delta(\NB)=\ttype''(T)$ and $\ttype''\subseteq\ttype'$, and where $\NA\notin\rho$ implies $\ttype\in\rho$.
+By induction hypothesis
+\[
+\Delta; \rho_1': \rho_2'; \usedsym \vdash \PP; \rho'; \usedsym'
+\] 
+for any $\rho_1', \rho_2'$ and $\usedsym, \usedsym'$, such that  $\rho_1'\uplus \rho_2'=\rho$ and $\usedsym'\setminus\usedsym=\sym{\PP}$. 
+We now have to show that $\Delta; \rho_1:\rho_2 ; \usedsym \vdash \send\NA\role\msg\NB.\PP ; \rho'; \usedsym'$ for any $\rho_1$ and $\rho_2$ such that $\rho_1\uplus \rho_2 = \rho$. We distinguish four cases.
+\begin{itemize}
+\item[(i)] If $\NA\in\rho$ and $\NA\in\rho_2$ we chose $\rho_2'=\rho_2$ and by \rulename{(a-out-1)} we derive $\Delta; \rho_1: \rho_2; \usedsym \vdash \send\NA\role\msg\NB.\PP; \rho'; \usedsym'$.
+%
+\item[(ii)] If $\NA\in\rho$ and $\NA\notin\rho_2$ we chose $\rho_2'=\rho_2\uplus\{\NA\}$ and by \rulename{(a-out-2)} we derive $\Delta; \rho_1: \rho_2; \usedsym \vdash \send\NA\role\msg\NB.\PP; \rho'; \usedsym'$.
+%
+\item[(iii)] If $\ttype\in\rho$ and $\ttype\in\rho_2$ we chose $\rho_2'=\rho_2$ and by \rulename{(a-out-1)} we derive $\Delta; \rho_1: \rho_2; \usedsym \vdash \send\NA\role\msg\NB.\PP; \rho'; \usedsym'$.
+\item[(iv)] If $\ttype\in\rho$ and $\ttype\notin\rho_2$ we chose $\rho_2'=\rho_2\uplus(\ttype\setminus\rho_2)$ and by \rulename{(a-out-2)} we derive $\Delta; \rho_1: \rho_2; \usedsym \vdash \send\NA\role\msg\NB.\PP; \rho'; \usedsym'$.
+\end{itemize}
+\end{itemize} 
+\end{proof}
+
+We may now state the main result of this section.
+
+
+\begin{theorem}[Typing correspondence]\label{lemm:algotirhmic_correctness}%\marginpar{H: I'm not sure about label Typing correspondence}
+$\Delta \vdash_\rho \erase(\PP)$ if and only if $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP ; \rho'; \usedsym'$, for any $\rho_1,\rho_2$  and $\usedsym$ such that $\rho_1\uplus\rho_2=\rho$ and $\usedsym'\setminus\usedsym=\sym{\PP}$.
+\end{theorem}
+%\marginpar{H: Do we want to say that $\usedsym' \setminus \usedsym = \sym{\PP}$?}
+\begin{proof}
+\begin{itemize}
+\item[]
+\item [$(\Leftarrow)$] Let $\Delta; \rho_1: \rho_2; \usedsym \vdash \PP ; \rho'; \usedsym'$. For $\rho=\rho_1\uplus\rho_2$,
+by Lemma~\ref{lemm:algorithmic_soundness} we obtain $\Delta \vdash_{\rho-\rho'} \erase(\PP)$. 
+Then, by Lemma~\ref{lemm:Weakening_Lemma} we can conclude $\Delta \vdash_\rho \erase(\PP)$.
+%
+\item [$(\Rightarrow)$] Directly by Lemma~\ref{lemm:alogtithmic_completness}.
+\end{itemize}
+\end{proof}
+
+%Notice that given $\Delta$ and $\rho$ and a type annotated process $\PP$ we may rely on
+%$\Delta; \emptyset: \rho; \emptyset \vdash \PP ; \emptyset; \sym{\PP}$
+%so as to conclude $\Delta \vdash_\rho \erase(\PP)$, since, considering the notation used in the statement, 
+%we may take $\rho_1 = \emptyset$ and $\rho_2 = \rho$ 
+%(for which we directly have $\emptyset \uplus \rho= \rho$)  
+%and $\usedsym = \emptyset$ (in which case $\usedsym'\setminus \emptyset = \sym{P}$) and given that $\rho' \subseteq \rho_1$ (cf. Appendix~\ref{app:typecheckingproofs}).
+Theorem~\ref{lemm:algotirhmic_correctness} shows that the type-checking procedures induced by the original and the refined type rules perfectly correspond,  while the latter rules offer for a more efficient implementation.
+For future work, we plan to make a precise complexity analysis so as to characterize the efficiency improvement. Also, we plan to make a precise characterization of the loss of expressiveness that results from the pragmatical (polynomial time) option.
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 

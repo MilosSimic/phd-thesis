@@ -1,0 +1,33 @@
+%!TEX root =  main.tex
+\chapter*{Abstract}
+%\pagestyle{empty}
+
+
+Distributed software systems have changed the way people communicate, 
+learn and run businesses: almost all aspects of human life have become connected to the internet.
+The system of interconnected computing devices has numerous positive impacts on everyday life, however, it also raises some concerns, among which are security, accessibility and availability issues.
+
+This thesis investigates problems of formal, mathematically based, representation and analysis of controlled usage and sharing of resources in distributed software systems.
+The thesis is organized into four chapters. The first chapter provides motivation for our work, and the last concludes the thesis. The second and the third chapters are the core of the thesis, the former addresses controlling information passing and the latter addresses controlling usages of resources.
+
+The second chapter presents a model for confidential name passing, called Confidential $\pi$-calculus, abbreviated $C_\pi$. This model is a simple fragment of the $\pi$-calculus that disables information forwarding directly at the syntax level. % by restricting the $\pi$-calculus feature that input variables can appear as objects of the output prefixes. 
+%As far as we know, this is the first process model based on the $\pi$-calculus 
+%that %tackles the problem of representing
+%represents the controlled name passing by constraining and not extending the original syntax. 
+We provide an initial investigation of the model by presenting some of its properties, such as the non-forwarding property and  the creation of closed domains for channels. We also present examples showing that $C_\pi$ can be used to model restricted information passing, authentication, closed and open-ended groups.
+We present an encoding of the (sum-free) $\pi$-calculus in $C_\pi$ and we prove the correctness of the encoding via an operational correspondence result. %The soundness of the encoding is left for future work.
+
+The third chapter presents a model of floating authorizations. Our process model introduces floating authorizations as first-class entities, encompassing dimensions of accounting, domain, and delegation. 
+We exploit the language of an already existing process algebra for authorizations, and we adopt a different semantic interpretation so as to capture accounting. We define the semantics of our model in two equivalent ways, using a labeled transition system and a reduction relation. %We motivated our work by showing that the starting process model~\cite{clar:eke} directly conflicts with our notion of accounting, as it allows to change the number of authorizations in the system directly, e.g., by rewriting rules of the structural congruence. 
+We define error processes as undesired configurations that cannot evolve due to lacking authorizations. %We have shown there is an alternative way to define errors by using the labeled transition system.
+The thesis also provides a preliminary investigation of the behavioral semantics of our authorization model, showing some fundamental properties and also informing on the specific nature of floating authorizations. %We have used the strong bisimilarity relation to show some fundamental properties and to validate our informal principles, but also to provide an insight on the difficulty 
+%of obtaining a normal form characterization of processes. 
+
+In the third chapter, we also  present a typing discipline that allows to statically single out processes that are not errors and that never evolve into errors, addressing configurations where authorization assignment
+is not statically prescribed in the system specification. %, which we also believeis unexplored in other approaches in the form we present it here. 
+%We have proved Soundness result for our typing discipline.
+%Our typing rules induce a decidable 
+%type-checking procedure, since rules are syntax directed, provided as usual that a (carried) type 
+%annotation is added to name restrictions. Considering such annotations are present, 
+We also develop a refinement of our typing discipline to pave the way for a more efficient type-checking procedure. %, and we showed the Correspondence result for the two type systems. 
+We show an extended example of a scenario that involves the notion of Bring Your Own License, and we exploit this example to provide insight on a possible application of our model in programming language design.
