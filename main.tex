@@ -13,6 +13,7 @@ english, % ngerman for German
 ]{book}
 %
 \usepackage{fancyhdr}
+\usepackage{float}
 %
 \usepackage{amsmath,amssymb}
 \usepackage{amsthm}
@@ -30,9 +31,9 @@ english, % ngerman for German
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
     linkcolor=blue,          % color of internal links
-    citecolor=green,        % color of links to bibliography
-    filecolor=magenta,      % color of file links
-    urlcolor=cyan 
+    citecolor=blue,        % color of links to bibliography
+    filecolor=blue,      % color of file links
+    urlcolor=blue 
 }
 \usepackage[nottoc,chapter]{tocbibind}
 \usepackage{caption}
@@ -52,6 +53,7 @@ english, % ngerman for German
 \usepackage[final]{pdfpages}
 \usepackage{acronym}
 \usepackage{geometry}
+\usepackage{dirtytalk}
 
 \RequirePackage{geometry}
 \geometry{
@@ -101,8 +103,8 @@ University of Novi Sad}
 \frontmatter
 %
 %
-\includepdf[pages=-]{naslovna.pdf}\cleardoublepage 
-\includepdf[pages=-]{kljucna.pdf}
+\includepdf[pages=-]{docs/naslovna.pdf}\cleardoublepage 
+\includepdf[pages=-]{docs/kljucna.pdf}
 \pagestyle{empty}
 \input{acknowledgement}\cleardoublepage 
 %
@@ -134,9 +136,24 @@ University of Novi Sad}
 \textbf{{\huge List of Abbreviations}\\}
 \vspace*{1cm}	
 \begin{acronym}[WWWW]
-	\acro{EPEI}{Every Part Every Interval}
-	\acro{TPS}{Toyota Production System}
-	\acro{TSP}{Transport Service Provider}
+	\acro{CC}{Cloud computing}
+	\acro{AWS}{Amazon Web Services}
+	\acro{IoT}{Internet of Things}
+	\acro{DS}{Distributed systems}
+	\acro{DC}{Data center}
+	\acro{IaaS}{infrastructure as a service}
+	\acro{PaaS}{Platform as a service}
+	\acro{SaaS}{Software as a service}
+	\acro{CaaS}{Container as a service}
+	\acro{DBaaS}{Databae as a service}
+	\acro{XaaS}{Everything as a Service}
+	\acro{P2P}{Peer-to-peer}
+	\acro{DHT}{Distributed Hash Table}
+	\acro{NoSQL}{Not Only SQL}
+	\acro{EC}{Edge computing}
+	\acro{MEC}{Mobile edge computing}
+	\acro{MCC}{Mobile cloud computing}
+	\acro{QoE}{Quality of experience}
 \end{acronym}
 %
 %
