@@ -1,24 +1,45 @@
 %!TEX root =  main.tex
 \chapter{Research review}\label{chapter:Review}
 %
+Faced real issues and limits of cloud computing, both academia, and the industry started researching and developing viable solutions. Some research is focused more on adapting existing solutions to fit EC, while others experiment with new ideas and solutions. 
+
+In this Chapter, we present the results of our research reviews existing nodes organizational abilities, as well platform models from industry and academia and cloud offloading techniques, addressing issues discussed earlier.
 %
 %
+\section{Nodes organization}\label{sec:nodes_organization}
+A zone-based organization for edge servers (ES) presented by Guo et al. in~\cite{GuoRG20}, gives an interesting perspective on EC in a smart vehicles application. They showed how zone-based models enable continuity of dynamic services, and reduce the connection handovers. Also, they show how to enlarge the coverage of ESs to a bigger zone, thus expanding the computing power and storage capacity of ESs. Since one of the premises of EC is geo-distributed workloads, organizing ESs into zones and regions could potentially benefit EC. 
 
+Baktir et al.~\cite{BaktirOE17} explored the programming capabilities of software-defined networks (SDN). Findings show SDN can simplify the management of the network in cloud-like environment. SDN is a good candidate for networking because it hides the complexity of the heterogeneous environment from the end-users.
+Kurniawan et al.~\cite{inbookKurniawan} argue about very bad scalability in centralized delivery models like cloud content delivery networks (CDN). They proposed a decentralized solution using nano DCs as a network of gateways for internet services at home~\cite{inbookKurniawan}. These DCs are equipped with some storage as well. Authors show a possible usage of nano DCs for some large scale applications with much less energy consumption. 
 
+Ciobanu et al.~\cite{CiobanuNPDMM19} introduce an interesting idea called drop computing. The authors show that we can compose EC platforms ad-hoc, thus enabling collaborative computing dynamically, using a decentralized model over multilayered social crowd networks. Instead of sending requests to the cloud, drop computing employees the mobile crowd formed of nearby devices, hence enabling quick and efficient access to resources. The authors show an interesting idea of how to form a computing group ad-hoc. Forming ad-hoc platforms from crowd resources might raise a few possible concerns: $(1)$ crowd nodes availability, and $(2)$ offered resources. Crowd nodes might be an interesting idea as a backup option, in cases we need more computing power or storage and there are no more available resources to use.
 
+MDCs are an interesting model and area of rapid innovation and development. Greenberg et al.~\cite{GreenbergHMP09} introduce MDCs as DCs that operate in proximity to a big population (on contrary to nano DCs that serves a lot smaller population), thus minimizing the latency and costs for end-users~\cite{ShiHPANZ14, GreenbergHMP09}, 
+%, WangZXYH19}
+and reducing the fixed costs of traditional DCs. Minimum size of an MDCs is defined by the needs of the local population~\cite{GreenbergHMP09, AbbasZTS18}, with agility as a key feature. Here agility means an ability to dynamically grow and shrink resources and satisfy the demands and usage of resources from the most optimal location~\cite{GreenbergHMP09}.
+%
+%
 \section{Platform models}\label{sec:platform_models}
 %
+Kubernetes~\cite{BurnsGOBW16} is an open-source variant of Google orchestrator Borg \cite{VermaPKOTW15}.  All workloads end in the domain of one cluster~\cite{BurnsGOBW16, VermaPKOTW15, RossiCPN20}. Rossi et al.~\cite{RossiCPN20} focuses on adapting Kubernetes for geo-distributed workloads using a reinforcement learning (RL) solution, to learn a suitable scaling policy from experience. Like every other machine learning implementation this could be potentially slow due to the required model training. Kubernetes is a promising solution, but it might not be the best proposal for EC. By design, Kubernetes operate in a completely different environment from EC. The second potential issue is the deployment concept that might be too complicated for EC workloads. On the other hand, there are a few ideas that are worth exploring, such as loosely coupling elements with labels and selectors. Nonetheless, researches show that adapted Kubernetes architecture works for geo-distributed workloads like EC.
+
+{Ryden et al.~\cite{RydenOCW14}} present a platform for distributed computing with attention to user-based applications. Unlike other systems, the goal is not to implement a resource management policy, but to give users more flexibility for application development. Users implement applications using Javascript (JS) programming language, with some embedded native code for efficiency. Similar to~\cite{CiobanuNPDMM19}, the authors use volunteer nodes to run all the workloads, with the difference that some nodes are used for storage, while others are used for calculation. Sandboxing technique protects nodes running applications from malicious code. Users develop their applications using JS only. This restriction comes from using Google Chrome Web browser-based Native Client (NaCl) sandbox~\cite{YeeSDCMOONF10}. JS is a popular language at the moment, but the restriction of a single language might be a deal-breaker for some usages. If standard virtual machines become too resource-demanding, a solution using containers could provide sandboxing and bring better resource utilization. It is an interesting idea to show how users can develop their applications and run them in an EC environment.
+
+L{\`{e}}bre et al.~\cite{LebrePSD17} describe a promising solution of extending OpenStack, an open-source IaaS platform for fog/edge use cases. They try to manage both cloud and edge resources using a NoSQL database. Implementation of a massively distributed multi-site IaaS, using OpenStack is a challenging task~\cite{LebrePSD17}. Communication between nodes of different sites can be subject to important network latencies~\cite{LebrePSD17}. The major advantage is that users of the IaaS solution can continue using the same familiar infrastructure. In~\cite{ShaoLFJL19} Shao et al. present a possible MDCs structure serving only the local population, in the smart city use-case.
+
+In~\cite{NingLSY20}, the Ning et al. show current open issues of EC platforms based on the literature survey. They illustrate the usage of edge computing platforms to build specific applications. In the survey, the authors outline how CC needs EC nodes to pre-process data, while EC needs massive storage and strong computing capacity of CC.
+
+There are few industry operating frameworks for EC, like Amazon Greengrass~\cite{kurniawan_2018}, deeply connected to the entire Amazon cloud ecosystem, or KubeEdge~\cite{KubeEdge}, a lightweight extension of Kubernetes framework. These frameworks are mainly used for user-based applications, while, for instance, General Electric Predix~\cite{GE_Predix} is a scalable platform used for industrial IoT applications.
 %
-
-
-
-\section{Nodes organization}\label{sec:nodes_organization}
 %
-%
-
-
 \section{Task offloading}\label{sec:task_offloading}
 %
+As we already mention in~\ref{sec:mobile_computing} EC nodes rely on the concept of data and computation offloading from the cloud closer to the ground \cite{KhuneP19}, while heavy computation remains in the cloud because of resource availability~\cite{NingLSY20}.
+
+In literature, there are few platforms proposing task offloading [56-59] to the nearby edge layer. These offloading techniques are based on different parameters, options, and techniques, to put tasks to different sets of nodes.
 %
-
-
+%
+\section{Thesis position}\label{sec:thesis_position}
+Different from the aforementioned work,this thesis focuses on descriptive dynamic organization of geo-distributed nodes over an arbitrary vast area that lacks in other solutions. To achieve such a task, thesis model is influenced by the CC organization, but adapted for a different environment such as EC. These adaptations are followed by clear Separation of concerns (SoC) and EC applications model. All these allow us to push the whole solution more towards EC as a service model like any other utility in the cloud.
+%
+%
