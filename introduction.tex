@@ -9,7 +9,7 @@ Various software systems has changed the way people communicate, learn and run b
 
 The aim of this thesis is to provide formal models uppon which we implement distributed system for oragnizing cloud-like geo-distributed environments for users or CC providers to utilize, in order to minimize downtime of critical services. The whole system can be looked as a pre-cloud or pre-processing layer sending only important data to the cloud minimizing cost for users, and ensuring avelability of CC services. Ensuring reliability and correctness of any system is very difficult, and should be mathematically based. Formal methods are techniques that allow us specification and verification of complex (software and hardware) systems based on mathematics and formal logic.
 
-We start by describing the general problem area that our work addresses in Section~\ref{sec:problem_area}. Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patters and organizational structure. In Section~\ref{sec:similar_models} we describe similar models that might be source of confusion. In Section~\ref{sec:virtualization_techniques} we describe different virtualization methods that are used in CC for system and/or applications. In Section~\ref{sec:problem_statement}, we specify the exact problem that our work addresses and describe our hypothesis and research goals in Section~\ref{sec:research_hyphotesis_and_golas}. Section~\ref{sec:structure_of_thesis} present the structure of the thesis.
+We start by describing the general problem area that our work addresses in Section~\ref{sec:problem_area}. Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patters and organizational structure. In Section~\ref{sec:similar_models} we describe similar models that might be source of confusion. In Section~\ref{sec:virtualization_techniques} we describe different virtualization methods that are used in CC for system and/or applications. In section~\ref{sec:concurency_parallelism} we describe brifley concurency and parallelism and explain actor system. In Section~\ref{sec:problem_statement}, we specify the exact problem that our work addresses and describe our hypothesis and research goals in Section~\ref{sec:research_hyphotesis_and_golas}. Section~\ref{sec:structure_of_thesis} present the structure of the thesis.
 %
 %
 %
@@ -28,6 +28,8 @@ To overcome cloud latency, research led to new computing areas, and model in whi
 There are various definitions of DS, but we can think of DS as a systems where multiple entities can comunicate to one another in some way, but at the same time, they are able to performing some operations. Three significant characteristics of distributed systems are: $(1)$~\textbf{concurrency of components}, $(2)$~\textbf{lack of a global clock}, and $(3)$~\textbf{independent failure of components}~\cite{0019513}. In~\cite{SteenT16} authors give formal definition \say{distributed system is a collection of autonomous computing elements that appears to its users as a single coherent system}.
 
 When talking about DS, we usually think about computing systems that are connected via network or over the internet. But DS are not exclusiv to domain of cumputer science. They existed before computers started to enrich almost every aspect of human life. DS have been used in varios different domains such as: \textbf{telecommunication networks}, \textbf{aircraft control systems}, \textbf{industrial control systems} etc. DS are used anywhere where amout of users are growing rapidly, so that single entity can't reponse to users demands in (near) real-time.
+
+Distributed systems (in computer science) are consists of various algorithms, techniques and trade-offs to create an illusion that set of nodes act as one. DS algorithms may include: $(1)$ replication, $(2)$ consensus, $(3)$ communication, $(4)$ storage, etc.
 
 This section will explain different aspects of DS in computing systems, that are important for future parts of the thesis. Section~\ref{sec:scalability} gives more details about scalability and what it meens in modern day computer applications. Section~\ref{sec:cloud_computing} gives explanation what CC is, organizational aspects of CC as well as used models. Section~\ref{sec:p2p_networks} gives explanation what peer-to-peer networks are, and why are they important in modern DS. Section~\ref{sec:mobile_computing} gives general deffinition what mobile computing is and new ways of implementation DS.
 %
@@ -66,6 +68,26 @@ Scaling horizontally is a preferable way for scaling DS, not because we can scal
 \end{itemize}
 
 But despite all the obvious benefits, for a DS to work properly, we need the write software in such a way that is able to run on multiple nodes, as well as that accept \textbf{failure} and deal with it. This turns out to be not an easy task.
+
+For example users need to be aware when using DS, is related to distributed data storage systems. Storage implementations that relys on vertical scaling to ensure scalability and faulte tolerance, have one nasty feature. 
+
+This nasty feature is represented in theorem called \textbf{CAP theorem} presented by Eric Brewer~\cite{Brewer2000}. Proven after insepction~\cite{GilbertL02}, CAP theorem states that it is impossible for a distributed data store to simultaneously provide more than two out of three guarantees:
+\begin{enumerate}
+	\item \textbf{C}onsistency
+	\item \textbf{A}vailability
+	\item \textbf{P}artition tolerance
+\end{enumerate}
+
+Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems by only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be:
+\begin{itemize}
+	\item \textbf{Commutative} $a*b = b*a$
+	\item \textbf{Associative} $(a*b)*c = a*(b*c)$
+	\item \textbf{Idempotent} $(a * a) = a$
+\end{itemize}
+
+\noindent
+where $*$ is a binary operation, for example: $max$, $union$, $or$ we can rely on SEC properties,
+
 %
 %
 \subsection{Cloud computing}\label{sec:cloud_computing}
@@ -93,6 +115,10 @@ Figure~\ref{fig:fig1} show difference in control and management of resources bet
 The user can choose a single solution, or combine more of them if such a thing is required depending on preferences and needs.
 
 CC has been the dominating tool in the past decade in various applications~\cite{Satyanarayanan17}. It is changing, evolving, and offering new types of services. Resources such as container as a service (CaaS), database as a service (DBaaS)~\cite{Peter} are newly introduced. The CC model gives us a few benefits. Centralization relies on the economy of scale to lower the cost of administration of big DCs. Organizations using cloud services avoid huge investments. Like creating and maintaining their own DCs. They consume resources created by others~\cite{Satyanarayanan17} and pay for usage time -- a pay as you go model. 
+
+But centralization give us few really hard problems to solve. As already stated in section~\ref{sec:problem_area} data is required to be moved to the cloud from data sources, which introduces a high latency in the system~\cite{HossainRH18}. 
+
+There are few notable attempts to help data ingestion into the cloud. Remote Direct Memory Access (RDMA) protocol makes it possible to read data directly from the memory of one computer and write that data directly to the memory of another. This is done by using \textit{specialized hardware} interface cards and switches and software as well, and operations like read, write, send, receive etc. do not go through CPU. With this caracteristivs, RDMA have low latencies and overhead, and as such reach better throughputs~\cite{CohenTKCKRCDG09}. This new hardware may not be cheap, and not evey CC provider use them for every use-case. And this may not be enough, esspecially with ever growing amount of IoT devices and services.
 
 Over the years there are more as a service options avalible, forming \textbf{everything as a service (XaaS)} model~\cite{DuanFZSNH15}. This model propose that any hardware or software resource can be ofered as a service to the users over the internet.
 
@@ -196,6 +222,8 @@ Processing in big data systems can be represented as~\cite{phdthesis, KiranMMDB1
 	\item \textbf{Lambda architectures} represents processing technique where stream processing and handling of massive data volumes in batch are combined in a uniform manner, reducing costs in the process~\cite{KiranMMDB15}.
 \end{itemize}
 
+Big data systems, are not processing and value extracting systems. Big data systems can be separated in few categories: $(1)$ data storage, $(2)$, data ingestion $(3)$, data processing and analytics. All these system aids to properly analyze ever growing requirements~\cite{RaoMBG19},
+
 Dispite promise that big data offers to derive value out of the collected data, this task is not easy to do and requre properly set up system filtering and removeing data that contains no value. To aid this idea, data could be filtered and little bit preprocessed on close to the source~\cite{inproceedingsSimic1}, and as such sent to data lakses~\cite{MarynowskiSP15}.
 %
 %
@@ -206,9 +234,11 @@ There is no single comperhensive deffinition of what a microservice is. Differne
 	\item they are small computer programs that are independently deployable and developed.
 	\item they coud be developed using different languages, principles and using differend databses.
 	\item they communicate over the network to achieve some goal.
+	\item they are organized around business capabilities~\cite{PautassoZALJ17}.
+	\item they are implemented and mainteined by a small team.
 \end{enumerate}
 
-Industry is migrating much of their applications to the cloud, because CC offers to scale their computing resources as per their usage~\cite{LiZJLZLGGS19}. Microservices are small units of code that follos UNIX philosophy~\say{do one thing and do it well}~\cite{krause2015microservices}, and they communicate over well defined API~\cite{DragoniGLMMMS16}.
+Industry is migrating much of their applications to the cloud, because CC offers to scale their computing resources as per their usage~\cite{LiZJLZLGGS19}. Microservices are small loosely coupled services that follos UNIX philosophy~\say{do one thing, and do it well}~\cite{krause2015microservices}, and they communicate over well defined API~\cite{DragoniGLMMMS16}.
 
 This architecure patter is well aligned to the CC paradigm~\cite{LiZJLZLGGS19}, contrary to previous models like monolith whose modules cannot be executed independently~\cite{DragoniGLMMMS16, abs-1905-07997}, and are not well aligned with the CC paradigm~\cite{abs-1905-07997}. Table~\ref{tab:table3} summrize differences between monolith and microservie architecture.
 
@@ -236,21 +266,16 @@ Since their inception, microservices architecture is gone through some adaptatio
 	this dedicated communication layer can provide a number of benefits, such as: $(1)$ observability, $(2)$ providing secure connections, or $(3)$ automating retries and backoff for failed requests.
 \end{itemize}
 
+Microservices communicate over a network to fulfil some goal using message passing technique and technology-agnostic protocols such as HTTP. They can be implemented as REST srevices, RPC calls or event-driven services. They are well aligned with text based protocols like HTTP/1 using $JSON$ for example, or binary protocols such as HTTP/2 using $protobuf$ and $gRPC$ for example, and even new faster version like HTTP/3.
+
 It is important to point out, that all flavors of microservices applications rely on continuous delivery and deployment~\cite{7436659}. This is enabled by lightweight containers, instead of virtual machines~\cite{FelterFRR15}, and orchestration tools such Kubernetes~\cite{BurnsGOBW16}. These concepts wll be described in more detail in Section~\ref{sec:virtualization_techniques}.
 
 Microservices architecture are good starting point especially for build as a service applications, and applications that should serve huge amount of requests and users. Esspecially with benefits of CC to pay for usage, and ability to scale parts of the system independently.  Although they are not necessarily easy to implement properly. There are more and more critique to the architecture model~\cite{SoldaniTH18}. Microservices are relying and use parts of the DS, and as such they inherit almost all problems DS has. Best chance to success is to follow existing patters and use existing solutions with proven quality.
 %
 %
-
 \section{Similar computing models}\label{sec:similar_models}
 %
-In this section we are going to shortly describe models that are similar to the DS, and as such they may be the source of confusion. Section~\ref{sec:decentralized_systems} describe decentralized computing compared to DS. Section~\ref{sec:parallel_computing} describes parallel computing compared to DC.
-
-\subsection{Decentralized systems}\label{sec:decentralized_systems}
-%
-Decentralized systems are similar to DS, in technical sense they are still DS. But if we take closer look, these systems \textbf{should not} be owned by single the entity. CC for example is example of DS, but centralized by the owner like AWS or Google because all computation needs to be moved to big DCs, which introduces a high latency in the system~\cite{HossainRH18}.
-
-By today standards, if people are talking about decentralyzed systems, they usually mean on blockchain technology~\cite{LeibleSSG19}. But even if this technology is run in the cloud, it is loosing the decentralized feature. This is the caveat people needs to be aware. These systems are facing different issues, because any participent in the sustem might be malicious and they need to handle this case. Nontheless, CC can and should be decentralized in a sense that some computation can happend outside CC DCs, closer to the sources of data.
+In this section we are going to shortly describe models that are similar to the DS, and as such they may be the source of confusion.  Section~\ref{sec:parallel_computing} describes parallel computing compared to DC. Section~\ref{sec:decentralized_systems} describe decentralized computing compared to DS.
 %
 %
 \subsection{Parallel computing}\label{sec:parallel_computing}
@@ -267,6 +292,13 @@ DC and parallel computing seems like models that overlap, and that may share som
 \end{figure}
 
 Parallel computing is ofet used strategy with problems, that due to their nature or constraints must be done on multi-core machines simultaneously~\cite{0072397}.
+%
+%
+\subsection{Decentralized systems}\label{sec:decentralized_systems}
+%
+Decentralized systems are similar to DS, in technical sense they are still DS. But if we take closer look, these systems \textbf{should not} be owned by single the entity. CC for example is example of DS, but centralized by the owner like AWS or Google because all computation needs to be moved to big DCs, which introduces a high latency in the system~\cite{HossainRH18}.
+
+By today standards, if people are talking about decentralyzed systems, they usually mean on blockchain technology~\cite{LeibleSSG19}. But even if this technology is run in the cloud, it is loosing the decentralized feature. This is the caveat people needs to be aware. These systems are facing different issues, because any participent in the sustem might be malicious and they need to handle this case. Nontheless, CC can and should be decentralized in a sense that some computation can happend outside CC DCs, closer to the sources of data.
 %
 %
 \section{Virtualization techniques}\label{sec:virtualization_techniques}
@@ -294,7 +326,24 @@ Figure~\ref{fig:fig5} represent architectural differences between VMs, container
 \end{figure}
 %
 %
+\section{Concurency and parallelism}\label{sec:concurency_parallelism}
+%
+People usually confuse these two concepts. Even they looks similar, they are different way of doing things. In his talk Rob Pike~\cite{Pike} give great explanation and examples on this topic. In this toke he give great deffinitions of these concepts like:\\
+\noindent
+\textbf{Concurrency} is composition of independently executing things. Concurrency is about dealing with a lot of things at once.
 
+\noindent
+\textbf{Parallelism} is simultaneous execution of multiple things. Parallelism is about doing a lot of things at once. 
+
+These things are important, esspecially when building applications and systems that should achieve very high throughput. We must build them with good structure and good concurrency can provide this enableing possible parallelism, but with communication~\cite{Pike, Hoare78}.
+
+\subsection{Actor model}\label{sec:actor_model}
+%
+Similar model to the~\cite{Hoare78} is actor model~\cite{Hewitt}. In actor model, the main idea is that actors are small concurrent code that communicate independently by sending messages, removing the need for lock-based synchronization. 
+
+Actors do not share memory, and actor can create another actor/s and even watch on them in case they stop unexpectedly. And when an actor finished its job, and he is not needed anymore, it disappears.
+%
+%
 \section{Motivation and Problem Statement}\label{sec:problem_statement}
 %
 In~\cite{GreenbergHMP09} Greenberg et al. point out that micro data-centers (MDCs) are used primarily as nodes in content distribution networks and other \say{embarrassingly distributed} applications.
