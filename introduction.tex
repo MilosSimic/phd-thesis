@@ -31,6 +31,18 @@ When talking about DS, we usually think about computing systems that are connect
 
 Distributed systems (in computer science) are consists of various algorithms, techniques and trade-offs to create an illusion that set of nodes act as one. DS algorithms may include: $(1)$ replication, $(2)$ consensus, $(3)$ communication, $(4)$ storage, etc.
 
+DS are hard to immplement because of their nature. James Gosling and Peter Deutsch both fellows at Sun Microsystems at the time crated list of problems for network applicatoins know as \textit{8 fallacies of Distributed Systems}:\label{enum:fallacies}
+\begin{enumerate}
+	\item The network is reliable.
+	\item Latency is zero.
+	\item Bandwidth is infinite.
+	\item The network is secure.
+	\item Topology doesn't change.
+	\item There is one administrator.
+	\item Transport cost is zero.
+	\item The network is homogeneous. 
+\end{enumerate}
+
 This section will explain different aspects of DS in computing systems, that are important for future parts of the thesis. Section~\ref{sec:scalability} gives more details about scalability and what it meens in modern day computer applications. Section~\ref{sec:cloud_computing} gives explanation what CC is, organizational aspects of CC as well as used models. Section~\ref{sec:p2p_networks} gives explanation what peer-to-peer networks are, and why are they important in modern DS. Section~\ref{sec:mobile_computing} gives general deffinition what mobile computing is and new ways of implementation DS.
 %
 %
@@ -48,7 +60,7 @@ Table~\ref{tab:table1} summarize differences between horizontall and verticall s
 \begin{table}[h!]
 	\begin{center}
 		\begin{tabular}{l|l|l}
-			  & \textbf{Scaling vertically} & \textbf{Scaling horizontally}\\
+			\textbf{Feature} & \textbf{Scaling vertically} & \textbf{Scaling horizontally}\\
 			\hline
 			\textbf{Scaling} & Limited & Unlimited \\
 			\textbf{Managment} & Easy & Comlex\\
@@ -73,9 +85,13 @@ For example users need to be aware when using DS, is related to distributed data
 
 This nasty feature is represented in theorem called \textbf{CAP theorem} presented by Eric Brewer~\cite{Brewer2000}. Proven after insepction~\cite{GilbertL02}, CAP theorem states that it is impossible for a distributed data store to simultaneously provide more than two out of three guarantees:
 \begin{enumerate}
-	\item \textbf{C}onsistency
-	\item \textbf{A}vailability
-	\item \textbf{P}artition tolerance
+	\item \textbf{C}onsistency, which means that all clients will see the same data at the same time, no matter which node they are connected to. Clients my not be connected to the same node since data could be replicated on many nodes in different locations.
+	\item \textbf{A}vailability, which means that any client issued a request will get response back, even if one or nodes are down. DS will not interprate this situation as an exception or error. Availability is represented in percentage, and it represent how much downtime is allowed per year, This can be calculated using formula:\\\\ 
+	\begin{equation}\label{eq:Availability}
+		Availability = \frac{uptime}{ (uptime + downtime)}
+	\end{equation}
+	\myequations{Availability percentage formula}
+	\item \textbf{P}artition tolerance, which means that the cluster must continue to work despite any number of communication breakdowns between nodes in the system. It is important to state that in a distributed system, partitions can’t be avoided.
 \end{enumerate}
 
 Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems by only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be:
@@ -87,7 +103,6 @@ Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CA
 
 \noindent
 where $*$ is a binary operation, for example: $max$, $union$, $or$ we can rely on SEC properties,
-
 %
 %
 \subsection{Cloud computing}\label{sec:cloud_computing}
@@ -114,7 +129,37 @@ Figure~\ref{fig:fig1} show difference in control and management of resources bet
 
 The user can choose a single solution, or combine more of them if such a thing is required depending on preferences and needs.
 
-CC has been the dominating tool in the past decade in various applications~\cite{Satyanarayanan17}. It is changing, evolving, and offering new types of services. Resources such as container as a service (CaaS), database as a service (DBaaS)~\cite{Peter} are newly introduced. The CC model gives us a few benefits. Centralization relies on the economy of scale to lower the cost of administration of big DCs. Organizations using cloud services avoid huge investments. Like creating and maintaining their own DCs. They consume resources created by others~\cite{Satyanarayanan17} and pay for usage time -- a pay as you go model. 
+By the ownership, CC can be categorized into three categories:
+\begin{itemize}
+	\item \textbf{Public cloud} is type where CC is delivered over the internet, and shared across many many organizations and users. In this type of the CC, architecture is built and maintained by others. Users and organizations pay for what they use. Examples include: AWS EC2, Google App Engine, Microsoft Azure etc.
+	\item \textbf{Private cloud} is type where CC is dedicated only to a single organization. In this type of the CC, architecture is built by organization who may offer their solution or services to the users or other organizations. These services are in domain what the organization does, and that organization is in charge of maintanance. Examples include VMWare, XEN, KVM etc.
+	\item \textbf{Hybrid cloud} is such environment that uses both public and private clouds. Examples include: IBM, HP, VMWare vCloud etc.
+\end{itemize}
+
+Table~\ref{tab:table4} show comparison of public, private and hybrid cloud capabilities.
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{l|l|l|l}
+			\textbf{Capabilities} & \textbf{Public cloud} & \textbf{Private cloud} & \textbf{Hybrid cloud}\\
+			\hline
+			\textbf{Data control} & IT enterprise & Service Provider & Both \\
+			\textbf{Cost} & Low & High & Moderate \\
+			\textbf{Data security} & Low & High & Moderate \\
+			\textbf{Service levels} & IT specific & Provider specific & Aggregate \\
+			\textbf{Scalability} & Very high & Limited & Very high \\	
+			\textbf{Reliability} & Moderate & Very high & Medium/High\\	
+			\textbf{Performance} & Low/Medium & Good & Good \\
+\end{tabular}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption{comparison of public, private and hybrid cloud capabilities.}
+	\label{tab:table4}
+\end{table}
+
+In the rest of the thesis, if not stated differently when CC term is used it denotes public cloud.
+
+CC has been the dominating tool in the past decade in various applications~\cite{Satyanarayanan17}. It is changing, evolving, and offering new types of services. Resources such as container as a service (CaaS), database as a service (DBaaS)~\cite{Peter} are newly introduced. The CC model gives us a few benefits. Centralization relies on the economy of scale to lower the cost of administration of big DCs. Organizations using cloud services avoid huge investments. Like creating and maintaining their own DCs. They consume resources usually created by others~\cite{Satyanarayanan17} and pay for usage time -- a pay as you go model. 
 
 But centralization give us few really hard problems to solve. As already stated in section~\ref{sec:problem_area} data is required to be moved to the cloud from data sources, which introduces a high latency in the system~\cite{HossainRH18}. 
 
@@ -186,6 +231,8 @@ DC can be defined as the use of a DS to solve one large problem by breaking it d
 
 Similar to CC in Section~\ref{sec:cloud_computing}, to a normal user, DC systems appear as a single system similar to one he use every day on his personal computer.
 
+DC share same fallacies to DS presented in~\ref{sec:distributed_systems}.
+
 In this section we are going to explain examples of distributed programs that rely on DS that are important for future parts of the thesis. Section~\ref{sec:big_data} gives more details about using DS to process huge quantity of data. Section~\ref{sec:microservices} gives explanation how to build scalable applications that are able to whitstand huge request rate and large amout of users.
 %
 %
@@ -245,7 +292,7 @@ This architecure patter is well aligned to the CC paradigm~\cite{LiZJLZLGGS19}, 
 \begin{table}[h!]
 	\begin{center}
 		\begin{tabular}{l|l|l}
-			& \textbf{Monolith} & \textbf{Microservices}\\
+			\textbf{Feature} & \textbf{Monolith} & \textbf{Microservices}\\
 			\hline
 			\textbf{Structure} & Single unit & Independent services \\
 			\textbf{Management} & Usually easier & Add DS complexity\\
@@ -280,25 +327,31 @@ In this section we are going to shortly describe models that are similar to the 
 %
 \subsection{Parallel computing}\label{sec:parallel_computing}
 %
-DC and parallel computing seems like models that overlap, and that may share some features. Broadly speaking, this might be true~\cite{Vera16}. But distinguished between the two can be presented as follows: in parallel computing all processor units have acces to the shared memory, while in DC all processors have their own memory. Figure~\ref{fig:fig4} visually summarize the differences between DC $(up)$ and parallel computing $(down)$.
+DC and parallel computing seems like models that are the same, and that may share some features like simultaneously executing a set of computations in parallel. Broadly speaking, this is not far from the truth~\cite{Vera16}. But distinguished between the two can be presented as follows: in parallel computing all processor units have acces to the shared memory and have some way of the faster inter-process communication, while in DS and DC all processors have their own memory on their own machine and communicate over network to other nodes which is significantly slower. 
+
+These models are similar, but they are not indentical, and the kind of problems they are designed to work on are different. Figure~\ref{fig:fig4} visually summarize the architectural  differences between DC $(up)$ and parallel computing $(down)$.
 
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[scale=0.9]{images/Figure4.png}
 	\end{center}
 	\vspace{-0.6cm}
-	\caption{Difference between DC and parallel computing.}
+	\caption{Architectural difference between DC and parallel computing.}
 	\label{fig:fig4}
 \end{figure}
 
-Parallel computing is ofet used strategy with problems, that due to their nature or constraints must be done on multi-core machines simultaneously~\cite{0072397}.
+Parallel computing is often used strategy with problems, that due to their nature or constraints must be done on multi-core machines simultaneously~\cite{0072397}. It is ofthen, that huge problems are divided into smaller ones, which can then be solved at the same time. 
+
+There are number of tasks that requre parallel computing like simulations, computer graphics rendering or different scenarios in scientific computing.
 %
 %
 \subsection{Decentralized systems}\label{sec:decentralized_systems}
 %
-Decentralized systems are similar to DS, in technical sense they are still DS. But if we take closer look, these systems \textbf{should not} be owned by single the entity. CC for example is example of DS, but centralized by the owner like AWS or Google because all computation needs to be moved to big DCs, which introduces a high latency in the system~\cite{HossainRH18}.
+Decentralized systems are similar to DS, in technical sense they are still DS. But if we take closer look, these systems \textbf{should not} be owned by the single entity. CC for example is perfect example of DS, but it is not decentralized by it's nature. It is centralized systems by the owner like AWS, Google, Microsoft or some other private compay because all computation needs to be moved to big DCs~\cite{HossainRH18}.
 
-By today standards, if people are talking about decentralyzed systems, they usually mean on blockchain technology~\cite{LeibleSSG19}. But even if this technology is run in the cloud, it is loosing the decentralized feature. This is the caveat people needs to be aware. These systems are facing different issues, because any participent in the sustem might be malicious and they need to handle this case. Nontheless, CC can and should be decentralized in a sense that some computation can happend outside CC DCs, closer to the sources of data.
+By today standards, when we are talking about decentralyzed systems, we usually think of blockchain or blockchain-like technology~\cite{LeibleSSG19}. Since here we have distributed nodes, that are scattered and there is no single entity that own all these nodes. But even if this technology is run in the cloud, it is loosing the decentralized feature. This is the caveat we needs to be aware of. These systems are facing different issues, because any participent in the system might be malicious and they need to handle this case. 
+
+Nontheless, CC can and should be decentralized in a sense that some computation can happend outside of cloud big DCs, closer to the sources of data. These computation could be owned by someone else, and big cloud companies could give their own solution to this as well to relax centralization and problems that CC will have esspecially with ever growing IoT and mobile devices.
 %
 %
 \section{Virtualization techniques}\label{sec:virtualization_techniques}
@@ -335,13 +388,17 @@ People usually confuse these two concepts. Even they looks similar, they are dif
 \noindent
 \textbf{Parallelism} is simultaneous execution of multiple things. Parallelism is about doing a lot of things at once. 
 
-These things are important, esspecially when building applications and systems that should achieve very high throughput. We must build them with good structure and good concurrency can provide this enableing possible parallelism, but with communication~\cite{Pike, Hoare78}.
+These things are important, esspecially when building applications and systems that should achieve very high throughput. We must build them with a good structure and a good concurrency model. These features enables possible parallelism, but with communication~\cite{Pike}. These ideas are based on Tony Hoare work~\cite{Hoare78}.
 
 \subsection{Actor model}\label{sec:actor_model}
 %
-Similar model to the~\cite{Hoare78} is actor model~\cite{Hewitt}. In actor model, the main idea is that actors are small concurrent code that communicate independently by sending messages, removing the need for lock-based synchronization. 
+In actor model, the main idea is based around \textbf{actors} which are small concurrent code, that communicate independently by sending messages, removing the need for lock-based synchronization~\cite{Hewitt}. This model propose similar idea like Tony Hoare in his work~\cite{Hoare78}.
 
-Actors do not share memory, and actor can create another actor/s and even watch on them in case they stop unexpectedly. And when an actor finished its job, and he is not needed anymore, it disappears.
+Actors do not share memory, and they are isolated by nature. Actor can create another actor/s and even watch on them in case they stop unexpectedly. And when an actor finished its job, and he is not needed anymore, it disappears. These actors can create complicated networks that are easy to understand, model and reason about and everything is based on a simple massage passing mechanism. 
+
+Every actor have a designated message box. When a message arrives, actor will test message type and do job acording to message type he received. In this way we are not dependent of lock-based synchronization that can be hard to understand, and it can cause serious problems.
+
+Actor model is fault tolerant by design. It support crush to happend, because there is a \say{self heal} mechanism that will monitor actor/s, and when crash happend it will try to apply some strategy, in most cases just restart actor, but other strategies could be applied. This philosophy is really usefull, because it is hard to think about every single failure option.
 %
 %
 \section{Motivation and Problem Statement}\label{sec:problem_statement}

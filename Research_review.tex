@@ -3,7 +3,7 @@
 %
 Faced real issues and limits of cloud computing, both academia, and the industry started researching and developing viable solutions. Some research is focused more on adapting existing solutions to fit EC, while others experiment with new ideas and solutions. 
 
-In this Chapter, we present the results of our research reviews existing nodes organizational abilities, as well platform models from industry and academia and cloud offloading techniques, addressing issues discussed earlier.
+In this Chapter, we present the results of our research reviews addressing issues discussed earlier. in Section~\ref{sec:nodes_organization} we review existing nodes organizational abilities, as well platform models from industry and academia in Section~\ref{sec:nodes_organization}. In Section~\ref{sec:task_offloading} we review cloud offloading techniques. In Section~\ref{sec:applications} we review some applicartio models, and we give position of this thesis compared to all revied aspects in Section~\ref{thesis_position}.
 %
 %
 \section{Nodes organization}\label{sec:nodes_organization}
@@ -23,7 +23,7 @@ and reducing the fixed costs of traditional DCs. Minimum size of an MDCs is defi
 %
 Kubernetes~\cite{BurnsGOBW16} is an open-source variant of Google orchestrator Borg \cite{VermaPKOTW15}.  All workloads end in the domain of one cluster~\cite{BurnsGOBW16, VermaPKOTW15, RossiCPN20}. Rossi et al.~\cite{RossiCPN20} focuses on adapting Kubernetes for geo-distributed workloads using a reinforcement learning (RL) solution, to learn a suitable scaling policy from experience. Like every other machine learning implementation this could be potentially slow due to the required model training. Kubernetes is a promising solution, but it might not be the best proposal for EC. By design, Kubernetes operate in a completely different environment from EC. The second potential issue is the deployment concept that might be too complicated for EC workloads. On the other hand, there are a few ideas that are worth exploring, such as loosely coupling elements with labels and selectors. Nonetheless, researches show that adapted Kubernetes architecture works for geo-distributed workloads like EC.
 
-{Ryden et al.~\cite{RydenOCW14}} present a platform for distributed computing with attention to user-based applications. Unlike other systems, the goal is not to implement a resource management policy, but to give users more flexibility for application development. Users implement applications using Javascript (JS) programming language, with some embedded native code for efficiency. Similar to~\cite{CiobanuNPDMM19}, the authors use volunteer nodes to run all the workloads, with the difference that some nodes are used for storage, while others are used for calculation. Sandboxing technique protects nodes running applications from malicious code. Users develop their applications using JS only. This restriction comes from using Google Chrome Web browser-based Native Client (NaCl) sandbox~\cite{YeeSDCMOONF10}. JS is a popular language at the moment, but the restriction of a single language might be a deal-breaker for some usages. If standard virtual machines become too resource-demanding, a solution using containers could provide sandboxing and bring better resource utilization. It is an interesting idea to show how users can develop their applications and run them in an EC environment.
+Ryden et al.~\cite{RydenOCW14} present a platform for distributed computing with attention to user-based applications. Unlike other systems, the goal is not to implement a resource management policy, but to give users more flexibility for application development. Users implement applications using Javascript (JS) programming language, with some embedded native code for efficiency. Similar to~\cite{CiobanuNPDMM19}, the authors use volunteer nodes to run all the workloads, with the difference that some nodes are used for storage, while others are used for calculation. Sandboxing technique protects nodes running applications from malicious code. It is an interesting idea to show how users can develop their applications and run them in an EC environment.
 
 L{\`{e}}bre et al.~\cite{LebrePSD17} describe a promising solution of extending OpenStack, an open-source IaaS platform for fog/edge use cases. They try to manage both cloud and edge resources using a NoSQL database. Implementation of a massively distributed multi-site IaaS, using OpenStack is a challenging task~\cite{LebrePSD17}. Communication between nodes of different sites can be subject to important network latencies~\cite{LebrePSD17}. The major advantage is that users of the IaaS solution can continue using the same familiar infrastructure. In~\cite{ShaoLFJL19} Shao et al. present a possible MDCs structure serving only the local population, in the smart city use-case.
 
@@ -34,16 +34,26 @@ There are few industry operating frameworks for EC, like Amazon Greengrass~\cite
 %
 \section{Task offloading}\label{sec:task_offloading}
 %
-As we already mention in~\ref{sec:mobile_computing} EC nodes rely on the concept of data and computation offloading from the cloud closer to the ground \cite{KhuneP19}, while heavy computation remains in the cloud because of resource availability~\cite{NingLSY20}.
+As already mention in~\ref{sec:mobile_computing} EC nodes rely on the concept of data and computation offloading from the cloud closer to the ground \cite{KhuneP19}, while heavy computation remains in the cloud because of resource availability~\cite{NingLSY20}. 
 
-In literature, there are few platforms proposing task offloading [56-59] to the nearby edge layer. These offloading techniques are based on different parameters, options, and techniques, to put tasks to different sets of nodes.
-%
-%
+Offloading is effective when using cloud servers but this principle introduce long latency, which some applications can't tolerate. On the other hand mobile devices and sensors do not have sufficient battery energy for task offloading~\cite{MaoZL16}. The computation performance may be compromised due to insufficient battery energy for task offloading, so these devices might send their data to nearby EC nodes.
 
-\section{Applications}\label{sec:applications}
+In literature, there are few platforms proposing task offloading~\cite{ShiHPANZ14, KhuneP19, ChenHLLW15, LinLJL19, JiangCGZW19, MaoZL16} to the nearby edge layer. These offloading techniques are based on different parameters, options, and techniques to put tasks to different sets of nodes in such a way that it won't drain mobile devices and sensors baterry. After compuitation is done, this edge layer send pre-processed data to the cloud for further analyse, storage et. 
 %
 %
+\section{Application models}\label{sec:applications}
+%
+Ryden et al.~\cite{RydenOCW14} present Nebula, a platform for distributed computing. Users develop their applications using JS only. This restriction comes from using Google Chrome Web browser-based Native Client (NaCl) sandbox~\cite{YeeSDCMOONF10}. JS is a popular language at the moment, but the restriction of a single language might be a deal-breaker for some usages. If standard virtual machines become too resource-demanding, a solution using containers could provide sandboxing and bring better resource utilization.
 
+In~\cite{SatyanarayananBCD09} Satyanarayanan et al. represent an interesting view on cloudlets s a \say{data center in a box.}. They give example that cloudleta should support the wide range of users, with minimal constraints on their software. They pun emphesis on transient VM technology. The emphasis on transient VMs is beacuse cloudlet infrastructure is restored to its pristine software state after each use, without manual intervention. In the time they conduct they reserach containers might not be working solution or it might be hard to use them. By today standards, containers may even fit better, and pack more user softvare on same hardware. This may be case for the unikernels, once they reach wider adoption rate and stable products.
+
+Various Kubernetes variants lik~\ref{KubeEdge, RossiCPN20}, give users possibiliety to run different applications like web servers and databses even on smaler devices cretaing green DC~\cite{ArocaG12}.
+
+Satyanarayanan et al.~\cite{SatyanarayananK19} propse concept of edge-native applications that will separate space into 3 tiers.Tier 1 represent various mobile and IoT devices. These devices produce a lot of data. Tier 2 represent applications running in cloudlets or other EC models, that will pre-process, fiter data before it goes further. Finaly, tier 3 represnet classic cloud applications that will accept pre-processed and filer data from previous tier. This represent interesting concept, and give wide space for users and application developement.
+
+In~\cite{inproceedingsBeck} Beck et al. argue that applications should use message bus, because most mobile edge applications are expected to be event driven.  Message bus system is an interesting, because virtualized applicatoin can subscribe to message streams, i.e., topics. And if for some reason mobile edge applications can't reach close EC server, it can always send data to cloud. So cloud applications should be changed so so slightly, just to accept this case.
+%
+%
 \section{Thesis position}\label{sec:thesis_position}
 Different from the aforementioned work,this thesis focuses on descriptive dynamic organization of geo-distributed nodes over an arbitrary vast area that lacks in other solutions. To achieve such a task, thesis model is influenced by the CC organization, but adapted for a different environment such as EC. These adaptations are followed by clear Separation of concerns (SoC) and EC applications model. All these allow us to push the whole solution more towards EC as a service model like any other utility in the cloud.
 %
