@@ -1,0 +1,39 @@
+%!TEX root =  main.tex
+\chapter{Implementation}\label{chapter:Implementation}
+%
+\section{Results}\label{sec:results}
+%
+We have implemented a proof of concept system of the proposed model using the microservice architecture shown in Figure~\ref{fig:fig11}.
+\begin{figure}[!htbp]
+	\begin{center}
+		\includegraphics[scale=0.75]{images/FIG5}
+	\end{center}
+	\vspace{-0.9cm}
+	\caption{Proof of concept implemented system.}
+	\label{fig:fig11}
+\end{figure} 
+
+All services are implemented using the Go programming language. As a storage layer, we used etcd, a popular open-source key-value database, and for metrics storage we used the open-source time-series database InfluxDB. Communication between microservices is implemented in RPC manner using gRPC, and Protobuf as a message definition. gRPC and Protobuf are open-source tools designed by Google to be scalable, interoperable, and available for general purposes. Communication between nodes and the system is carried out using NATS, an open-source messaging system. Health checking and action push to nodes are implemented over NATS in a publish-subscribe manner. To communicate with the platform, we have developed a simple command-line interface (CLI) application also using the Go programming language that sends JSON encoded messages over HTTP to the system.
+
+Every node runs a simple daemon program implemented as an actor system using the Go programming language. When a message arrives, the proper actor will react based on the message type, or discard if the type is not supported. Before daemon starts, the user needs to specify identifier, name, labels, health-check interval, and system address using YAML configuration file. Based on the configuration file, the daemon will start a background health-check mechanism, and it will subscribe to the system, using an identifier as a subscription topic. The background thread will contact the system repeatedly using a contact interval time, specified in the configuration file. On every health-check, the node will send labels, name, id, and metrics to the system (e.g., CPU utilization, total, used, free ram or disk, etc.). The specified labels will be used when the user is querying for available nodes, while node id will be used for reservation when forming a cluster.
+
+The system operates with four commands: 
+%\begin{compactitem}[$\bullet$]
+
+\begin{itemize}
+	\setlength{\itemsep}{1pt}
+	\setlength{\parskip}{0pt}
+	\setlength{\parsep}{0pt}
+	\item \textbf{mutate} (orange arrows in Figure \ref{fig:fig5}.) change the system state by creating, editing, or deleting clusters, regions, and topologies. When a user wants to perform a mutation over the system, a desired state needs to be specified using a YAML file. The users specify which nodes are forming the cluster. Optionally, users can also specify labels and names on the node level, and retention period on the cluster level. The retention period is used to describe how long metrics are going to be kept. When the retention period expires, the metrics data will be deleted or moved to another location. Users can target a specific system queue, by adding a metadata part in the configuration file. With this ability, users can have specific queues just for the mutation to avoid long waiting times if other queues are full. When forming a topology, users can assign a name and labels to the entire topology. These parameters will be used when the user wants to query all topologies to get full information about regions, clusters, and nodes inside a topology; 
+	\item \textbf{list} show the current state of the system for the registered user (blue arrows in Figure \ref{fig:fig5}.). Using labels, the user can specify what part of the system he wants to see. He can get a global view of the system - all topologies he manages, or details about a single topology (i.e., regions, clusters, and nodes in a single topology). Users can specify a more detailed view of a single cluster, meaning the users will get information about what resources the cluster has, but also resource utilization over time (using stored metrics information); 
+	\item \textbf{query} operation showing all or filtered free nodes registered to the system (yellow arrows in Figure \ref{fig:fig5}.). When a user wants to get information about free nodes, they need to submit a selector value which is composed of multiple key-value pairs. The selector will be used to compare labels of every free node existing in the system. The nodes satisfying the rules defined in Section~\ref{subsec:cluster_formation} will be in the result; 
+	\item \textbf{logs} operation showing stored logs and traces to the user (purple arrows in Figure \ref{fig:fig5}.). Here, the user can see the state of his operations and actions.
+\end{itemize}
+%\end{compactitem}
+
+The proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. Integration with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure is possible since they all operate over the cluster, with some small infrastructure changes and adaptations --- since the communication is implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an  organization tool.
+%
+%
+\section{Limitations}\label{sec:limitations}
+%
+%
