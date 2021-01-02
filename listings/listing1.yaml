@@ -1,0 +1,18 @@
+star:
+  version: v1
+  nodeid: node1
+  name: noname
+  flusher: address
+  healthcheck:
+    address: address
+    topic: health
+    interval: 1m
+  labels: 
+    os: linux
+    disk: flash
+    arch: arm
+    model: rpi
+    memory: 4GB
+    storage: 120GB
+    cpu: 1
+    cores: 4

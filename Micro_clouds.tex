@@ -3,12 +3,22 @@
 %
 This section explains the model of EC as a service compared to the traditional CC model. We present the formation of such a system with a formal model and proof of concept implementation based on the proposed model.
 
-In Section~\ref{sec:formal_model} we present why formal models are important in computer science and DS in particular, as well as model of our system with all protocols and nodes properties. Section~\ref{sec:configurable_model_structure} present configurable model used to describe our system. in Section~\ref{sec:separation_of_concerns} we present separation of concerns for our model. In Section~\ref{sec:as_a_service_model} we discuss how this system could be offered as a service model and could be used for EC as a service. In Section~\ref{sec:application_model} we present possible application model and how users can utilize newly created architecture fully, using existing application models. Section~\ref{sec:results} give result of our experiments and architecture od implemented system. Finally, section~\ref{sec:limitations} present limitation of our model.
+In Section~\ref{sec:formal_model} we present why formal models are important in computer science and DS in particular, as well as model of our system with all protocols and nodes properties. Section~\ref{sec:configurable_model_structure} present configurable model used to describe our system. in Section~\ref{sec:separation_of_concerns} we present separation of concerns for our model. In Section~\ref{sec:as_a_service_model} we discuss how this system could be offered as a service model and could be used for EC as a service. In Section~\ref{sec:application_model} we present possible application model and how users can utilize newly created architecture fully, using existing application models. Section~\ref{sec:repercussion} give repercussion of proposed model, and how it can be used as stand alone model where other features could be implemented on top of that or used as service for other, existing, systems. Finally, section~\ref{sec:limitations} present limitation of our model.
 %
 %
 \section{Formal model}\label{sec:formal_model}
 %
-Infrastructure deployment will not happen until the process is trivial \cite{SatyanarayananBCD09}, hence the key is to simplify ECC management. The main problem is that going to every node is tedious and time consuming, especially in a geo-distributed environment. The system we propose tackles this issue using remote configuration and it relies on three protocols: $(1)$ \textbf{health-check} protocol informs the system about state of every node, $(2)$ \textbf{cluster formation} protocol forms new clusters, and $(3)$ \textbf{list detail} protocol shows the current state of the system to the user.
+Ensuring reliability and correctness of any system is very difficult, and should be mathematically based. Formal methods are techniques that allow us specification and verification of complex (software and hardware) systems based on mathematics and formal logic.
+
+Infrastructure deployment will not happen until the process is trivial \cite{SatyanarayananBCD09}, hence the key is to simplify ECC management. The main problem is that going to every node is tedious and time consuming, especially in a geo-distributed environment. In such complex environemnt, formal models are of great help if we can model and prove that protocols that system reyls on are correct. The system we propose tackles this issue using remote configuration and it relies on three formaly modeled protocols: 
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+\item \textbf{health-check} protocol informs the system about state of every node 
+\item \textbf{cluster formation} protocol forms new clusters dinamicaly
+\item \textbf{list detail} protocol shows the current state of the system to the user
+\end{enumerate}
+
+These three protocols are base of the geo-distribued Infrastructure deployment.
 
 In Section~\ref{sec:multiparty} we give short introduction what multiparty asynchronous session types (MST) are and what properties they guarantee. Section~\ref{sec:health_check_protocol} describe formal model of healh-check protocol. Section~\ref{sec:cluster_formation_protocol} describe cluster formation protocol. Section~\ref{sec:list_detail_protocol} describe protocol that return data based on some query.
 %
@@ -798,5 +808,31 @@ In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containres 
 In future and when unikernels are more matured and tested, they could be used for paritical use-cases and applications, esspecially like events or serverless implementations. Containres will probably not be fully replaced, but they can co-exist with unikernels in some cases where we need more controll over running single function.
 
 Like any other system, users can create their own variants of the systems and different flavours optimized for certen solutions. In that cases, they may favorized one solution over the other one. But in general case containers and unikernels should be prefered way to package, run and distributed user applicatoins in micro-clouds environment.
+%
+%
+\section{Immutable infrastructure}\label{sec:immutable_infrastructure}
+%
+%
+\section{Repercussion}\label{sec:repercussion}
+%
+Model presented in this chapter, have two possible repercussions:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be valiable option in the CC.
+	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because --- the communication should implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an  organization tool.
+\end{enumerate} 
+%
+%
+\section{Limitations}\label{sec:limitations}
+%
+Since the perfect model never existed, model that is proposed in this thesis have some limitations, that we must be aware of. Either to work on improvements, or use the model as is. When talking about small scale servers and micro-clouds, we must be aware of the few things. 
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item not all companies and organizations will be able to deploy them, due to the high investments required~\cite{MonsalveCC18}. Similar to the cloud where massive DCs are built by a few companies and used by many others. These small servers could be deployed by government authorities or large cloud companies for their own needs. The general public can use them, similarly to the cloud --- pay as you go, model.
+	\item there is no guarantiee that existing public cloud providers will allow nodes that are not built, resigned or deployed by them. If we are building private cloud, thant we can make different decision. One way to resolve this issue is that whole platform become open-source, so that public cloud providers can engage into development, and eventually use tham as a solution.
+	\item These small scale servers must be out of reach of people, and protected in some way so that not everyone have access to them. Some degree of phisical security mut be implemented.
+	\item places where these small scale servers will be deployd must have stable internet connection, and ability to integrate SDN or other similar techologies, so that complex network topologies could be implemented properly.
+	\item these servers can have some open architecture or could be custom built by other providers. In both cases they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
+\end{enumerate}
 %
 %

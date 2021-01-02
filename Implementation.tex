@@ -1,9 +1,25 @@
 %!TEX root =  main.tex
 \chapter{Implementation}\label{chapter:Implementation}
 %
-\section{Results}\label{sec:results}
+In this chapter, we are going to give more details about framework implemented based on formal model and architecture specification given i previous chapter.
+Section~\ref{sec:results} give result of our experiments and architecture od implemented system. Section~\ref{sec:app} describe few possible senarios and applications that could utilize micro-clouds platform.
 %
-We have implemented a proof of concept system of the proposed model using the microservice architecture shown in Figure~\ref{fig:fig11}.
+%
+\section{Framework}\label{sec:results}
+%
+We have implemented a proof of concept system based on the proposed, model using the microservice architecture with services that have distinct role and purpose to the entire system. These services are:
+
+\begin{itemize}
+	\item \textbf{Authentification \& Authorization}, sole purpose of this service is to store users and their credentials. This servic will validate idoes user exists in the system, and does he have certen rights to performe some specific operation. Users that often use the system will be stored in the cache layer of the sevice, so that on next request his actions are done faster. Users that not use the system that often will not be stored in the cache, until first use. After that, if user do not use system in some time, he will expire from the cache.
+	\item \textbf{Queues}, purpose of this service is to prevent huge request load to the system, and to accept more user requests. When user submit any \textbf{mutation} operation --- operation that change state of the system, thse opreations will be put in the queue. User can create their own queues, to prevent long lines for specific tasks. For example, user can crete queues for specific tasks, and use them only for those tasks, while other queues could be general purpos queues. On system start, evey user will start with one queue --- \textbf{default}. When doing mutations on different parts of the system, user can specify in matadata which queue he wnats task to go to.
+	\item \textbf{Nodes}, this service stores and maintain informations about registered nodes in the system. All node hardware and software details will be stored in this here. This service is also responsabile for storeing metrics data, accept health-check requests from nodes, and inform rest of the system that used node is alive.
+	\item \textbf{State}, is heart of the system. This service store all informations about architecture, clusters, regions and topologies. When new cluster/region/topology is creted, this service will setup watchers for nodes, so that if node is not send healtch-check signal for some time, that node will be declared dead. This is important, so that at any moment we must know state of the clusters and their utilization. This service as well will cache frequently used nodes data, so that on next request node lookup is faster since we can have huge number of nodes, topologies clusters and informations about them. To prevent data loss, this service will first store a copy of operation before attepting any mutation of the system.
+	\item \textbf{Log}, is responsabile for storeing all log an trace data from every service. Here user can check are all jobs done, or is there some error and possible why error happend to resolve it, or fix for the next time. From user point of view, this is \textbf{read only} service and from sysem view this is \textbf{write only} service.
+	\item \textbf{Command push}, purpose of this service is to push commands and operations to the nodes user desired. This service implement token bucket rate limiting algorithm to prevent constant data push to the nodes. As State service, this service will store a copy of operation information localy before attempting any push to the nodes. This information will be deleted, once operation reach all desided nodes, and all of them response with ACK message.
+\end{itemize}
+
+All services, are higly customizable and all have their own configuratoin data taht could be setup. All these services are easy to extend to support new operations and informations about nodes, reginos, clusters, topologies and latter on applications as well. Service architecture is shown in Figure~\ref{fig:fig11}.
+
 \begin{figure}[!htbp]
 	\begin{center}
 		\includegraphics[scale=0.75]{images/FIG5}
@@ -13,27 +29,75 @@ We have implemented a proof of concept system of the proposed model using the mi
 	\label{fig:fig11}
 \end{figure} 
 
-All services are implemented using the Go programming language. As a storage layer, we used etcd, a popular open-source key-value database, and for metrics storage we used the open-source time-series database InfluxDB. Communication between microservices is implemented in RPC manner using gRPC, and Protobuf as a message definition. gRPC and Protobuf are open-source tools designed by Google to be scalable, interoperable, and available for general purposes. Communication between nodes and the system is carried out using NATS, an open-source messaging system. Health checking and action push to nodes are implemented over NATS in a publish-subscribe manner. To communicate with the platform, we have developed a simple command-line interface (CLI) application also using the Go programming language that sends JSON encoded messages over HTTP to the system.
+All services are implemented using the Go programming language. As a main storage layer for our system, we used etcd, a popular open-source key-value database, that show good performance, and it is mostly used for configiration data. Metrics data are stored in the open-source time-series database InfluxDB. 
 
-Every node runs a simple daemon program implemented as an actor system using the Go programming language. When a message arrives, the proper actor will react based on the message type, or discard if the type is not supported. Before daemon starts, the user needs to specify identifier, name, labels, health-check interval, and system address using YAML configuration file. Based on the configuration file, the daemon will start a background health-check mechanism, and it will subscribe to the system, using an identifier as a subscription topic. The background thread will contact the system repeatedly using a contact interval time, specified in the configuration file. On every health-check, the node will send labels, name, id, and metrics to the system (e.g., CPU utilization, total, used, free ram or disk, etc.). The specified labels will be used when the user is querying for available nodes, while node id will be used for reservation when forming a cluster.
+Communication between microservices is implemented in RPC manner using gRPC, and Protobuf as a message definition. gRPC and Protobuf are open-source tools designed by Google to be scalable, interoperable, and available for general purposes. Communication between nodes and the system is carried out using NATS, an open-source messaging system. Health checking and action push to nodes are implemented over NATS in a publish-subscribe manner.
 
-The system operates with four commands: 
-%\begin{compactitem}[$\bullet$]
+Chacheing layer for every service is implemented using Redis key-value, in memory database. It is important to notice, that all concrete tools that are used, are easy swapable for some other as long as they implement proper interface.
 
-\begin{itemize}
-	\setlength{\itemsep}{1pt}
-	\setlength{\parskip}{0pt}
-	\setlength{\parsep}{0pt}
-	\item \textbf{mutate} (orange arrows in Figure \ref{fig:fig5}.) change the system state by creating, editing, or deleting clusters, regions, and topologies. When a user wants to perform a mutation over the system, a desired state needs to be specified using a YAML file. The users specify which nodes are forming the cluster. Optionally, users can also specify labels and names on the node level, and retention period on the cluster level. The retention period is used to describe how long metrics are going to be kept. When the retention period expires, the metrics data will be deleted or moved to another location. Users can target a specific system queue, by adding a metadata part in the configuration file. With this ability, users can have specific queues just for the mutation to avoid long waiting times if other queues are full. When forming a topology, users can assign a name and labels to the entire topology. These parameters will be used when the user wants to query all topologies to get full information about regions, clusters, and nodes inside a topology; 
-	\item \textbf{list} show the current state of the system for the registered user (blue arrows in Figure \ref{fig:fig5}.). Using labels, the user can specify what part of the system he wants to see. He can get a global view of the system - all topologies he manages, or details about a single topology (i.e., regions, clusters, and nodes in a single topology). Users can specify a more detailed view of a single cluster, meaning the users will get information about what resources the cluster has, but also resource utilization over time (using stored metrics information); 
-	\item \textbf{query} operation showing all or filtered free nodes registered to the system (yellow arrows in Figure \ref{fig:fig5}.). When a user wants to get information about free nodes, they need to submit a selector value which is composed of multiple key-value pairs. The selector will be used to compare labels of every free node existing in the system. The nodes satisfying the rules defined in Section~\ref{subsec:cluster_formation} will be in the result; 
-	\item \textbf{logs} operation showing stored logs and traces to the user (purple arrows in Figure \ref{fig:fig5}.). Here, the user can see the state of his operations and actions.
-\end{itemize}
-%\end{compactitem}
+All communication with the outside world, is done in REST manner using JSON encoded messages over HTTP. To communicate with the platform, we have developed a simple command-line interface (CLI) application also using the Go programming language that sends JSON encoded messages over HTTP to the system.
 
-The proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. Integration with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure is possible since they all operate over the cluster, with some small infrastructure changes and adaptations --- since the communication is implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an  organization tool.
+Every service is packed in container, and for this purpose Docker containers are used. To achieve automatic orchestration, and self-heal and up-time, all services that are packed in containres, are runnin inside Kubernetes.
+
+The system operates with four commands, where three of them follow formal models described in previous chapter. Last command is simple command to list logs for every user.
 %
 %
-\section{Limitations}\label{sec:limitations}
+\subsection{Node daemon}\label{sec:node_daemon}
+Every node runs a simple daemon program implemented using the Go programming language, as an actor system (Ref. secion~\ref{sec:actor_model}). When a message arrives, the proper actor will react based on the message type, or discard if the type is not supported. Extending such system is reather easy, because users need to simply write new actor and logic that goes with him and register it to the system.
+
+Before daemon starts, the user needs to specify some parameters for proper configuration like: $(1)$ identifier, $(2)$ name, $(2)$ labels, $(3)$ health-check interval, and $(3)$ system. Configuration can be done easly using YAML configuration file. Listing~\ref{lst:listing1} show simple YAML configuration file for deamon process.
+
+\begin{center}
+	\begin{tabular}{c}
+		\lstinputlisting[caption=Daemon configiration file, label={lst:listing1}]{listings/listing1.yaml}
+	\end{tabular}
+\end{center}
+
+Based on the configuration file, the daemon will start a background health-check mechanism, and it will subscribe to the system, using an identifier as a subscription topic. The background thread will contact the system repeatedly using a contact interval time, specified in the configuration file. 
+
+On every health-check, the node will send labels, name, id, and metrics to the system (e.g., CPU utilization, total, used, free ram or disk, etc.). The specified labels will be used when the user is querying for available nodes, while node id will be used for reservation when forming a cluster.
+
+On first start of the deamon when node is free, user can specify whathever node id he wants. Once, node is a part of the cluster, node id will be updated to match that. Node id update will happend on cluster formation process.
+%\
+%
+\subsection{Mutate}\label{sec:mutate} 
+(orange arrows in Figure \ref{fig:fig11}.) change the system state by creating, editing, or deleting clusters, regions, and topologies. When a user wants to perform a mutation over the system, a desired state needs to be specified using a YAML file. 
+
+The users specify which nodes are forming the cluster. Optionally, users can also specify labels and names on the node level, and retention period on the cluster level. The retention period is used to describe how long metrics are going to be kept. When the retention period expires, the metrics data will be deleted or moved to another location. Users can target a specific system queue, by adding a metadata part in the configuration file. With this ability, users can have specific queues just for the mutation to avoid long waiting times if other queues are full. When forming a topology, users can assign a name and labels to the entire topology. These parameters will be used when the user wants to query all topologies to get full information about regions, clusters, and nodes inside a topology
+
+\begin{center}
+	\begin{tabular}{c}
+		\lstinputlisting[caption=Mutate file, label={lst:listing2}]{listings/listing2.yaml}
+	\end{tabular}
+\end{center}
+%
+%
+\subsection{List}\label{sec:list}  
+This command show the current state of the system for the registered user (blue arrows in Figure \ref{fig:fig11}.). Using labels, the user can specify what part of the system he wants to see. He can get a global view of the system - all topologies he manages, or details about a single topology (i.e., regions, clusters, and nodes in a single topology). Users can specify a more detailed view of a single cluster, meaning the users will get information about what resources the cluster has, but also resource utilization over time (using stored metrics information); 
+%
+%
+\subsection{Query}\label{sec:query}  
+This operation showing all or filtered free nodes registered to the system (yellow arrows in Figure \ref{fig:fig11}.). When a user wants to get information about free nodes, they need to submit a selector value which is composed of multiple key-value pairs. The selector will be used to compare labels of every free node existing in the system. The nodes satisfying the rules defined in Section~\ref{subsec:cluster_formation} will be in the result; 
+%
+%
+\subsection{Logs}\label{sec:logs} 
+This operation showing stored logs and traces to the user (purple arrows in Figure \ref{fig:fig11}.). Here, the user can see the state of his operations and actions.
+%
+%
+\section{Applications}\label{sec:app}
+%
+This research focus on a platform with geo-distributed edge nodes can be organized dynamically into the micro data-centers and regions based on the cloud model, but adapted for a different environment. This middle layer helps the power-hungry servers reduce traffic by serving the nearby population requests and possibly syncing their data without expensive consensus protocols [55]. These micro data-centers or micro clouds also increase the availability and reliability of the cloud services, and as such could be offered as a service to users.
+
+With clear separation of concerns and a familiar application model for the users it opens possibilities for new human-centered applications, for example, area traffic control. 
+
+If we imagine a scenario where a new catastrophic event (earthquake, tsunami, war, terrorist attack, pandemic, etc.) is in the human population, an increasing amount of ambulance vehicles must be routed to hospitals fast, in the city area for example. The traffic control system suddenly needs more resources to continue operating properly. On top of that, if the healthcare system is like the one presented in [56, 57], we can monitor patient health in real-time [58] and transfer data to the healthcare platform. 
+
+This gives health workers crucial information about patients on their arrival. Resource vise, this scenario is relatively easy to solve if using the cloud, as we increase resource demand. The main advance of EC, when compared to the cloud only approach, is the acceleration of the communication speed. In our scenario, the cloud could bring huge latency, while EC originates from peer to peer systems [11], serving only local population needs, minimizing potentially huge round-trip time of the cloud. Furthermore, our model expands peer to peer systems into new directions and blends them with the cloud to allow novel human-centered, cloud-like applications. 
+
+For applications like self-driving cars, delivery drones, or power balancing in electric grids require real-time processing for proper decision making, or any other application that future developers may develop.
+
+Users are getting a new platform as a blank canvas, and there is no limitation in what applications they can develop. Integrating hardware and/or software even more, connecting sensors and things around us and eventually an operating system that will be capable of running city/state infrastructure without human intervention.
+
+
 %
 %

@@ -1,0 +1,31 @@
+constellations:
+  version: v1
+  kind: Topology
+  metadata:
+    taskName: default
+    queue: default
+  payload: 
+    name: MyTopology
+    selector:
+      labels:
+        l1: v1
+        l2: v2
+        l3: v3
+    topology:
+      region1: 
+        cluster1:
+          retention:
+            period: 24h
+          machineid1:
+            name: node1
+          machineid2:
+            name: node2
+          machineid3:
+            name: node3
+            selector:
+              labels:
+                os: linux
+                arch: arm
+                model: rpi
+                storage: 100GB
+                memory: 1GB 
