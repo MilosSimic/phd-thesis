@@ -763,16 +763,19 @@ Figure~\ref{fig:fig10}. shows the proposed SoC for every layer of the ECC as a s
 %
 \section{As a service model}\label{sec:as_a_service_model}
 %
-Users should be able to develop their applications using two different models: 
+Users should be able to develop their applications using two different models:
+ 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{PaaS}, where the platform is doing all the management and offers a simple interface for developers to deploy their applications 
-	\item  \textbf{CaaS}, if users require more control over resources requirements, deployment and orchestration decisions
+	\item \textbf{microPaaS or mPaaS}, where the platform is doing all the management and offers a simple interface for developers to deploy their applications. This model is similar to PaaS, and the only difference is that this is running in micro-cloud and synchronize with CC.
+	\item \textbf{microCaaS or mCaaS}, if users require more control over resources requirements, deployment and orchestration decisions. This model is similar to CaaS, and the only difference is that this is running in micro-cloud and synchronize with CC.
 \end{enumerate}
+
+Both variants should not stand alone, at least not for now. Fot that same reason we do not have microSaaS or mSaaS option, since that woul requre that whole application is running \textbf{only} in micro-clouds. But both options could be included, and part of any cloud model presented in~\ref{sec:cloud_computing}, or offered separatly.
 %
 %
 \section{Applications Model}\label{sec:application_model}
 %
-Traditional DCs propose specially designed cloud-native applications~\cite{GannonBS17}, that are easier to scale, more available, and less error-prone when compared to traditional web applications~\cite{GannonBS17}. Edge-native applications~\cite{SatyanarayananK19} should use the full potential of EC infrastructure, and keep good features of their cloud counterparts. 
+Traditional DCs and CC propose specially designed cloud-native applications~\cite{GannonBS17}, that are easier to scale, more available, and less error-prone when compared to traditional web applications~\cite{GannonBS17}. Edge-native applications~\cite{SatyanarayananK19} should use the full potential of EC infrastructure, and keep good features of their cloud counterparts. 
 
 Applications may be split in front and back processing services. Front processing service is an edge-native application running inside micro cloud to minimize latency, while the back service runs in traditional cloid as a cloud-native application to leverage greater resources. 
 
@@ -799,11 +802,11 @@ Because their nature, micro clouds could be most likley composed of ARM devices.
 
 But even if VMs are fully compatable with ARM devices, we still inherite VMs large footprint, already descused in~\ref{sec:virtualization_techniques} if we try to use tham $as is$.
 
-On contrary, containers and unikernels give us $more for less$, meaning we can run more services in containers and even more in unikernels. But untill unikernels are fulkly ready to be used they will fall in nice to have category, and we should stick to containers. But even with containers we need to be aware of their limitations and pitfalls, and know that there is no $silver bullit$ and there is no one solution for all scenarios.
+On contrary, containers and unikernels give us $more for less$ same functionality but using less resources, meaning we can run more services in containers and even more in unikernels. But untill unikernels are fulkly ready to be used they will fall in nice to have category, and we should stick to containers. But even with containers we need to be aware of their limitations and pitfalls, and know that there is no $silver bullit$ and there is no one solution for all scenarios.
 
 At the moment, containers are more matured solution than unikernels, and require less resources than VMs. On top of that, there are numerous of tools already existing using containers that could be utilized. Knowing all this, at first stages of micro-clouds, containres should be option to go. 
 
-In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containres in large sclae edge computing systems. Authors focus on differences between VMS and containers in cases where services needs to be runned on ARM devices with limited resources.
+In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containres in large sclae edge computing systems from theoretical point of vew, by looking into architecture difference. Authors focus on differences between VMS and containers in cases where services needs to be runned on ARM devices with limited resources.
 
 In future and when unikernels are more matured and tested, they could be used for paritical use-cases and applications, esspecially like events or serverless implementations. Containres will probably not be fully replaced, but they can co-exist with unikernels in some cases where we need more controll over running single function.
 
@@ -811,6 +814,19 @@ Like any other system, users can create their own variants of the systems and di
 %
 %
 \section{Immutable infrastructure}\label{sec:immutable_infrastructure}
+%
+As described in~\ref{sec:deployment}, we have few options when it comes to setup and deply infrastructure and/or applications. This thesis propose DS model that is build with three tier architecture that should operate in geo-distributed environment we blieve that \textbf{immutable deployment} model would be good fit. It will simplify deployment process, since we want to rely on atomic operations and do not want to left misconfigured system at any level. If something like that happend, we will end up in problem, that would be hard to properly address and resolve.
+
+Geo-distributed micro-clouds model that is described in this chaper, should operate in two levels of deployment that are build one on top of the another:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{Infrastructure deployement}, update and change should be atomic and immutable. Users should do changes declaratively --- mutations of the system, by telling the system what new state should be, and let the system to figure out the best way how to do user specified changes. In this category, we can account any change that is doing on the cluster, region or topology that user/s operate on. For example create of new cluster, region, topology or doing configurations of the setup system. The only change that could possible be done by imperative strategy is updates on the nodes itself. But even for this strategy, it would be beneficial if we could usedeclarative way \textbf{if possible}. It is important to notice that \textbf{mutation} does not mean in place change, but just name of operation. This deployment strategy is reserved for operations people, but if compay or team is small any developer could do this. Developers should not be dealing with this part of the deployment.
+	\item \textbf{Services deployment}, make sense only if previous action is takane. We must have infrastructure setup already, in order do put any sort of services (applications) into the system. As previous model, this should be done declaratively as well, and all changes dould be done immutably without any in place change. User should specify his new state or \say{view of the word} declaratively and let system do all the changes he wants. All user services should be packed as described in~\ref{sec:packaging} because this simplifies way services are put to the nodes. When done properly, this allow operations people to do faster changes with almost zero downtime deployments with all strategies already discused in~\ref{sec:deployment}. this part of the deployemnt should be done by developers, since they done implementation and testing. They know hos much resources they need for their service, what type of service they had developed. This deployment could be done in colaboration between operations and deveopers, if compay is big or time is properly separated.
+\end{enumerate}
+
+It is important to notice, that both deployments should be closley followed, for posible errors and problems so that users can act accordingly. This deployment messages, logs and traces should be stored in centralized log system, for convenient lookup, alerting and reporting.
+
+Separation like this, simplify deployment and usage for both: $(1)$ operation people like devops who sould be dealing with infrastructure and tooling, and $(2)$ developers who sould be dealing with services and their interaction.
 %
 %
 \section{Repercussion}\label{sec:repercussion}

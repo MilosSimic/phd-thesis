@@ -2,10 +2,10 @@
 \chapter{Implementation}\label{chapter:Implementation}
 %
 In this chapter, we are going to give more details about framework implemented based on formal model and architecture specification given i previous chapter.
-Section~\ref{sec:results} give result of our experiments and architecture od implemented system. Section~\ref{sec:app} describe few possible senarios and applications that could utilize micro-clouds platform.
+Section~\ref{sec:framework} framework architecture, andd system implementation details. Section~\ref{sec:app} describe few possible senarios and applications that could utilize micro-clouds platform. In Section~\ref{sec:results} we present results of our experiments.
 %
 %
-\section{Framework}\label{sec:results}
+\section{Framework}\label{sec:framework}
 %
 We have implemented a proof of concept system based on the proposed, model using the microservice architecture with services that have distinct role and purpose to the entire system. These services are:
 
@@ -49,7 +49,7 @@ Before daemon starts, the user needs to specify some parameters for proper confi
 
 \begin{center}
 	\begin{tabular}{c}
-		\lstinputlisting[caption=Daemon configiration file, label={lst:listing1}]{listings/listing1.yaml}
+		\lstinputlisting[caption={Daemon configiration file}, label={lst:listing1}]{listings/listing1.yaml}
 	\end{tabular}
 \end{center}
 
@@ -76,12 +76,32 @@ The users specify which nodes are forming the cluster. Optionally, users can als
 This command show the current state of the system for the registered user (blue arrows in Figure \ref{fig:fig11}.). Using labels, the user can specify what part of the system he wants to see. He can get a global view of the system - all topologies he manages, or details about a single topology (i.e., regions, clusters, and nodes in a single topology). Users can specify a more detailed view of a single cluster, meaning the users will get information about what resources the cluster has, but also resource utilization over time (using stored metrics information); 
 %
 %
-\subsection{Query}\label{sec:query}  
+\subsection{Query}\label{sec:query} 
+% 
 This operation showing all or filtered free nodes registered to the system (yellow arrows in Figure \ref{fig:fig11}.). When a user wants to get information about free nodes, they need to submit a selector value which is composed of multiple key-value pairs. The selector will be used to compare labels of every free node existing in the system. The nodes satisfying the rules defined in Section~\ref{subsec:cluster_formation} will be in the result; 
 %
 %
-\subsection{Logs}\label{sec:logs} 
+\subsection{Logs}\label{sec:logs}
+% 
 This operation showing stored logs and traces to the user (purple arrows in Figure \ref{fig:fig11}.). Here, the user can see the state of his operations and actions.
+%
+%
+\section{Results}\label{sec:results} 
+In our tests, we have used:
+
+\begin{itemize}
+	\item 9 Raspberry Pi 3+ Model B with 1GB LPDDR2 SDRAM, 16GB SDCard storage, and 1.4GHz Cortex-A53 64-bit SoC running Raspbian Linux, a Debian-based operating system.
+	\item 3 Beagle bone black devices with 512MB DDR3 RAM, 4GB 8-bit eMMC on-board flash storage, and 1GHz ARM Cortex-A8 running a version of Linux Debian operating system.
+\end{itemize}
+
+\noindent
+as test heterogenious nodes for creating clusters, regions, and topologies. 
+
+Using Go tooling we were able to build daemon problam without changes and dissiminate on all nodes.
+
+We have run tests on different configurations and different nodes clusters using these nodes. All nodes were connected on the WIFI network, and experiments were conducted in a controlled environment.
+
+Experimental research was realized in the laboratory of the Department of Informatics at the Faculty of Technical Sciences in Novi Sad. The laboratory of the Department of Informatics is equipped with adequate computer, communication and software equipment on which the set goals in this thesis can be fully realized.
 %
 %
 \section{Applications}\label{sec:app}
@@ -97,7 +117,5 @@ This gives health workers crucial information about patients on their arrival. R
 For applications like self-driving cars, delivery drones, or power balancing in electric grids require real-time processing for proper decision making, or any other application that future developers may develop.
 
 Users are getting a new platform as a blank canvas, and there is no limitation in what applications they can develop. Integrating hardware and/or software even more, connecting sensors and things around us and eventually an operating system that will be capable of running city/state infrastructure without human intervention.
-
-
 %
 %

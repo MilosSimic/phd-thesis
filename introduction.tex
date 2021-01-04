@@ -108,11 +108,33 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 
 \begin{enumerate} [start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{C}onsistency, which means that all clients will see the same data at the same time, no matter which node they are connected to. Clients my not be connected to the same node since data could be replicated on many nodes in different locations.
-	\item \textbf{A}vailability, which means that any client issued a request will get response back, even if one or nodes are down. DS will not interprate this situation as an exception or error. Availability is represented in percentage, and it represent how much downtime is allowed per year, This can be calculated using formula:\\\\ 
+	\item \textbf{A}vailability, which means that any client issued a request will get response back, even if one or nodes are down. DS will not interprate this situation as an exception or error. Availability is represented in percentage, and it describe how much downtime is allowed per year, This can be calculated using formula:\\\\ 
 	\begin{equation}\label{eq:Availability}
 		Availability = \frac{uptime}{ (uptime + downtime)}
 	\end{equation}
 	\myequations{Availability percentage formula}
+	Industry is using measureing avelability in \say{class of nines}. Availability class is the number of leading nines in the availability figure for a system or module~\cite{GrayS91}. This metric relates to the amount of time (per year) that a service is up and running. Table~\ref{tab:table7} show different classes of nine and their availability and unavailability in minutes per year (\textbf{min/year}) for some examples~\cite{GrayS91}.
+	
+	\begin{table}[h!]
+		\begin{center}
+			\begin{tabular}{l|l|l}
+				\textbf{Type} & \textbf{Availability} & \textbf{Unavailability} \\
+				\hline
+				\textbf{Unmanaged} & 90\% & 50,000 \\
+				\textbf{Managed} & 99\% & 5,000 \\
+				\textbf{Well-managed} & 99.9\% & 500 \\
+				\textbf{Well-managed} & 99.9\% & 500 \\
+				\textbf{Fault-tolerant} & 99.99\% & 50 \\
+				\textbf{High-availability} & 99.999\% & 5 \\
+				\textbf{Very-high-availability} & 99.9999\% & 0.5 \\
+			\end{tabular}
+		\end{center}
+		\vspace{-0.5cm}
+		\caption{Downtime for different classes of nines.}
+		\label{tab:table7}
+	\end{table}
+	
+	It is important to notice that even a 99\% available system gives almost four days of downtime a year, which is unacceptable for services like Facebook, google, AWS. And when service is down, companies are loosing customers.
 	\item \textbf{P}artition tolerance, which means that the cluster must continue to work despite any number of communication breakdowns between nodes in the system. It is important to state that in a distributed system, partitions can’t be avoided.
 \end{enumerate}
 
@@ -178,7 +200,7 @@ Table~\ref{tab:table4} show comparison of public, private and hybrid cloud capab
 \end{tabular}
 	\end{center}
 	\vspace{-0.5cm}
-	\caption{comparison of public, private and hybrid cloud capabilities.}
+	\caption{Comparison of public, private and hybrid cloud capabilities.}
 	\label{tab:table4}
 \end{table}
 
@@ -205,7 +227,7 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 		\end{tabular}
 	\end{center}
 	\vspace{-0.5cm}
-	\caption{common examples of SaaS, PaaS, and IaaS.}
+	\caption{Common examples of SaaS, PaaS, and IaaS.}
 	\label{tab:table2}
 \end{table}
 
@@ -343,11 +365,54 @@ Since their inception, microservices architecture is gone through some adaptatio
 	this dedicated communication layer can provide a number of benefits, such as: $(1)$ observability, $(2)$ providing secure connections, or $(3)$ automating retries and backoff for failed requests. With these features, developers only focus on implementation of buisniss logic, while operators gain out-of-the-box traffic policies, observability, and insights from the services. Advocates of microservice movemant, nowdays recommend using service mesh architecture when running microservices in production environments.
 \end{itemize}
 
-Microservices communicate over a network to fulfil some goal using message passing technique and technology-agnostic protocols such as HTTP. They can be implemented as REST srevices, RPC calls or event-driven services. They are well aligned with text based protocols like HTTP/1 using $JSON$ for example, or binary protocols such as HTTP/2 using $protobuf$ and $gRPC$ for example, and even new faster version like HTTP/3.
+Microservices communicate over a network to fulfil some goal using message passing technique and technology-agnostic protocols such as HTTP. They can be implemented as:
+
+\begin{itemize}
+	\item Representational state transfer (REST) services~\cite{AdamczykSJH11}, is an architectural style with set of constraints that users can create web srevices and interoperability between computer systems on the internet. It is based on HTTP routs to define resources, and used HTTP verbs to represent operations over these resources. It relys on textual based communications, and payload could be represented using $JSON$, $XML$, $HTML$ etc.
+	\item Remote procedure calls (RPC) represent architectural way to design services that are able to call subroutines that are located in different places, usually on other machine. Client is calling these operations like they are located localy in his address space.
+	\item Event-driven services, are services where communicatoin between services is done using events. Events are sent on some channel and other read messages that are received on other channel. These channels could be implemented either like message queues or message topics. Services connect to message queu or subscribe to the specific topic, and when messige arive, they can act acording to message type.
+\end{itemize}
+ 
+ They are well aligned with text based protocols like HTTP/1 using $JSON$ for example, or binary protocols such as HTTP/2 using $protobuf$ and $gRPC$ for example, and even new faster version like HTTP/3 over new $QUIC$ protocol, designed by Google. 
+ 
+ To enshure vider range of devices that are able to comunicate with the rest of the systems, developrs usually have a gateway into the system that is REST service, and other services could be implemented in different way.
 
 It is important to point out, that all flavors of microservices applications rely on continuous delivery and deployment~\cite{7436659}. This is enabled by lightweight containers, instead of virtual machines~\cite{FelterFRR15}, and orchestration tools such Kubernetes~\cite{BurnsGOBW16}. These concepts wll be described in more detail in Section~\ref{sec:virtualization_techniques}.
 
-Microservices architecture are good starting point especially for build as a service applications, and applications that should serve huge amount of requests and users. Esspecially with benefits of CC to pay for usage, and ability to scale parts of the system independently.  Although they are not necessarily easy to implement properly. There are more and more critique to the architecture model~\cite{SoldaniTH18}. Microservices are relying and use parts of the DS, and as such they inherit almost all problems DS has. Best chance to success is to follow existing patters and use existing solutions with proven quality.
+Microservices architecture are good starting point especially for build as a service applications, and applications that should serve huge amount of requests and users. Esspecially with benefits of CC to pay for usage, and ability to scale parts of the system independently.  Although they are not necessarily easy to implement properly. There are more and more critique to the architecture model~\cite{SoldaniTH18}. Microservices are relying and use parts of the DS, and as such they inherit almost all problems DS has. 
+
+One particilar thing that users need to be aware of is \textbf{idempotency}. In microservices applications, developers are dealing with inconsistencies in distributed state, and their operations should be implemented as idempotent. An operation is idempotent if it will produce the same results when executed over and over again. It is a strategy that means that operations with sade effects like creation or deletion can be called any number of times, while guaranteeing that side effects only occur once. Idempotency is term that come from mathematics, and can be represented by simple idempotency law for operation $*$ like~\cite{gratzer2002general}:
+
+\begin{equation}
+	\forall x, x * x = x
+\end{equation}
+\myequations{Idempotency formula}
+
+Not all Create, Read, Update, Delete (CRUD) operations are idempotent by default. But developers need to make effort to make all of them idempotent, to prevent bad outcomes and incosistant state. 
+
+Table~\ref{tab:table8} show list of idempotent and non-idepotent for standard CRUD operations:
+
+\begin{table}[h!]
+	\begin{center}
+		\begin{tabular}{l|c|c}
+			\textbf{Operation} & \textbf{Idempotent} & \textbf{Non-idempotent}\\
+			\hline
+			\textbf{Create} &  & x \\
+			\textbf{Read} & x & \\
+			\textbf{Update} & x & \\
+			\textbf{Delete} & x & \\
+		\end{tabular}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption{Idempotent and non-idempotent operations.}
+	\label{tab:table8}
+\end{table}
+
+Crate operation is not idempotent by default, but to make it idempotent there are multiple strategies how to do so. Most comon way is to create \textbf{idempotency key} that will be sent in the request, and based on that request server can decide is this operations already invoked or not. If server is already \say{seen} specified idempotency key, than operation is already done and we can return just responce that operation is done but no operation will be done over the state of the service or application. If server see idempotency key for the first time, that is the signal that this request is new one, and it should be done.
+
+Idempotency key could be stored in any kind of the storage, it is not uncommon that these keys are stored in cache storage with some time to live (TTL) policy that will automatically remove the key after specified time.
+
+Best chance to success when implementing microservices architecture, is to simply follow existing patters and use existing solutions with proven quality.
 %
 %
 \section{Similar computing models}\label{sec:similar_models}
@@ -429,7 +494,7 @@ Figure~\ref{fig:fig12} summaraze difference bewteen prevous infrastructure deply
 	\label{fig:fig12}
 \end{figure}
 
-Immutability is a simple concept to understand, and simplify a lot esspecially in DS~\ref{Helland16}. Write down some data, and ensure that it never changes. It can never be modified, updated, or deleted~\ref{perry2020art}. When this is combined with premisse that we can avoid downtime esspecially in complex DS, it is clear why immutable model is gainign more and more popularity (esspecially with arival of containers). Immutable infrastructure deployment offer few models how to deploy change on the services, even in production to test it, or switch to whole new version. These strategeis include:
+Immutability is a simple concept to understand, and simplify a lot esspecially in DS~\cite{Helland16}. Write down some data, and ensure that it never changes. It can never be modified, updated, or deleted~\cite{perry2020art}. When this is combined with premisse that we can avoid downtime esspecially in complex DS, it is clear why immutable model is gainign more and more popularity (esspecially with arival of containers). Immutable infrastructure deployment offer few models how to deploy change on the services, even in production to test it, or switch to whole new version. These strategeis include:
 
 \begin{itemize}
 	\item \textbf{Blue-Green deployment}, this strategy require two separate environemnts: $(1)$ \textit{Blue} current running version, and $(2)$ \textit{Green} is the new version that needs to be deployed. When we are satisfied that the green version is working properly, we can gradually reroute the traffic from the old environment to the new environment for example by modifying DNS. This strategy offers near zero downtime.
