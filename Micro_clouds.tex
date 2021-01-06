@@ -8,7 +8,7 @@ In Section~\ref{sec:formal_model} we present why formal models are important in 
 %
 \section{Formal model}\label{sec:formal_model}
 %
-Ensuring reliability and correctness of any system is very difficult, and should be mathematically based. Formal methods are techniques that allow us specification and verification of complex (software and hardware) systems based on mathematics and formal logic.
+Ensuring reliability and correctness of any system is very difficult, and should be mathematically based. Formal methods are techniques that allow us specification and verification of complex (software and hardware) systems based on mathematics and formal logic. There are few options to formaly describe DS: TLA+, $pi$ calculus, asynchronous session types (MST), etc. Unfortunately, DS cannot always be formally described by any of existing models.
 
 Infrastructure deployment will not happen until the process is trivial \cite{SatyanarayananBCD09}, hence the key is to simplify ECC management. The main problem is that going to every node is tedious and time consuming, especially in a geo-distributed environment. In such complex environemnt, formal models are of great help if we can model and prove that protocols that system reyls on are correct. The system we propose tackles this issue using remote configuration and it relies on three formaly modeled protocols: 
 
@@ -20,7 +20,7 @@ Infrastructure deployment will not happen until the process is trivial \cite{Sat
 
 These three protocols are base of the geo-distribued Infrastructure deployment.
 
-In Section~\ref{sec:multiparty} we give short introduction what multiparty asynchronous session types (MST) are and what properties they guarantee. Section~\ref{sec:health_check_protocol} describe formal model of healh-check protocol. Section~\ref{sec:cluster_formation_protocol} describe cluster formation protocol. Section~\ref{sec:list_detail_protocol} describe protocol that return data based on some query.
+In Section~\ref{sec:multiparty} we give short introduction what MST are and what properties they guarantee. Section~\ref{sec:health_check_protocol} describe formal model of healh-check protocol. Section~\ref{sec:cluster_formation_protocol} describe cluster formation protocol. Section~\ref{sec:list_detail_protocol} describe protocol that return data based on some query.
 %
 %
 \subsection{Multiparty asynchronous session types}\label{sec:multiparty}
@@ -550,7 +550,7 @@ Since we follow the approach of~\cite{HuY17} with explicit connections, projecti
 The last communication protocol in our system appears in the information retrieval process. Namely, on formed topologies, using labels, the user can specify what part of the system he wants to retrieve, for example to visualise on some dashboard. Two options are available: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{global view} of the system --- all topologies the user manages, or
+	\item \textbf{global view} of the system --- all topologies the user manages
 	\item \textbf{specific clusters} details --- complete details about specified clusters like resources utilization over time (using stored metrics information), node information, and running or stopped services.
 \end{enumerate}
  
@@ -811,6 +811,87 @@ In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containres 
 In future and when unikernels are more matured and tested, they could be used for paritical use-cases and applications, esspecially like events or serverless implementations. Containres will probably not be fully replaced, but they can co-exist with unikernels in some cases where we need more controll over running single function.
 
 Like any other system, users can create their own variants of the systems and different flavours optimized for certen solutions. In that cases, they may favorized one solution over the other one. But in general case containers and unikernels should be prefered way to package, run and distributed user applicatoins in micro-clouds environment.
+%
+%
+\section{Idempotency}\label{sec:idempotency}
+%
+Mutate operation should be immutable and idempotent. But since we have different scenario then standard write to storage, and we do not specify steps how operations should be done, so approuch how to implement idempotance is little bit different. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
+
+User can specify topology data, but in different order. We must ensure that new cluster formation protocol should \textbf{not} be initiated, if user change order of regions, clusters, nodes or labels in one node. If operation fail for whatever reason, or same infrastructure exists, user can get message that infrastructure is alaready formed. If user change the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start new protocol.
+
+Design of idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represebted as a set, because most of their operations are idempotent as described in SEC. $Data$ set could be represented in the two ways:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, node1\_label1 etc.
+	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on.
+\end{enumerate}
+
+If we have cached idempotency data for user request, and if he tries to send same request we can test set idempotency using set operation \textbf{intersection}.
+
+\begin{definition}
+	Intersection of two sets $x$ and $y$ $x \cap y$ is an idempotent operation, becasue $x \cap x$ is always equal to $x$. This means that the idempotency law~\ref{form:idempotency_law} $\forall x, x \cap x = x$ is always $true$.
+\end{definition}
+
+So if we have stored user request for cluster formation, and we receive new request with the same name, than we can take intersection of two sets. If we get the same set, that means that this action is already done, otherwise we this is the new action. But first we need to test, if same topology name is present, that lookup will spare us of unnecessary comperiosson. 
+
+Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
+%%TODO: Videti kako ovo rekurzivno srediti!!
+\begin{algorithm}
+	\SetKwFunction{printlcs}{\textsc{Print}-LCS}
+	\Indm\printlcs{$b,X,i,j$}\\
+	\Indp
+	\If{$i=0$ or $j=0$}{\KwRet{}}
+	\If{$b[i,j]=\text{``}\nwarrow\hspace{-3pt}\text{''}$}{
+		\printlcs{$b,X,i-1,j-1$}\\
+		print $x_i$
+	}
+	\ElseIf{$b[i,j]=\text{``}\uparrow\hspace{-3pt}\text{''}$}{
+		\printlcs{$b,X,i-1,j$}
+	}
+	\Else{\printlcs{$b,X,i,j-1$}}
+\end{algorithm}
+
+\begin{algorithm}[H]
+	\SetAlgoLined
+	\SetKwInOut{Input}{input}
+	\Input{request}
+	id $\leftarrow$ seenBefore(request.payload.name)\\
+	\uIf{id = null}{
+		return true;
+	}\Else{
+		data $\leftarrow$ findRequest(id)\\
+		\uIf{data.intersection(request.payload.topology)}{
+			return true;
+		}
+		return false;
+	}
+	\caption{Health-check data received}
+	\label{alg:alg6}
+\end{algorithm}
+
+Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
+
+\begin{figure}[!htpb]
+	\begin{center}
+		\includegraphics[scale=0.7]{images/Figure13}
+	\end{center}
+	\vspace{-0.7cm}
+	\caption{Low level view of idempotency check communication.}
+	\label{fig:fig13}
+\end{figure}
+
+The participants follow the communication that we now describe informally:
+%%TODO: DODATI OPISE ZA SVKOG UCESNIKA
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{User} sends a list request to State service;
+	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service;
+	\item \textbf{State service} contain node metrics data, and if required, it may send this data to State;
+	\item \textbf{Idempotency storage} contains records of all operations. Users can query this service.
+	\item \textbf{Main storage} contains records of all operations. Users can query this service.
+	\item \textbf{Log} contains records of all operations. Users can query this service.
+	\item \textbf{Nodes} contains records of all operations. Users can query this service.
+	\item \textbf{Scheduler} contains records of all operations. Users can query this service.
+\end{enumerate}
 %
 %
 \section{Immutable infrastructure}\label{sec:immutable_infrastructure}

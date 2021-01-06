@@ -108,7 +108,8 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 
 \begin{enumerate} [start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{C}onsistency, which means that all clients will see the same data at the same time, no matter which node they are connected to. Clients my not be connected to the same node since data could be replicated on many nodes in different locations.
-	\item \textbf{A}vailability, which means that any client issued a request will get response back, even if one or nodes are down. DS will not interprate this situation as an exception or error. Availability is represented in percentage, and it describe how much downtime is allowed per year, This can be calculated using formula:\\\\ 
+	\item \textbf{A}vailability, which means that any client issued a request will get response back, even if one or nodes are down. DS will not interprate this situation as an exception or error. Availability is represented in percentage, and it describe how much downtime is allowed per year, This can be calculated using formula:\\ 
+	
 	\begin{equation}\label{eq:Availability}
 		Availability = \frac{uptime}{ (uptime + downtime)}
 	\end{equation}
@@ -134,7 +135,13 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 		\label{tab:table7}
 	\end{table}
 	
-	It is important to notice that even a 99\% available system gives almost four days of downtime a year, which is unacceptable for services like Facebook, google, AWS. And when service is down, companies are loosing customers.
+	We can calculate availability class if we have system availability $A$, the system's availability class is define as~\cite{GrayS91}: 
+	
+	\begin{equation} 
+		e^{\log_{10} \frac{1}{ (1 - A)}} 
+	\end{equation}
+	\myequations{Availability class formula}
+	It is important to notice that even a 99\% available system gives almost four days of downtime in a year, which is unacceptable for services like Facebook, Google, AWS etc. And when service is down, companies are loosing customers.
 	\item \textbf{P}artition tolerance, which means that the cluster must continue to work despite any number of communication breakdowns between nodes in the system. It is important to state that in a distributed system, partitions can’t be avoided.
 \end{enumerate}
 
@@ -383,7 +390,7 @@ Microservices architecture are good starting point especially for build as a ser
 
 One particilar thing that users need to be aware of is \textbf{idempotency}. In microservices applications, developers are dealing with inconsistencies in distributed state, and their operations should be implemented as idempotent. An operation is idempotent if it will produce the same results when executed over and over again. It is a strategy that means that operations with sade effects like creation or deletion can be called any number of times, while guaranteeing that side effects only occur once. Idempotency is term that come from mathematics, and can be represented by simple idempotency law for operation $*$ like~\cite{gratzer2002general}:
 
-\begin{equation}
+\begin{equation}\label{form:idempotency_law}
 	\forall x, x * x = x
 \end{equation}
 \myequations{Idempotency formula}
@@ -411,6 +418,8 @@ Table~\ref{tab:table8} show list of idempotent and non-idepotent for standard CR
 Crate operation is not idempotent by default, but to make it idempotent there are multiple strategies how to do so. Most comon way is to create \textbf{idempotency key} that will be sent in the request, and based on that request server can decide is this operations already invoked or not. If server is already \say{seen} specified idempotency key, than operation is already done and we can return just responce that operation is done but no operation will be done over the state of the service or application. If server see idempotency key for the first time, that is the signal that this request is new one, and it should be done.
 
 Idempotency key could be stored in any kind of the storage, it is not uncommon that these keys are stored in cache storage with some time to live (TTL) policy that will automatically remove the key after specified time.
+
+Other option that is comonly used is hasing user specified actions. This is usefull to know what part of action set is already done and what is not. This strategy is used in scenarios where we must preserve order of actions.
 
 Best chance to success when implementing microservices architecture, is to simply follow existing patters and use existing solutions with proven quality.
 %
