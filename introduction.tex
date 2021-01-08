@@ -148,9 +148,9 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems by only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be:
 
 \begin{itemize}
-	\item \textbf{Commutative} $a*b = b*a$
-	\item \textbf{Associative} $(a*b)*c = a*(b*c)$
-	\item \textbf{Idempotent} $(a * a) = a$
+	\item \textbf{Commutative} $a*b = b*a$ \myequations{Commutative formula}
+	\item \textbf{Associative} $(a*b)*c = a*(b*c)$ \myequations{Associative formula}
+	\item \textbf{Idempotent} $(a * a) = a$ \myequations{Idempotent formula}
 \end{itemize}
 
 \noindent
@@ -393,7 +393,7 @@ One particilar thing that users need to be aware of is \textbf{idempotency}. In 
 \begin{equation}\label{form:idempotency_law}
 	\forall x, x * x = x
 \end{equation}
-\myequations{Idempotency formula}
+\myequations{Idempotency law formula}
 
 Not all Create, Read, Update, Delete (CRUD) operations are idempotent by default. But developers need to make effort to make all of them idempotent, to prevent bad outcomes and incosistant state. 
 

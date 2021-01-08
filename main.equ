@@ -1,6 +1,9 @@
 \contentsline {myequations}{\numberline {1.1}Availability percentage formula}{7}{equation.1.2.1}% 
 \contentsline {myequations}{\numberline {1.2}Availability class formula}{8}{equation.1.2.2}% 
-\contentsline {myequations}{\numberline {1.3}Idempotency formula}{22}{equation.1.3.3}% 
+\contentsline {myequations}{\numberline {1.2}Commutative formula}{9}{Item.16}% 
+\contentsline {myequations}{\numberline {1.2}Associative formula}{9}{Item.16}% 
+\contentsline {myequations}{\numberline {1.2}Idempotent formula}{9}{Item.16}% 
+\contentsline {myequations}{\numberline {1.3}Idempotency law formula}{22}{equation.1.3.3}% 
 \contentsline {myequations}{\numberline {3.0}Global type construction}{59}{subsection.3.6.1}% 
 \contentsline {myequations}{\numberline {3.0}Local type representation syntax}{60}{subsection.3.6.1}% 
 \contentsline {myequations}{\numberline {3.0}Health-check global protocol}{65}{definition.3.6.3}% 

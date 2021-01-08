@@ -718,85 +718,6 @@ We remark global type $\G_2$ could also be modeled directly using standard MPST 
 Since we follow the approach of~\cite{HuY17} with explicit connections, projection of $\G_2$ onto $\mathtt{sched}$ is indeed defined as $\ST_\mathtt{sched}$.
 %
 %
-\subsection{Idempotency}\label{sec:idempotency}
-%
-Mutate operation should be immutable and idempotent. But since we have different scenario then standard write to storage, and we do not specify steps how operations should be done, so approuch how to implement idempotance is little bit different. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
-
-User can specify topology data, but in different order. We must ensure that new cluster formation protocol should \textbf{not} be initiated, if user change order of regions, clusters, nodes or labels in one node. If operation fail for whatever reason, or same infrastructure exists, user can get message that infrastructure is alaready formed. If user change the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start new protocol.
-
-Design of idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represebted as a set, because most of their operations are idempotent as described in SEC. $Data$ set could be represented in the two ways:
-
-\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
-	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on.
-\end{enumerate}
-
-If we have cached idempotency data for user request, and if he tries to send same request we can test set idempotency using set operation \textbf{intersection}.
-
-\begin{definition}
-	Intersection of two sets $x$ and $y$ $x \cap y$ is an idempotent operation, becasue $x \cap x$ is always equal to $x$. This means that the idempotency law~\ref{form:idempotency_law} $\forall x, x \cap x = x$ is always $true$.
-\end{definition}
-
-So if we have stored user request for cluster formation, and we receive new request with the same name, than we can take intersection of two sets. If we get the same set, that means that this action is already done, otherwise we this is the new action. But first we need to test, if same topology name is present, that lookup will spare us of unnecessary comperiosson. 
-
-Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
-
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[scale=0.7]{images/Figure13}
-	\end{center}
-	\vspace{-0.7cm}
-	\caption{Low level view of idempotency check communication.}
-	\label{fig:fig13}
-\end{figure}
-
-The participants follow the communication that we now describe informally:
-\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{User} sends a list request to State service (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{State service} service that is wrapper aroud system main storage. Interacts with main storage in oreder to create new topologies, regions or clusters, or to get data from main storages about same entities.
-	\item \textbf{Idempotency storage} contains idempotent set for all \textbf{already} formed topologies, regions and clusters.
-	\item \textbf{Main storage} contains records about desired state for all formed topologies, regions and clusters.
-	\item \textbf{Log} contains records of operations. Users can query this service to see if their tasks are finished or have any problems (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Nodes} accept messages from State. If possible, it will reserve desired nodes, otherwise it will send an error message to Log service. On a health-check message, if a node is used in some cluster, it will inform that the node is alive (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Scheduler} waits for a message sent from State, and pushes clus- ter formation messages to desired nodes (same as~\ref{sec:cluster_formation_protocol});
-\end{enumerate}
-
-Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
-
-\begin{algorithm}[H]
-	\SetKwFunction{idempotent}{idempotent}
-	\SetKwProg{Fn}{function}{:}{}
-	\Fn{\idempotent{$stored$, $topology$}}{
-		\ForEach{data $\in$ topology}{
-			\If{isNotSet(data)}{
-				\uIf{data.intersection(stored) = data}{
-					\KwRet{true}
-				}
-				\KwRet{false}
-			}
-			\Else{\idempotent{$data, topology$}}
-		}
-	}
-	
-	\SetAlgoLined
-	\SetKwInOut{Input}{input}
-	\Input{request}
-	id $\leftarrow$ seenBefore(request.payload.name)\\
-	\uIf{id = null}{
-		return true;
-	}\Else{
-		stored $\leftarrow$ storage.findRequest(id)\\
-		topology $\leftarrow$ request.payload.topology\\
-		\KwRet{\idempotent{$stored, topology$}}
-	}
-	\caption{Mutate idempotency check}
-	\label{alg:alg6}
-\end{algorithm}
-
-Next we present a formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17}.
-%
-%
 \subsection{List detail protocol}\label{sec:list_detail_protocol}
 %
 The last communication protocol in our system appears in the information retrieval process. Namely, on formed topologies, using labels, the user can specify what part of the system he wants to retrieve, for example to visualise on some dashboard. Two options are available: 
@@ -915,6 +836,89 @@ where
 For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in the session only after receiving from $\mathtt{state}$, either message $\mathit{detail}$, or message $\mathit{brief}$, and then terminates. 
 
 Similarly as for $\G_2$, we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
+%
+%
+\subsection{Idempotency}\label{sec:idempotency}
+%
+Mutate operation should be atomic, immutable and idempotent. User can specify the same topology details, but in different order. We must ensure that new cluster formation protocol should \textbf{not} be initiated, if user change order of regions, clusters, nodes or labels in one or more node/s. If mutate operation fails, for whatever possible reason but infrastructure is created, or same infrastructure already exists, user can get message that infrastructure is formed. If user change the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start new protocol.
+
+But since we have different scenario then standard write to storage, and we do not specify steps how operations should be done, to implement idempotance correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
+
+Idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represebted as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in the two ways:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
+	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on.
+\end{enumerate}
+
+If we have cached idempotency data for user request, and if he tries to send same request we can test idempotency using set operation \textbf{intersection}.
+
+\begin{definition}\label{def:intersection_idempotent}
+	Intersection of two sets $x$ and $y$ $x \cap y$ is an idempotent operation, becasue $x \cap x$ is always equal to $x$. This means that the idempotency law~\ref{form:idempotency_law} $\forall x, x \cap x = x$ is always $true$.
+\end{definition}
+
+If we have stored user request on cluster formation protocol, and we receive new request with the same name, \textbf{than} we can take intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise request represents the new action, and new cluster formation protocol. 
+
+We can make this test a litle bit faster. If we first test does the same topology name is already present in idempotency store, that lookup will spare us of unnecessary comperiosson on sets.
+
+We can go little bit further, and use CRDTs and SEC to store and replicate deta on copies of the services that are required for idempotency test.
+
+Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{images/Figure13}
+	\end{center}
+	\vspace{-0.7cm}
+	\caption{Low level view of idempotency check communication.}
+	\label{fig:fig13}
+\end{figure}
+
+The participants follow the communication that we now describe informally:
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{User} sends a list request to State service (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{State service} service that is wrapper aroud system main storage. Interacts with main storage in oreder to create new topologies, regions or clusters, or to get data from main storages about same entities.
+	\item \textbf{Idempotency storage} contains idempotent set for all \textbf{already} formed topologies, regions and clusters.
+	\item \textbf{Main storage} contains records about desired state for all formed topologies, regions and clusters.
+	\item \textbf{Log} contains records of operations. Users can query this service to see if their tasks are finished or have any problems (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Nodes} accept messages from State. If possible, it will reserve desired nodes, otherwise it will send an error message to Log service. On a health-check message, if a node is used in some cluster, it will inform that the node is alive (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Scheduler} waits for a message sent from State, and pushes clus- ter formation messages to desired nodes (same as~\ref{sec:cluster_formation_protocol});
+\end{enumerate}
+
+Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
+
+\begin{algorithm}[H]
+	\SetKwFunction{idempotent}{idempotent}
+	\SetKwProg{Fn}{function}{:}{}
+	\Fn{\idempotent{$stored$, $topology$}}{
+		\ForEach{data $\in$ topology}{
+			\If{isNotSet(data)}{
+				\uIf{data.intersection(stored) = data}{
+					\KwRet{true}
+				}
+				\KwRet{false}
+			}
+			\Else{\idempotent{$data, topology$}}
+		}
+	}
+	
+	\SetAlgoLined
+	\SetKwInOut{Input}{input}
+	\Input{request}
+	id $\leftarrow$ seenBefore(request.payload.name)\\
+	\uIf{id = null}{
+		return true;
+	}\Else{
+		stored $\leftarrow$ storage.findRequest(id)\\
+		topology $\leftarrow$ request.payload.topology\\
+		\KwRet{\idempotent{$stored, topology$}}
+	}
+	\caption{Mutate idempotency check}
+	\label{alg:alg6}
+\end{algorithm}
+
+Next we present a formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17}.
 %
 %
 \section{Repercussion}\label{sec:repercussion}
