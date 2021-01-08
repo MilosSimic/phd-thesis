@@ -1,10 +1,10 @@
 \contentsline {myequations}{\numberline {1.1}Availability percentage formula}{7}{equation.1.2.1}% 
 \contentsline {myequations}{\numberline {1.2}Availability class formula}{8}{equation.1.2.2}% 
 \contentsline {myequations}{\numberline {1.3}Idempotency formula}{22}{equation.1.3.3}% 
-\contentsline {myequations}{\numberline {3.0}Global type construction}{47}{subsection.3.1.1}% 
-\contentsline {myequations}{\numberline {3.0}Local type representation syntax}{48}{subsection.3.1.1}% 
-\contentsline {myequations}{\numberline {3.0}Health-check global protocol}{53}{definition.3.1.3}% 
-\contentsline {myequations}{\numberline {3.0}Global type $\ensuremath {{\sf G}}_1$ projection onto participants}{53}{definition.3.1.3}% 
-\contentsline {myequations}{\numberline {3.3}$i_\mathit {th}$ server selector}{57}{equation.3.1.3}% 
-\contentsline {myequations}{\numberline {3.3}Cluster formation global protocol}{59}{Item.50}% 
-\contentsline {myequations}{\numberline {3.3}Global type $\ensuremath {{\sf G}}_2$ projections onto the participants}{61}{Item.52}% 
+\contentsline {myequations}{\numberline {3.0}Global type construction}{59}{subsection.3.6.1}% 
+\contentsline {myequations}{\numberline {3.0}Local type representation syntax}{60}{subsection.3.6.1}% 
+\contentsline {myequations}{\numberline {3.0}Health-check global protocol}{65}{definition.3.6.3}% 
+\contentsline {myequations}{\numberline {3.0}Global type $\ensuremath {{\sf G}}_1$ projection onto participants}{65}{definition.3.6.3}% 
+\contentsline {myequations}{\numberline {3.3}$i_\mathit {th}$ server selector}{69}{equation.3.6.3}% 
+\contentsline {myequations}{\numberline {3.3}Cluster formation global protocol}{71}{Item.65}% 
+\contentsline {myequations}{\numberline {3.3}Global type $\ensuremath {{\sf G}}_2$ projections onto the participants}{73}{Item.67}% 
