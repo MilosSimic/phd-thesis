@@ -180,7 +180,9 @@ Only with tight colaboration with those two development roles, such complex syst
 %
 \section{Formal model}\label{sec:formal_model}
 %
-Ensuring reliability and correctness of any system is very difficult, and should be mathematically based. Formal methods are techniques that allow us specification and verification of complex (software and hardware) systems based on mathematics and formal logic. There are few options to formaly describe DS: TLA+, $pi$ calculus, asynchronous session types (MST), etc. Unfortunately, DS cannot always be formally described by any of existing models.
+Ensuring reliability and correctness of any system is very difficult, and should be mathematically based. Formal methods are techniques that allow us specification and verification of complex (software and hardware) systems based on mathematics and formal logic. There are several options how to formaly describe DS: TLA+, $pi$ calculus, combinational topology, asynchronous session types (MST), etc. 
+
+Unfortunately, becasue of their nature DS cannot always be formally described by any of the existing models. But if the nature of the DS that is developing is such that can be formaly described, it is recomended and beneficial. Formaly described and corect model, can save hours, days and event months of hard debugging, testing to reveal all bugs and problems in the system.
 
 Infrastructure deployment will not happen until the process is trivial \cite{SatyanarayananBCD09}, hence the key is to simplify ECC management. The main problem is that going to every node is tedious and time consuming, especially in a geo-distributed environment. In such complex environemnt, formal models are of great help if we can model and prove that protocols that system reyls on are correct. The system we propose tackles this issue using remote configuration and it relies on four formaly modeled protocols: 
 
@@ -506,10 +508,10 @@ The $i_\mathit{th}$ server from the server set $S$
 will be present in the result set $R$,
 % if and only if, 
 iff both rules are satisfied:
-\begin{equation}  
+\begin{equation}\label{frm:query_rule}  
 R=\{ s_i \;|\; \left|s_i[L]\right|=\left|Q\right| \wedge P(Q, s_i),i\in\{1, \ldots, n\}\}
 \end{equation} 
-\myequations{$i_\mathit{th}$ server selector}
+\myequations{Server selector}
 
 \noindent
 If the result set $R$ is not empty, we reserve nodes for configurable time so that other users cannot see (and try to use) them, and, finally, 
@@ -860,7 +862,6 @@ If we have cached idempotency data for user request, and if he tries to send sam
 If we have stored user request on cluster formation protocol, and we receive new request with the same name, \textbf{than} we can take intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise request represents the new action, and new cluster formation protocol. 
 
 We can make this test a litle bit faster. If we first test does the same topology name is already present in idempotency store, that lookup will spare us of unnecessary comperiosson on sets.
-
 We can go little bit further, and use CRDTs and SEC to store and replicate deta on copies of the services that are required for idempotency test.
 
 Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
@@ -886,7 +887,7 @@ The participants follow the communication that we now describe informally:
 	\item \textbf{Scheduler} waits for a message sent from State, and pushes clus- ter formation messages to desired nodes (same as~\ref{sec:cluster_formation_protocol});
 \end{enumerate}
 
-Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
+When testing is request idempotent we must have in mind that stored structure could be $(1)$ flat keyspace and $(2)$ hierarhical keyspace both options are valid as log as structure is idempotent. Algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
 
 \begin{algorithm}[H]
 	\SetKwFunction{idempotent}{idempotent}
@@ -894,12 +895,12 @@ Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done bef
 	\Fn{\idempotent{$stored$, $topology$}}{
 		\ForEach{data $\in$ topology}{
 			\If{isNotSet(data)}{
-				\uIf{data.intersection(stored) = data}{
+				\uIf{stored.intersection(data) = stored}{
 					\KwRet{true}
 				}
 				\KwRet{false}
 			}
-			\Else{\idempotent{$data, topology$}}
+			\Else{\idempotent{$stored, data$}}
 		}
 	}
 	
@@ -919,6 +920,40 @@ Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done bef
 \end{algorithm}
 
 Next we present a formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17}.
+
+\begin{align*}
+\G_4 & = 
+\left\{
+\begin{array}{@{}l@{}}  
+\mathtt{user}\to\mathtt{state}{:} \mathit{quit}().\tend\\
+\mathtt{user} \to \mathtt{state}{:}\mathit{create}(\T_3).
+\mathtt{state} \to \mathtt{user}{:}\mathit{ok}().\G'
+\end{array} \right.
+\end{align*}
+
+\begin{align*}
+G' & = 
+\mathtt{service} \to \mathtt{istorage}{:}\mathit{try}(\T_3).
+\mathtt{istorage} \to \mathtt{service}{:}\mathit{resp}().\\
+& \hspace{4mm}
+\left\{
+\begin{array}{@{}l@{}}
+	\mathtt{state}\to\mathtt{log}{:} \mathit{done}(\mathsf{String}).\tend\\
+	\mathtt{state}\to\mathtt{nodes}{:}\mathit{ids}(\T_4).
+	\mathtt{nodes}\to \mathtt{state}{:}\mathit{rsrvd}().\G''
+\end{array} \right.
+\end{align*}
+
+\begin{align*}
+\G'' = & 
+\mathtt{service} \to \mathtt{mstorage}{:}\mathit{store}(\T_3).
+\mathtt{mstorage} \to \mathtt{istorage}{:}\mathit{save}(\T_3).\\
+& \hspace{4mm}
+\mathtt{istorage} \to \mathtt{mstorage}{:}\mathit{saved}().
+\mathtt{mstorage} \to \mathtt{service}{:}\mathit{stored}().\\
+& \hspace{4mm}
+\mathtt{service} \to \mathtt{sched}{:}\mathit{ids}(\T_5).\tend
+\end{align*}
 %
 %
 \section{Repercussion}\label{sec:repercussion}

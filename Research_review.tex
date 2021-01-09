@@ -31,6 +31,8 @@ In~\cite{NingLSY20}, the Ning et al. show current open issues of EC platforms ba
 
 In~\cite{abs-1802-10375} the de Guzm{\'{a}}n et al. present solution based on Kubernetes that use Kubernetes Deployment Manifests in order to reuse successful principles from Kubernetes by creating  virtual machine for each Pod using Linuxkit. Their solution is based on the immutable infrastructure pattern, and instead of containers they use the virtual machines as the unit of deployment. Authors prove that the attack surface of their system is reduced since Linuxkit only installs the minimum OS dependencies to run containers. It represent interesting usage of LinuxKit to deploy OS dependencies, and immutable infrastructure pattern, but VMs might be a bit problem for small devices, and ARM nodes as well as complex flow of Kubernetes application model. But nonetheless, it is interesting extension of Kuibernetes framework and prove that LinuxKit can be used for immutable infrastructures with custom OS.
 
+In~\cite{SamiM20} Sami et al. show interesting platform for dynamic sevices distribtion over Fog nodes using volunteer nodes. Their platform is tuned for container placement with relevance and efficiency on volunteering fog devices, near users with maximum time availability and shortest distance. They do this \textit{on the fly}  with improved QoS.
+
 There are few industry operating frameworks for EC, like Amazon Greengrass~\cite{kurniawan_2018}, deeply connected to the entire Amazon cloud ecosystem, or KubeEdge~\cite{KubeEdge}, a lightweight extension of Kubernetes framework. These frameworks are mainly used for user-based applications, while, for instance, General Electric Predix~\cite{GE_Predix} is a scalable platform used for industrial IoT applications.
 %
 %
@@ -40,7 +42,9 @@ As already mention in~\ref{sec:mobile_computing} EC nodes rely on the concept of
 
 Offloading is effective when using cloud servers but this principle introduce long latency, which some applications can't tolerate. On the other hand mobile devices and sensors do not have sufficient battery energy for task offloading~\cite{MaoZL16}. The computation performance may be compromised due to insufficient battery energy for task offloading, so these devices might send their data to nearby EC nodes.
 
-In literature, there are few platforms proposing task offloading~\cite{ShiHPANZ14, KhuneP19, ChenHLLW15, LinLJL19, JiangCGZW19, MaoZL16} to the nearby edge layer. These offloading techniques are based on different parameters, options, and techniques to put tasks to different sets of nodes in such a way that it won't drain mobile devices and sensors baterry. After compuitation is done, this edge layer send pre-processed data to the cloud for further analyse, storage et. 
+In literature, there are few platforms proposing task offloading~\cite{ShiHPANZ14, KhuneP19, ChenHLLW15, LinLJL19, JiangCGZW19, MaoZL16} to the nearby edge layer. These offloading techniques are based on different parameters, options, and techniques to put tasks to different sets of nodes in such a way that it won't drain mobile devices and sensors baterry. After compuitation is done, this edge layer send pre-processed data to the cloud for further analyse, storage et.
+
+In~\cite{SamiM20} authors used Evolutionary Memetic Algorithm (MA) to solve their multi-objective container placement optimization problem to achieve better QoS.
 %
 %
 \section{Application models}\label{sec:applications}

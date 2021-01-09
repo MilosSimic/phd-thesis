@@ -54,15 +54,17 @@ Distributed systems (in computer science) are consists of various algorithms, te
 DS are hard to immplement because of their nature. James Gosling and Peter Deutsch both fellows at Sun Microsystems at the time crated list of problems for network applicatoins know as \textit{8 fallacies of Distributed Systems}:\label{enum:fallacies}
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item The network is reliable.
-	\item Latency is zero.
-	\item Bandwidth is infinite.
-	\item The network is secure.
-	\item Topology doesn't change.
-	\item There is one administrator.
-	\item Transport cost is zero.
-	\item The network is homogeneous. 
+	\item \textbf{The network is reliable}; there will always be something that go wrong with the network --- power failure, a cut cable, environment disasters etc.
+	\item \textbf{Latency is zero}; localy latency is not an issue, but it deteriorates very quickly when you move to the internet and CC scenarios.
+	\item \textbf{Bandwidth is infinite}; even though bandwidth is constantly getting better and better, the amount of data we try to push through it rise as well.
+	\item \textbf{The network is secure};  Internet attack trends are showing growth, and this becomes problem even more in public CC.
+	\item \textbf{Topology doesn't change}; network topology is usually out of user control, and network topology changes sonstantly for numerous of reasons --- added or removed new devices, servers, breaks, outages etc.
+	\item \textbf{There is one administrator}; nowdays there are numerous of administratos for web servers, databases, cache and so one, but also company collaborates with other copanies or CC provider.
+	\item \textbf{Transport cost is zero}; we have to serialize information and send data over the wire, which takes resources and adds to the total latency. Problem here is not just latency,but that information serialization takes time and resources.
+	\item \textbf{The network is homogeneous}; today, homogeneous network is the exception, rather then a rule. We have different servers, systems, clients that interacts. The implication of this is that we have to assume interoperability between these systems sooner or later but we must be aware of it. We might also have some  proprietary protocols that might also take time to send on and they may stay without support, so we should avoid them.
 \end{enumerate}
+
+These fallacies are intruduced over the dacade ago, and more than four decades since we started building DS, but the characteristics and underlying problems remains pretty the same. It is interesting fact that designers, architects still asume that technology solves everything. This is not the case in DS, and these fallacies should not be forgoten. Because of these problems, DS are hard to implement corectly and they are hard to test and maintain.
 
 This section will explain different aspects of DS in computing systems, that are important for future parts of the thesis. Section~\ref{sec:scalability} gives more details about scalability and what it meens in modern day computer applications. Section~\ref{sec:cloud_computing} gives explanation what CC is, organizational aspects of CC as well as used models. Section~\ref{sec:p2p_networks} gives explanation what peer-to-peer networks are, and why are they important in modern DS. Section~\ref{sec:mobile_computing} gives general deffinition what mobile computing is and new ways of implementation DS.
 %
@@ -503,7 +505,7 @@ Figure~\ref{fig:fig12} summaraze difference bewteen prevous infrastructure deply
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.9]{images/Figure12.png}
+		\includegraphics[scale=0.7]{images/Figure12.png}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Difference bewteen mutable and immutable deplyment models}

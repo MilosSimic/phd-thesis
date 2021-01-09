@@ -1,0 +1,4 @@
+\StarSystem
+  +--\TopologyActor
+  +--\HealthcheckActor
+  +--\InternalActor

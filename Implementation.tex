@@ -19,18 +19,27 @@ We have implemented a proof of concept system based on the proposed, model using
 	\item \textbf{Command push}, purpose of this service is to push commands and operations to the nodes user desired. This service implement token bucket rate limiting algorithm to prevent constant data push to the nodes. As State service, this service will store a copy of operation information localy before attempting any push to the nodes. This information will be deleted, once operation reach all desided nodes, and all of them response with ACK message.
 \end{itemize}
 
-All services, are higly customizable and all have their own configuratoin data taht could be setup. All these services are easy to extend to support new operations and informations about nodes, reginos, clusters, topologies and latter on applications as well. Service architecture is shown in Figure~\ref{fig:fig11}.
+All services, are higly customizable and all have their own configuratoin file that could be changed and adopted. All these services are easy to extend to support new operations and informations about nodes, regions, clusters, topologies and latter on applications as well. 
 
-\begin{figure}[!htbp]
+The system operates with four commands, where three of them follow formal models described in previous chapter. Last command is simple command to list logs for every user.
+
+In the rest of this section we will see details about all operations, as well as used technologies to implement whole system. We will describe possible applicatinos and give future directions for applicatoin development. System architecture is shown in Figure~\ref{fig:fig11}.
+
+\begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.75]{images/FIG5}
+		\includegraphics[scale=0.7]{images/FIG5}
 	\end{center}
 	\vspace{-0.9cm}
 	\caption{Proof of concept implemented system.}
 	\label{fig:fig11}
-\end{figure} 
+\end{figure}
+%
+%
+\subsection{Technologies}\label{sec:technologies}
+%
+All services are implemented using the Go programming language, because his well-known tooling, support for developing system software, web based applications, small binaries but also great concurency model and ability to build binaries for almost any architecture without any changes in code. All services rely on go inplicit $interface$ implementation mechanism. Every technology or component used in the system can be swaped for some other, as long as that component implement $interface$ fully. Framework is developed in such a way that is relativly easy to extend, or switch and use different components and technologies.
 
-All services are implemented using the Go programming language. As a main storage layer for our system, we used etcd, a popular open-source key-value database, that show good performance, and it is mostly used for configiration data. Metrics data are stored in the open-source time-series database InfluxDB. 
+As a main storage layer for our system, we used etcd, a popular open-source key-value database, that show good performance, and it is mostly used for configiration data. Metrics data are stored in the open-source time-series database InfluxDB. 
 
 Communication between microservices is implemented in RPC manner using gRPC, and Protobuf as a message definition. gRPC and Protobuf are open-source tools designed by Google to be scalable, interoperable, and available for general purposes. Communication between nodes and the system is carried out using NATS, an open-source messaging system. Health checking and action push to nodes are implemented over NATS in a publish-subscribe manner.
 
@@ -38,21 +47,52 @@ Chacheing layer for every service is implemented using Redis key-value, in memor
 
 All communication with the outside world, is done in REST manner using JSON encoded messages over HTTP. To communicate with the platform, we have developed a simple command-line interface (CLI) application also using the Go programming language that sends JSON encoded messages over HTTP to the system.
 
-Every service is packed in container, and for this purpose Docker containers are used. To achieve automatic orchestration, and self-heal and up-time, all services that are packed in containres, are runnin inside Kubernetes.
+Every service is packed in a container, and for this purpose Docker containers are used. To achieve automatic orchestration, and self-heal and up-time, all services that are packed in containres, are runnin inside Kubernetes.
 
-The system operates with four commands, where three of them follow formal models described in previous chapter. Last command is simple command to list logs for every user.
+Every service will log details abot his usage and calls, as well as traces how requests are going. Log data is stored outside the service and container, and informations will be sent to centralized log storage on every $t$ seconds specified by user. Sending interval could be changed and addopted using configuration file for every service independently.
+
+Log data will be stored in the two levels:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{system level}, this data is generated by the system, and could be viewd by administrators of the system \textbf{only}. Non operations people in the team or devops, but by developers of the system and providers of the system.
+	\item \textbf{user level} that stores informations about user requests that \textbf{only} users can see. This type of data will not be visible to the developers of the system, and only users that created these logs will be able to see them.
+\end{enumerate}
+
+Log storage could be searched to see general state of the sytem, and informations about user requests and state of their requests.
 %
 %
 \subsection{Node daemon}\label{sec:node_daemon}
-Every node runs a simple daemon program implemented using the Go programming language, as an actor system (Ref. secion~\ref{sec:actor_model}). When a message arrives, the proper actor will react based on the message type, or discard if the type is not supported. Extending such system is reather easy, because users need to simply write new actor and logic that goes with him and register it to the system.
+Every node runs a simple daemon program implemented using the Go programming language, as an actor system (Ref. secion~\ref{sec:actor_model}). Actor system is developed for this purpose. When a message arrives, the proper actor will react based on the message type, or discard if the type is not supported. 
 
-Before daemon starts, the user needs to specify some parameters for proper configuration like: $(1)$ identifier, $(2)$ name, $(2)$ labels, $(3)$ health-check interval, and $(3)$ system. Configuration can be done easly using YAML configuration file. Listing~\ref{lst:listing1} show simple YAML configuration file for deamon process.
+Extending such system is reather easy, because users need to simply write new actor and logic that goes with him and register it to the system.
 
-\begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting[caption={Daemon configiration file}, label={lst:listing1}]{listings/listing1.yaml}
-	\end{tabular}
-\end{center}
+When daemon start, he will first read configuration file to do proper setup, and then will contact actor system to start all the actors. 
+
+System messages will be send to the daemon, but he will not react to these messages. Daemon is not able to communicate with any actor dyrectly. All communication goes trough actor system who is responsabile to pass messages to the actors. Actor system at this point have only tree existing actors:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{cluster actor}, this actor react on messages about new cluster formation, but he is also responsabile to contact rest of the system that message has arrived.
+	\item \textbf{internal actor}, this actor react on messages from other actors in order to update daemon state. For example on new cluster creation, this actor will update daemon id, name, labels etc.
+	\item \textbf{health actor}, this actor will periodicaly sent healtch-check data to the sytem about node state, utilization etc. This actor will communicate to the rest of the hardware to get proper informations, to collect logs from node and send all that data to the system.
+\end{enumerate}
+
+The actor system will monitor these actors, so in order that any of them crush for whatever reason, actor system will restart them. Listing~\ref{lst:listing3} show actor system hierarchy of existing actors.
+
+\lstinputlisting[caption={Actor system hierarchy.}, label={lst:listing3}, captionpos=b, xleftmargin=.35\textwidth]{listings/listing3.txt}
+
+Before daemon starts, the user needs to specify some parameters for proper configuration like: 
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{identifier}
+	\item \textbf{name}
+	\item \textbf{labels}
+	\item \textbf{health-check details}
+	\item \textbf{system informations}
+\end{enumerate} 
+
+Configuration can be done easly using YAML configuration file. Listing~\ref{lst:listing1} show simple YAML configuration file for deamon process.
+
+\lstinputlisting[caption={Daemon configiration file}, label={lst:listing1}, captionpos=b, xleftmargin=.35\textwidth]{listings/listing1.yaml}
 
 Based on the configuration file, the daemon will start a background health-check mechanism, and it will subscribe to the system, using an identifier as a subscription topic. The background thread will contact the system repeatedly using a contact interval time, specified in the configuration file. 
 
@@ -62,15 +102,11 @@ On first start of the deamon when node is free, user can specify whathever node 
 %\
 %
 \subsection{Mutate}\label{sec:mutate} 
-(orange arrows in Figure \ref{fig:fig11}.) change the system state by creating, editing, or deleting clusters, regions, and topologies. When a user wants to perform a mutation over the system, a desired state needs to be specified using a YAML file. 
+Mutate operation (orange arrows in Figure \ref{fig:fig11}.) change the system state by creating, editing, or deleting clusters, regions, and topologies. When a user wants to perform a mutation over the system, a desired state needs to be specified using a YAML file. 
 
 The users specify which nodes are forming the cluster. Optionally, users can also specify labels and names on the node level, and retention period on the cluster level. The retention period is used to describe how long metrics are going to be kept. When the retention period expires, the metrics data will be deleted or moved to another location. Users can target a specific system queue, by adding a metadata part in the configuration file. With this ability, users can have specific queues just for the mutation to avoid long waiting times if other queues are full. When forming a topology, users can assign a name and labels to the entire topology. These parameters will be used when the user wants to query all topologies to get full information about regions, clusters, and nodes inside a topology
 
-\begin{center}
-	\begin{tabular}{c}
-		\lstinputlisting[caption=Mutate file, label={lst:listing2}]{listings/listing2.yaml}
-	\end{tabular}
-\end{center}
+\lstinputlisting[caption=Example of mutate file using YAML., label={lst:listing2}, captionpos=b, xleftmargin=.3\textwidth]{listings/listing2.yaml}
 %
 %
 \subsection{List}\label{sec:list}  
@@ -79,7 +115,20 @@ This command show the current state of the system for the registered user (blue 
 %
 \subsection{Query}\label{sec:query} 
 % 
-This operation showing all or filtered free nodes registered to the system (yellow arrows in Figure \ref{fig:fig11}.). When a user wants to get information about free nodes, they need to submit a selector value which is composed of multiple key-value pairs. The selector will be used to compare labels of every free node existing in the system. The nodes satisfying the rules defined in Section~\ref{subsec:cluster_formation} will be in the result; 
+This operation showing all or filtered free nodes registered to the system (yellow arrows in Figure \ref{fig:fig11}.). When a user wants to get information about free nodes, they need to submit a selector value which is composed of multiple key-value pairs. The selector will be used to compare labels of every free node existing in the system. The nodes satisfying the rules~\ref{frm:query_rule} defined in Section~\ref{sec:cluster_formation_protocol} will be in the result.
+
+Querying process is little bit changed from one presented in Section~\ref{sec:cluster_formation_protocol}, and the only change is addition of the $Gateway$ service that will pass requests into the system and to prevent overflow of requests. This change \textbf{does not} affect or valiate formal model presented before.
+
+Figure~\ref{fig:fig14} show communication diagram for query action.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.8]{images/Figure14}
+	\end{center}
+	\vspace{-0.7cm}
+	\caption{Low level communication protocol diagram of query operation.}
+	\label{fig:fig14}
+\end{figure}
 %
 %
 \subsection{Logs}\label{sec:logs}
