@@ -850,7 +850,7 @@ Idempotent structure can be represented as a tuple of topology name and set of d
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
-	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on.
+	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
 \end{enumerate}
 
 If we have cached idempotency data for user request, and if he tries to send same request we can test idempotency using set operation \textbf{intersection}.
