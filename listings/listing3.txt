@@ -1,4 +1,5 @@
 \StarSystem
   +--\TopologyActor
   +--\HealthcheckActor
+  +--\GossipActor
   +--\InternalActor

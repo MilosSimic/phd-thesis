@@ -1,0 +1,5 @@
+\topology\region\cluster\node
+  +--\labels
+  +--\informations
+  +--\resources
+  +--\status
