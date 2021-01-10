@@ -147,6 +147,8 @@ When creationg topologies, user is free to give whatever name he wants for every
 Listing~\ref{lst:listing2} show example of user defined state that forms topology of one region with one cluster that contains three nodes, with retention period of 24h. Whole topology will have same set of labels, but $node3$ redefine this rule by specifying his own.
 
 \lstinputlisting[caption=Example of mutate file using YAML., label={lst:listing2}, captionpos=b, xleftmargin=.3\textwidth]{listings/listing2.yaml}
+
+After all nodes that should form a cluster, acknowledge cluster formation message, they will inform system that message is received, and they will start the process of cluster formation. This process is done by using SWIM~\cite{DasGM02}, a Gossip style protocol. When every node have complete list of his peers that should be in the cluster, the process of cluster formation is done. On next health-check, every node will send his \textbf{new id} that is telling the sytem that he is part of some cluster. This kind of messages, will be used in $State$ service to validate that cluster is alive and well, or that some nodes (or all), are dead or down. And Gossip style protocols (like SWIM) could be used in the future to propagate information in the cluster, without explicitly ping every node in the cluster.
 %
 %
 \subsection{List}\label{sec:list}  
