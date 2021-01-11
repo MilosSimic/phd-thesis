@@ -1,13 +1,82 @@
 %!TEX root =  main.tex
 \chapter{Conclusion}\label{chapter:Conclusion}
 %
-In Section~\ref{sec:summary_of_contributions} we give summary of contributions for this thesis, while in Section~\ref{sec:future_work} we present future work.
+In this chapter, we give summary of contributions for this thesis in Section~\ref{sec:summary_of_contributions}, while in Section~\ref{sec:future_work} we present future work.
 %
 %
 \section{Summary of contributions}\label{sec:summary_of_contributions}
 %
-%
+This thesis presents a possible solution for the organization of geo-distributed micro-clouds with EC nodes, with addition of few proven abstractions from cloud computing like zones and regions. 
 
+These abstractions allow coverage of any geographic area, and yield a more available and reliable EC system. The organization and reorganization of these abstractions is done descriptively, and their size is determined by the population needs. 
+
+We present a cloud to EC mapping and give a formal model of the system, with clear SoC and edge-native application model for future EC as a service development. The thesis also presents a proof of concept implementation and discusses integration into existing solutions with few applications that could be used in.
+
+In Chapter~\ref{chapter:Intro} we gave a short introduction into the topic of distributed systems,  withe focus only on the areas that are important for understanding of this thesis. 
+
+We show what distributed systems are or at least general consensus how we can describe some system as a distributed. We present problems these systems create, and why they are so hard to implement and maintain. 
+
+We also few present distributed computing, that we can use to employ nodes in the distributed system. Further on we show what virtualization techniques we can use, how to implement various deployment techniques esspecially in CC environment, but also difference between DS and few models that are usually confised as distributed like parallel computing and decentralized computing.
+
+In Chapter~\ref{chapter:Review}, we show related work done by various other researchers or companies, and again we focuse, only on things that are related to this thesis.
+
+We show different platform options, where people change the existing solutions like Kubernetes or OpenStack to made them work in areas like edge computing and mobile komputing. Futher we show implementations of few new platforms to use volounter nodes to do some computation and storage on them with drop computing and systems like Nebula for example.
+
+We show how nodes can be organized to split dome geographic are into zones, and show how MDCs can help CC to serve requests from local population. There are different offloading techniques that are used today, how to offload tasks from mobile devices closer to fog or edge nodes, but also various applicationas models that could harnes these offloading techniques and nodes organizasions.
+
+At the end, we present position of this thesis, compared to other similar models.
+
+In Chapter~\ref{chapter:Micro_clouds}, we present heart and soul of this thesis. We deisect all importatnt asspects that we need to have in order to help CC with latency issues, Big Data with huge volumes of data esspecialy in the age of mobile devices and IoT.
+
+Our model is based around MDCs that are zonaly organzied, that will serve only local populations and populations nearby. We present model that is based on CC, but adopted for different scenario and use case.
+
+We show how we can dinamicaly form new clusters, regions and topologies and how we can use them in new age of mobile evices and IoT. This newly formed systems or system od systems will have clear the SoC, adopted from existing research to three tier architecture. Formed model will serve as a pre-processing layer, firewall or privacy layers, and it is adjustable in various dimensions.
+
+Presetned model can be as huge as whole state, or small as single household and all in between. This is a metter of agreement and metter of choice. We present how developers can use this new infrastructure and how possible models of applications, and how operations can deploy developed services onto existing infrastructure.
+
+At the end, we present repercusions of this model, and how can be used as an integral part of existing systems to server as a nodes storage, or can be used as a new model where we can develop new subsystems and applicatoins on top. We present protocols for creation of such a system, and model them using asynchronous session types. System follow formal model, and it is easy to extend.
+
+At the end we give limitations of such system, and things we must be aware of, \textbf{if} such technology is going to be used in real-life scenarios.
+
+In last Chapter~\ref{chapter:Implementation}, we present implemented framework that is based on knowladge compiled from previous chapters. We also presetn in detail operations that could be done in the framework, where it fits in presetned SoC model.
+
+Further we present results of our experimets in controlled environment, what are the limitations of the framework at the curretn stage, and possible applications and where this model could be used and beneficial.
+%
+%
 \section{Future work}\label{sec:future_work}
+%
+Our work on the micro-clouds is at an early stage and leaves many open questions. As part of our current and future work, we are planning to extend the proposed model into different directions. Future work might be separated into three options:
+ 
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item features that operations and devops users can benefit from;
+	\item features developers might benefits from;
+	\item infrastructure features, that both previous groups can benefits from;
+\end{enumerate}
+
+For the first group, the first thing that should be implemented is remote cluster management, using configurations, security credentials, and actions over nodes in one or multiple clusters. On formed cluster user should be able to do remote configurations, and setting up the data without going from node to node that nodes and/or applicatoins can use.
+
+System should also be extending with namespaces for usage in environments with many users in multiple teams --- multi tenant environment. Namespaces provide the separation on virtual clusters, runnin on the same physical hardware. Speaking about multi tenancy, we are also planning to implement role-based access controll integrate with authentification and authorizatoin services. With the addition og controlling different users with quotas, using reate limiting and resource limiting.
+
+We are also planning to implement a full architecture and applications monitoring, alerting and reporting that would be helpful to any administrator of such system. We might also consider rethinking networking and makeing network isolation so that once formed topologies can communicate within herself, and a possibly to speficy 
+stretegies of communication with other topologies.
+ 
+For the last part in this operations section, we sould also think about continious integration, deployment and delivery of services onto the infrastructure, and as well various UI dashboards that can be customzied to present different aspects of the system.
+
+Another direction for future work, is the implementation which developers could benefit from. First thing that should be implemented here is full applications framework so that users can start developeing services that can actually do something. We should also also implement framework and maybe domain specific langiuage for use case where users just want to pre-processing the data before send it to the cloud, on more convinient than writing whole application.
+
+Users can develop their applications with different models: 
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{mPaaS}, where the platform is doing all the management and offers a simple interface for developers to deploy their applications
+	\item \textbf{mCaaS}, if users require more control over resources requirements, deployment and orchestration decisions.
+\end{enumerate}
+
+Second would be file system and databses APIs that users can use to store their data. We should also provide interface for extensions, so that others can create their own databases following different models from which developers can benefits, but also integrating existing ones.
+
+Last part of future woulr would be extending current system with tunable replicating strategies for the data, in case that any part of the topology fails for whatever reason, data would not be lost. Furthermore, we should provide tunable CC synchronization models that could be used.
+
+We sbould implement a scheduling system for user-developed applications, so that we can put applications into the formed architecture. And last but not least, we are planning to add several security layers to protect a system in general from malicious users.
+
+This thesis in section~\ref{sec:repercussion}, stated that this model could be integrated into existing solustios. Our efforts should go as well on integrating this system with existing solutions, so that they can benefits from this hierarchical and geo-distributed nodes organization in a same way or almost the same way as stand alone solution would.
 %
 %

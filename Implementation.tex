@@ -2,7 +2,7 @@
 \chapter{Implementation}\label{chapter:Implementation}
 %
 In this chapter, we are going to give more details about framework implemented based on formal model and architecture specification given i previous chapter.
-Section~\ref{sec:framework} framework architecture, andd system implementation details. Section~\ref{sec:app} describe few possible senarios and applications that could utilize micro-clouds platform. In Section~\ref{sec:results} we present results of our experiments.
+Section~\ref{sec:framework} framework architecture, and system implementation details, and framework limits. In Section~\ref{sec:framework_operations} we present implementation details about framework operations. Section~\ref{sec:app} describe few possible senarios and applications that could utilize micro-clouds platform. In Section~\ref{sec:results} we present results of our experiments.
 %
 %
 \section{Framework}\label{sec:framework}
@@ -70,12 +70,13 @@ Extending such system is reather easy, because users need to simply write new ac
 
 When daemon start, he will first read configuration file to do proper setup, and then will contact actor system to start all the actors. 
 
-System messages will be send to the daemon, but he will not react to these messages. Daemon is not able to communicate with any actor dyrectly. All communication goes trough actor system who is responsabile to pass messages to the actors. Actor system at this point have only tree existing actors:
+System messages will be send to the daemon, but he will not react to these messages. Daemon is not able to communicate with any actor dyrectly. All communication goes trough actor system who is responsabile to pass messages to the actors. Actor system at this point have only four existing actors:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{cluster actor}, this actor react on messages about new cluster formation, but he is also responsabile to contact rest of the system that message has arrived.
 	\item \textbf{internal actor}, this actor react on messages from other actors in order to update daemon state. For example on new cluster creation, this actor will update daemon id, name, labels etc.
 	\item \textbf{health actor}, this actor will periodicaly sent healtch-check data to the sytem about node state, utilization etc. This actor will communicate to the rest of the hardware to get proper informations, to collect logs from node and send all that data to the system.
+	\item \textbf{gossip actor}, this actor will communicate with other peers in the group using SWIM protocol techniques.
 \end{enumerate}
 
 The actor system will monitor these actors, so in order that any of them crush for whatever reason, actor system will restart them. Listing~\ref{lst:listing3} show actor system hierarchy of existing actors.
@@ -101,7 +102,30 @@ Based on the configuration file, the daemon will start a background health-check
 On every health-check, the node will send labels, name, id, and metrics to the system (e.g., CPU utilization, total, used, free ram or disk, etc.). The specified labels will be used when the user is querying for available nodes, while node id will be used for reservation when forming a cluster.
 
 On first start of the deamon when node is free, user can specify whathever node id he wants. Once, node is a part of the cluster, node id will be updated to match that. Node id update will happend on cluster formation process.
-%\
+%
+%
+\subsection{Separation of concerns}\label{sec:framework_SoC}
+%
+Implemented framework follow the clear SoC model, presented in~\ref{sec:separation_of_concerns}. Since presetned model consists of tree components, implemented framework is dealing only with \textbf{resources}~\ref{soc:resources} part of the SoC. 
+
+His job is to organize nodes into clusters, regions and topologis,to  make them communicate and expose their resources to the upper layer of SoC for utilization. Upper layer will run services on these resources, to collect data from data creators and process them as requested.
+
+Upper layer must have set up infrastructure in order to do any processing od storage. This middle layer is binding element between the layers.
+%
+%
+\subsection{Limitations}\label{sec:framework_limits}
+% 
+The framework at the current state, have some limitations that we \textbf{must address}. As shown in the Figure~\ref{fig:fig11}, for purpose of testing the system, and to give the users any way to interact with the system a CLI applications is implemented. This is good option for initiating commands to the sytem. The problem with this approuch is that showing logs, and topologies might be limiting for users, esspecially if they monitor and supervise multiple topologies with regions and clusters.
+
+For purpose of monitoring, a tools with UI would be better solution and it can show more details. For small amount of data when topologies are relativly small, CLI could be used. But for some real-world applications desktop and/or Web based UI will be much better solution, and CLI can be used for fast lookup on specific informations about clusters and nodes, for example.
+
+But since purpose of this thesis is not Human-computer interaction, this should be topic of the future work~\ref{sec:future_work}.
+%
+%
+\section{Operations}\label{sec:framework_operations}
+%
+In this secion we are going go describe all implemented operations in the framework, and details about every individual operation.
+%
 %
 \subsection{Query}\label{sec:query} 
 % 
@@ -134,9 +158,13 @@ Users can target a specific system queue, by adding a metadata part in the confi
 
 When forming a topology, users can assign a name and labels to the entire topology. These parameters will be used when the user wants to query all topologies to get full information about regions, clusters, and nodes inside a topology
 
-Mutate operation is \textbf{immutable} which mean that there will be no in place changes to the existing state. If user want to do any update, he needs to specify full new state that will replace existing state. This operation is \textbf{atomic} as well, which mean that whole new state must be able to replace existing state. Iff this happend, system will replace old state with the new state. Main storage that stores configuration data is key-value store implemented using etcd databse. Key that will be used to store the confuguration data is the whole path of topology, regions, cluster, node, while the value is user desired state.
+Mutate operation is \textbf{immutable} which mean that there will be no in place changes to the existing state. If user want to do any update, he needs to specify full new state that will replace existing state. This operation is \textbf{atomic} as well, which mean that whole new state must be able to replace existing state. Iff this happend, system will replace old state with the new state. Main storage that stores configuration data is key-value store implemented using etcd databse. Key that will be used to store the confuguration data is the whole path of topology, regions, cluster, node, while the value is user desired state. Listing~\ref{lst:listing4} show structure for key-value pair that is stored in main database, where on top we can see a structure of the \textbf{key}, and below it we can see structure of the \textbf{value}. This kind of structure is similar to OS file-system data organizations of files and folders.
 
-This operaption is not idempotent by the nature, but whole process behind it make mutate an idempotent operation. Whether user try to create already existing infrastructure by changeing order of regions clusters or labes in the nodes, or if he for whatever reason did not get confirmation that infgrastructure is created a existing infrastructure will not be created. This is done in such a way, that $State$ service (Figure~\ref{fig:fig11}) will keep information set about created infrastructure. 
+\lstinputlisting[caption={Structure of stored key-value element.}, label={lst:listing4}, captionpos=b, xleftmargin=.25\textwidth]{listings/listing4.txt}
+
+We store as well one additional information about labels \textbf{index} value. This index is used for faster querry of elements, when doing labels comparison. To find elements we can query on similar way like doing search in files and folders structure. The etcd in newer version \textbf{do not allow} hierarchical keyspace, but what they allow is \textbf{ranged} query by some \textbf{prefix}. This is useafull as well, because we can still get all regions in topology, clusters in region or nodes in the cluster if we know to which group they belog.
+
+Mutate operaption is not idempotent by the nature, but whole process behind it make mutate an idempotent operation. Whether user try to create already existing infrastructure by changeing order of regions clusters or labes in the nodes, or if he for whatever reason did not get confirmation that infgrastructure is created a existing infrastructure will not be created. This is done in such a way, that $State$ service (Figure~\ref{fig:fig11}) will keep information set about created infrastructure. 
 
 This informations is implemented as a \textbf{flat keyspace} set, that have information. On every mutation request, system will tets if such topology already exists. If such topology already exists user will get confirmation that his infrastructure is created. If such topology do not exists, a new cluster formation protocol~\ref{sec:cluster_formation_protocol} will be initiated.
 
@@ -148,7 +176,11 @@ Listing~\ref{lst:listing2} show example of user defined state that forms topolog
 
 \lstinputlisting[caption=Example of mutate file using YAML., label={lst:listing2}, captionpos=b, xleftmargin=.3\textwidth]{listings/listing2.yaml}
 
-After all nodes that should form a cluster, acknowledge cluster formation message, they will inform system that message is received, and they will start the process of cluster formation. This process is done by using SWIM~\cite{DasGM02}, a Gossip style protocol. When every node have complete list of his peers that should be in the cluster, the process of cluster formation is done. On next health-check, every node will send his \textbf{new id} that is telling the sytem that he is part of some cluster. This kind of messages, will be used in $State$ service to validate that cluster is alive and well, or that some nodes (or all), are dead or down. And Gossip style protocols (like SWIM) could be used in the future to propagate information in the cluster, without explicitly ping every node in the cluster.
+After all nodes that should form a cluster, acknowledge cluster formation message, they will inform the system that the message is received, and they will start the process of cluster formation. This process is done by using SWIM~\cite{DasGM02}, a Gossip style protocol. When every node have complete list of his peers that should be in the cluster, the process of cluster formation is done. 
+
+On the next health-check message, every node will send his \textbf{id} that is telling the sytem that he is part of some cluster. This kind of messages, will be used in $State$ service to validate that cluster is alive and well, or that some nodes (or all), are dead or down if \textbf{id} is not received. 
+
+And Gossip style protocols (like SWIM) could be used in the future to propagate information in the cluster, without explicitly ping every node in the cluster.
 %
 %
 \subsection{List}\label{sec:list}  
@@ -176,15 +208,6 @@ The logs operation showing stored logs and traces to the user (purple arrows in 
 \end{enumerate}
 
 This action is implemented in some basic aspects, as this action can return huge amoount of data that require some better visualizaion than CLI.
-%
-%
-\subsection{Limitations}\label{sec:framework_limits}
-% 
-The framework at the current state, have some limitations that we \textbf{must address}. As shown in the Figure~\ref{fig:fig11}, for purpose of testing the system, and to give the users any way to interact with the system a CLI applications is implemented. This is good option for initiating commands to the sytem. The problem with this approuch is that showing logs, and topologies might be limiting for users, esspecially if they monitor and supervise multiple topologies with regions and clusters.
-
-For purpose of monitoring, a tools with UI would be better solution and it can show more details. For small amount of data when topologies are relativly small, CLI could be used. But for some real-world applications desktop and/or Web based UI will be much better solution, and CLI can be used for fast lookup on specific informations about clusters and nodes, for example.
-
-But since purpose of this thesis is not Human-computer interaction, this should be topic of the future work~\ref{sec:future_work}.
 %
 %
 \section{Results}\label{sec:results} 

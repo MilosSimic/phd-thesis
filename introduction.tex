@@ -31,7 +31,7 @@ In~\cite{SteenT16, 0019513} Tanenbaum et al. give two interesting assumption abo
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item  \say{A computing element, which we will generally refer to as a node, can be either a hardware device or a software process}.
-	\item \say{A second element is that users (be they people or applications) believe they are dealing with a single system. This means that one way or another the autonomous nodes need to collaborate}.
+	\item \say{A second element is that users (be they people or applications) believe they are dealing with a single system. This means that one way or another the autonomous nodes need to collaborate}.\label{ds:asumption_2}
 \end{enumerate}
 
 \noindent
@@ -53,7 +53,7 @@ Distributed systems (in computer science) are consists of various algorithms, te
 
 DS are hard to immplement because of their nature. James Gosling and Peter Deutsch both fellows at Sun Microsystems at the time crated list of problems for network applicatoins know as \textit{8 fallacies of Distributed Systems}:\label{enum:fallacies}
 
-\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]\label{ds:8_fallacies}
 	\item \textbf{The network is reliable}; there will always be something that go wrong with the network --- power failure, a cut cable, environment disasters etc.
 	\item \textbf{Latency is zero}; localy latency is not an issue, but it deteriorates very quickly when you move to the internet and CC scenarios.
 	\item \textbf{Bandwidth is infinite}; even though bandwidth is constantly getting better and better, the amount of data we try to push through it rise as well.
@@ -267,6 +267,49 @@ Based on how the nodes are linked to each other within the overlay network, and 
 \end{itemize}
 
 P2P networks are great tool in many arsenals, but because their unique ability to act as a server and as a client at the same time we must be aware and pay more attention to security because they are more vulnerable to exploits~\cite{0024003}/
+%
+%
+\subsection{Membership protocol}\label{sec:memership_protocol}
+%
+A the start of this section we introduced DS, and we present two interesting assumptions by Tanenbaum et al.~\cite{SteenT16, 0019513}. If we take one more look at the~\ref{ds:asumption_2} assumption, we will see that user of the DS whether they are users or applications perceive DS as a single element. Inside this single elements nodes need to colaborate, so that they are albe to do various kinds of tasks.
+
+Most basic of all these tasks, is that nodes needs to know which group they belog to, and who are their peers in the group they will colaborate with. This might sound as a trivial idea, but when we include 8 fallacies of the DS~\ref{ds:8_fallacies} into the equation, things start to be not so trivial, after all. In the setup where nodes are connected over the local network or internet, and they need to communicate things will go wrong for various reasons.
+
+To resolve the problem that nodes need to know who are their group peers, a membership protocols come to help. These protocols needs to ensures that each process of one group updates his local list of \textbf{non-faulty} members of the group, and when a new process joins or leaves the group, local list for every process needs to be updated. This is the most basic idea behind membership protocols.
+
+Processes in the group, or nodes in a group will ping each other in different ways, and using different strategies to figure out which nodes are dead and which are alive. There are few existing algorithms that does this job, and they are (usually) based on the way epidemics spread or how gossip is spreaded in population. Because of this feature these algorithms are usually called \textit{Gossip} style protocols.
+
+Every membership protocol have some properties that will ensure efficiency and scalability:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{Completeness}, this property must ensure that every failure in the system is detected.
+	\item \textbf{Accuracy}, in ideal world, there should be no mistakes when detecting failures. But In real life scenario, we need to reduce false positives as much as we can.
+	\item \textbf{Failure detection speed}, all failures needs to be tected as fast as possible, in order to remove the node from the group and reschedule the tasks from dead node to alive ones.
+	\item \textbf{Scale}, with this property we must ensure that the network load that is generated should be distributed equally between all processes in the group.
+\end{enumerate}
+
+Easiest idea to implement this protocol would be \textbf{heartbeating} technique where process $P_i$ will send heartbeat message to all his peers in the group or \textbf{multicast}. After some time if process $P_j$ did not receive heartbeat message from $P_i$, it will mark him as faild. This idea is easy to understand, and implement but downsides are that his process is not really \textbf{scalable}, esspecially for large groups, and this will introduce huge network traffic.
+
+To resolve this problem, Das et al.~\cite{DasGM02} introduced \textbf{S}calable \textbf{W}eakly-consistent \textbf{I}nfection-style Process Group \textbf{M}embership protocol, or \textbf{SWIM} for short. This protocol divides the membership problem into two parts:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{Failure detection}, this component works so that one node will select random node in the group, and it will send him $ping$ message, expecting $ack$ message in return --- \textbf{direct ping}. If such message is not received, he will pick $n$ nodes to probe through a $ping-req$ message --- \textbf{indirect ping}. If this fail, node will be marked as $suspected$, and it will be marked as $dead$ after some timeout. If node get alive, he will ping some other node and he will get back into the group.
+	\item \textbf{Information dissemination}, with previous strategy, we can disseminate information by piggybacking the data on multiple messages ($ping$, $ping-req$ and $ack$), and avoid using the multicast solution.
+\end{enumerate}
+
+\noindent
+Figure~\ref{fig:fig15} show message passing in \textbf{direct} $(left)$, and \textbf{indirect} $(right)$ ping in SWIM protocol.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{images/Figure15.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{Direct and indirect ping in SWIM protocol.}
+	\label{fig:fig15}
+\end{figure}
+
+Over the years, reserchers foud ways to improve the protocol, and there are other implementations to fine tune the SWIM, but base idea is still there.
 %
 %
 \subsection{Mobile computing}\label{sec:mobile_computing}
