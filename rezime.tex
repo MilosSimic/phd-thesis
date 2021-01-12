@@ -2,5 +2,91 @@
 \chapter*{Rezime}
 \pagestyle{plain}
 
+Razni softverski sistemi promenili su na\v cin na koji ljudi komuniciraju, u\v ce i vode posao, a me\dj usobno povezani ra\v cunarski sistemi imaju brojne pozitivne primene u svakodnevnom \v zivotu. Tokom protekle decenije, koli\v cina prora\v cuna i obim podataka su se znatno pove\'cali~\cite {ChiangZ16}, \v sto je za posledicu imalo sve ve\'cu upotrebu distriburanih sistema da bi se ti poslovi mogli obaviti uspe\v sno.
+
+Pro\v sirena stvarnost, igre preko mre\v ze, automatksko prepoznavanje lica, autonomna vozila ili aplikacije Internet stvari (IoT) proizvode izuzetno velike koli\v ine podataka. Ovakva optere\'enja zahtevaju ka\v snjenje ispod nekoliko desetina milisekundi~\cite {ChiangZ16}. Ovi zahtevi su izvan onoga \v sto centralizovani ra\v cunarski modeli, poput ra\v cunarstva u oblaku, moge da ponude~\cite {ChiangZ16}.\v Cak i mali problemi mogu dovesti do velikog zastoja u aplikacijama i uslugama od kojih ljudi zavise. 
+
+Nedavni primer koji se desio, je još jedan u nizu prekid koji se dogodio na Amazon Web Services (AWS) platformi. Ovim je platforma bila nedostupna korisnicima i aplikacijama, a kao rezultat nedostupnosti platforme velika koli\v cina aplikacija i servisa koji se izvr\v savaju preko interneta postaje nedostupna korisnicima. Da bi razumeli kako smo do\v sli do tog problema, prvo moramo razumeti \v sta je zapravo ra\v cunarstvo u oblaku.
+
+Računarstvo u oblaku mo\v zemo da defini\v semo kao agregaciju ra\v cunarskih resursa koji se mogu ponuditi korisnicima, kroz uslu\v zni softver~\cite {Vogels}. Hardver i softver u velikim centrima za obradu podataka pru\v zaju usluge korisnicima preko Interneta~\cite {AboveTheCloud}. Resursi poput CPU-a, GPU-a, skladi\v sta podataka i mre\v ze su resursi, i mogu se koristiti ili ne i to na zahtev i po potrebi korisnika~\cite {ZhangCB10}. 
+
+Klju\v cna snaga ra\v cunarstva u oblaku su servisi koji su ponu\dj eni korisnicima kao usluge~\cite {Vogels}. Tradicionalni model ra\v cunarstva u oblaku pru\v za ogromne procesne i skladi\v sne resurse i to po potrebi, na zahtev korisnika --- elasti\v cno, kako bi podr\v zao razli\v cite potrebe aplikacija.  Ovo svojstvo se odnosi na sposobnost ovog modela da dozvoli alokaciju dodatnih resursa ili osloba\dj postoje\'cih, da bi se podudarali sa radnim optere\'c enjima aplikacije i to na zahtev~\cite {AssuncaoVB18}.
+
+Problem nastaje (izme\dj u ostalog) kada je potrebno da se (veliki) podaci prebace sa izvora u oblak. Ovaj proces dovodi do velike latencije ili ka\v snjenja u sistemu~\cite {HossainRH18}. Na primer, Boeing 787s generi\v se pola terabajta podataka po jednom letu, dok autonomni automobil generiše dva petabajta podataka tokom samo jedne vo\v znje. Me\dj utim, propusni opseg nije dovoljno velik da bi podr\v zao takve zahteve~\cite {CaoZS18}. Prenos podataka nije jedini problem sa \v cime se ra\v cunarsto u oblaku susre\'ce. Aplikacije kao \v sto su autonomni automobili, bespilotne letelice ili balansiranje snage u elektri\v cnim mre\v zama zahtevaju obradu podatka u realnom vremenu da bi ispravno donosili odluke, i reagovali na promene~\cite {CaoZS18}. Suo\v cavamo se sa ozbiljnim problemima, ako usluga u oblaku postane nedostupna zbog napada milicioznih korisnika --- hakera, ili prostog kvara na mre\v zi~\cite{GunawiHSLSAE16}.
+
+Centralizovana arhitektura ra\v cunarstva u oblaku sa ogromnim kapacitetima centara za obradu podataka stvara efikasnu ekonomiju obima \v cime se dolazi do smanjenja administrativnih tro\v kova celokupnog sistema~\cite{BariBEGPRZZ13}. Me\dj utim, kada takav sistem dod\dj e do svojih granica, centralizacija donosi vi\v se problema nego \v sto ih mo\v ze re\v siti~\cite{GunawiHSLSAE16, LopezMEDHIBFR15}. Uprkos svim prednostima ovog modela, servisi i usluge vremenom se suo\v cavaju sa ozbiljnom degradaciom kvaliteta odziva i performansi, usled velike propusnosti i ka\v snjenja~\cite {KarimIWGSYO16}. 
+
+To mo\v ze dovesti do nesagledivih posledica po biznise, ali potencijalno i ljudske živote. Organizacije koriste usluge u oblaku kako bi izbegle velike infrastrukturalne investicije~\cite {MonsalveCC18}, poput pravljenja i održavanja sopstvenih centara za obradu podataka. Oni koriste resurse koje su obezbedili drugi~\cite{Satyanarayanan17}, i pla\'caju shodno tome koliko vremenski koriste usluge -- a pay as you go model.
+
+Cilj ove teze je predstavi upotrebu formalnih modela na osnovu kojih mo\v zemo opisati, formalno verifikovati protokole i implementirati radni okvir za distribuirani sistem koriste\'ci geografski rasprostranjena okru\v zenja, nalik ra\v cunarstvu u oblaku. Opisani sistem mogu da koriste ne samo obi\v cni korisnici, ve\'ci pru\v zaoci usluga ra\v cunarstva u oblaku mogu ga integrisai u svoje servise kako bi se minimalizovao zastoj kritičnih sistemskih segmenata. \v Citav sistem mo\v zemo posmatrati kao skup mikro oblaka ili sloj obrade, koji u oblak \v salje samo va\v zne podatke smajuju\'c i tro\v skove korisnicima, ali i obezbe\dj uju\'ci ve\'cu dostupnost usluga ra\v cunarstva u oblaku.
+
+Da bi se prevazi\v slo ka\v snjenje u oblaku, istra\v zivanje je dovelo do novih ra\v cunarskih oblasti poput ivi\v cnog ra\v cunarstva (EC). EC je model u kome se procesne i skladi\v sne mogu\'cnosti ra\v cunarstva u oblaku, u blizini izvora podataka~\cite{Satyanarayanan17}. Ra\v cunarstvo u oblaku je pro\v sireno mogu\'cnostima \v sto dovodi do novih ideja za aplikacije budu\'ce generacije~\cite{NingLSY20}. Tokom godina pojavili su se razni modeli poput fog ra\v cunarstva~\cite{BonomiMNZ14}, cloudleta~\cite {MonsalveCC18} i mobilnih ivi\v cnih ra\v cunara (MEC)~\cite{WangZZWYW17}. U ovom radu sve ove modele nazivamo ivi\v cnim \v cvorovima. 
+
+Svi pomenuti modeli koriste koncept prenosa skladi\v snih i procesnih mogu\v cnosti, iz oblaka bli\v ze izvorima podataka~\cite{KhuneP19} dok su zahtevnije obrade ostaju u oblaku iz vrlo prostog razloga -- dostupnosti znatno ve\'ckoli\v cine resursa~\cite{NingLSY20}. EC modeli uvode male servere koji se arhitekturalno nalaze izme\dj u izvora podataka i oblaka. Tipi\v cno je za ove servere da imaju mnogo manje mogu\'cnosti u pore\dj enju sa servera u oblaku~\cite{ChenHLLW15}. 
+
+Prednost malih servera je u tome \v sto se oni mogu na\'ci skoro bilo gde, na primer u baznim stanicama~\cite{WangZZWYW17}, gradskim centralama, kafi\'cima ili rasprostranjeni po geografskim regionima a sve to, kako bi se izbeglo kašnjenje, kao i pove\'cala propusnost~\cite{MonsalveCC18}. Oni mogu poslu\v ziti kao za\v stitni zidovi~\cite{SatyanarayananK19} ili kao nivo obrade pre nego \v sto podaci budu poslati u oblak. Sa druge strane, korisnici dobijaju jedinstvenu mogu\'cnost dinami\v cke i selektivne kontrole informacija koje bivaju poslate u oblak.
+
+Jedna opcija \'ce te\v sko mo\'cda odgovara potrebama svih aplikacija u budu\'cnosti, tako da ra\v cunarstvo u oblaku ne bi trebalo da bude naša granica i jedina opcija. Razni modeli nastali na bazi malih servera, pokazuju mogu\'cnost da se obrada podataka mo\v ze obaviti bli\v ze izvori\v stu, a sve u cilju smanjenja ka\v snjenje zahteva klijentskih aplikacija primenom malih servera, dok teški proračuni mogu ostati u oblaku zbog ve\'ce dostupnosti resursa. Slediti ideju, da u oblak poslati samo informacije koje su klju\v cne za druge usluge ili aplikacije~\cite{inproceedingsSimic1}, a ne sve kako predla\v ze standardni model oblaka. Ideja malih servera sa razli\v citim ra\v cunskim, skladi\v snim i mre\v znim resursima pokre\'ce zanimljive istraz\v ziva\'cke ideje i motivacija  su za ovu tezu. Koriste\'ci resurse koji su organizovani lokalno kao mikro oblaci, oblaci zajednice ili ivi\v cni oblaci~\cite {RydenOCW14} predla\v zu Riden i saradnici.
+
+U svom radu~\cite{GreenbergHMP09} Greenberg i saradnici ističu da se mikro centri za obradu podataka (MDC) koriste prvenstveno kao \v cvorovi u mre\v zama za distribuciju sadr\v zaja i drugim \say{sramotno distribuiranim} aplikacijama. MDC su zanimljiv model u podru\v cju brzih inovacija i razvoja. Greenberg i saradnici~\cite{GreenbergHMP09} uvode MDC-ove kao centar za obradu podataka koji rade u blizini velike populacije, smanjuju\'ci fiksne tro\v skove tradicionalnih centara za obradu podataka. Minimalna veli\v cina MDC-a definisana je potrebama lokalnog stanovništva~\cite{GreenbergHMP09, AbbasZTS18}, pri\v zaju\'ci agilnost kao klju\v cnu karakteristiku. Ovde agilnosti zna\v ci sposobnost dinami\v ckog rasta i smanjenja potrebe za resursima i upotrebe resursa sa optimalne lokacije~\cite{GreenbergHMP09}. 
+
+Zonska organizacija malih servera koju su predstavili Guo i saradnici~\cite{GuoRG20} u primeni kod pametnih vozila, daje zanimljivu perspektivu o EC. Autori su pokazali kako modeli zasnovani na zonama omogućavaju kontinuitet dinami\v ckih usluga i smanjuju primopredaju veze. Tako\dj e, su pokazali kako da se pove\'ca pokrivenost malim serverima na ve\'cu zonu, \v cime se pro\v siruju ra\v cunarska snaga i kapacitet skladištenja podataka.
+
+MDC-ovi sa zonskom organizacijom servera dobra su polazna osnova za izgradnju EC-a koja mo\v ze biti ponu\dj na kao servis. Da bi to postigli, potreban nam je dostupniji i elasti\v cniji sistem sa manje ka\v snjenja.  
+
+EC poti\v ce iz P2P sistema~\cite{LopezMEDHIBFR15} kako su pretpostavili L{\'{o}}pez i saradnici, ali ga pro\v siruje u novim pravcima i pru\v za mogu\'cnost integracije sa ra\v cunarstvom u oblaku. Me\dj utim, infrastrukture ne\'ce biti postavljena sve dok proces pode\v savanja i kori\v s\'cenja ne bude trivijaln~\cite{SatyanarayananBCD09}. Odlazak od \v cvora do \v cvora je dosadan i dugotrajan proces. Naro\v cito kada se uzme u obzir geografska rasprostranjenost \v cvorova. 
+
+Dobro definisan sistem mogao bi se ponuditi kao usluga, kao i bilo koji drugi resurs u ra\v unarstvu u obaku. Mo\v zemo ga ponuditi istra\v ziva\v cima i programerima da naprave nove aplikacije usmerene vi\v se ka raznim potrebama ljudi. Ako nam je potrebno vi\v se resursa na jednoj strani, mo\v zemo uzeti jedanu koli\v cinu resursa i premestiti gde nam ti resursi trebaju. Sa druge strane, kompanije koje pru\v zaju usluge ra\v cunarstva u oblaku mogu da integrisati model u svoj postoje\'ci sistem, skrivaju\'ci nepotrebnu slo\v zenost iza nekog komunikacionog interfejsa ili predlo\v zenog modela aplikacije.
+
+Da bi se postiglo takvo pona\v sanje, neophodno je dinami\v cko upravljanje resursima i upravljanje ure\dj ajima. Moramo uvek imati dostupne informacije o resursima, konfiguraciju i zauzetosti \v cvorova~\cite{GubbiBMP13, WangZZWYW17}. Tradicionalni centri za obradu podataka predstavljaju dobro organizovan i povezan sistem. Sa druge strane, MDC-ovi se sastoje od razli\v itih ure\dj aja koji nisu~\cite{JiangCGZW19}. Ova ideja nas dovodi do problema sa kojim se bavi ova teza.
+
+EC i MDC modelima nedostaje jasna dinami\v cka organizacija geografski raspore\dj nenih \v cvorova, dobro definisan model mati\v cnih aplikacija i jasno razdvajanje nadle\v znosti. Kao takvi ne mogu se ponuditi kao usluga korisnicima. Obi\v cno postoje nezavisno jedni od drugih, rasuti bez me\dj usobne komunikacije, a nude ih pru\v zaoci usluga, koji korisnike uglavnom zaklju\v cavaju u sopstveni ekosistem. Grupisani \v cvorovi treba da budu organizovani lokalno, \v cine\'ci kompletan sistem i aplikacije dostupnijim i pouzdanijim, ali tako\dj e pro\v siruju\'ci resurse izvan pojedina\v cnog \v cvora ili male grupe \v cvorova, odr\v zavaju\'ci dobre performanse za izgradnju servera i klastera~\cite{ArocaG12}.
+
+Ovo pro\v sirenje ra\v cunarstva u oblaku produbljuje i ja\v ca na\v se razumevanje oblasti u celini. Razdvajanjem nadle\v znosti, modela mati\v cnih aplikacija i objedinjenem organizacije \v cvorova, idemo ka ideji EC-a kao usluge. Na osnovu ovih ideja, definišemo problem koji ova teza obra\dj uje kroz slede\'ca tri istra\v ziva\v cka pitanja:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]\label{rez:questions}
+	\item \textit{Da li mo\v zemo da organizujemo geografski distribuirane \v cvorove na sli\v can na\v cin kao ra\v cunarstvo u oblaku, adaptiran za razli\v cito okru\v zenje, sa jasnom podelim nadle\v znosti, i poznatim modelom razvoja aplikacija za korisnike?}
+	\item \textit{Da li mo\v zemo da ponudimo ovako organizovane \v cvorove kao uslugu programerima i istra\v ziva\v cima za budu\'caplikacije usmerene vi\v se ka ljudima, a zasnovane na poznatom modelu -- pay as you go?}
+	\item \textit{Da li mo\v zemo da napravimo model na takav na\v cin da je formalno ispravan, lak za pro\v sirivanje, razumevanje i obrazlo\v enje?}
+\end{enumerate}
+
+Ako su prethogna istra\v ziva\v cka pitanja potvrdna, onda takvo pro\v sirenje nalik na oblak \v cini \v citav sistem, ali i same aplikacije koje bi se izvr\v savale u njemu dostupnijim i pouzdanijim, ali tako\dj e pro\v siruje resurse van granica pojedina\v cnog \v cvora. Satianaraianan i saradnici u svom radu~\cite{SatyanarayananK19} pokazuju da MDC-ovi mogu poslu\v ziti kao za\v stitni zidovi, dok Simi \ 'c i saradnici, u svom radu~\cite {inproceedingsSimic1} koriste sli\v cnu ideju kao nivo obrade podatka na njihovom mestu nastanka -- izvoru. Istovremeno, korisnici dobijaju jedinstvenu mogu\'cnost dinami\v ckog i selektivnog upravljanja informacijama koje se \v salju u oblak. Godinama nakon svog osnivanja, EC vi\v se nije samo ideja~\cite {SatyanarayananK19}, ve\'cneophodan alat za nove aplikacije koje dolaze.
+
+Na osnovu prethodno definisanih istraživačkih pitanja i motivacije~\ref {rez:questions}, izvodimo hipoteze oko kojih se temelji teza, a koje se mo\v gu rezimirati na slede\'ci na\v cin:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textit{Organizovati \v cvorove na standardni na\v cin zasnovan na arhitekturi zasnovanu na ra\v cunarstvu u oblaku, prilago\dj en druga\v cijem geografski rasprostranjenim okruženju. Dati korisnicima mogu\'cnost da na najbolji mogu\'ci na\v cin organizuju \v cvorove po raznim geografskim oblastima kako bi opslu\v zivali samo lokalno stanovni\v stvo u neposrednoj blizini.}
+	\item \textit{Ponudite dobijeni model istra\v ziva\v cima i programerima da kreiraju nove aplikacije usmerene vi\v se ka ljudima. Ako nam je potrebno vi\v se resursa na jednoj strani, mo\v zemo uzeti odre\dj neu koli\v cinu resursa i premestiti na mesto gde su oni potrebni, ili ih organizovati na bilo koji drugi \v zeljeni na\v cin.}
+	\item \textit{Predstaviti jasnu podelu nadle\v znosti za budu\'ci sistem kao uslugu, i uspostaviti dobro organizovan sistem u kojem svaki deo ima intuitivnu i jasnu ulogu.}
+	\item \textit{Predstaviti objedinjeni model koji podr\v zava heterogene \v cvorove, sa jasnim setom tehni\v ckih zahteva koje budu\'ci \v cvorovi moraju ispuniti, ako \v zele da postanu deo sistema.}
+	\item \textit{Predstaviti jasan aplikativni model, kako bi korisnici mogli da iskoriste puni potencijal novonastale infrastrukture.}
+\end{enumerate}
+
+Iz prethodno definisanih hipoteza izvodimo primarne ciljeve ove teze, gde o\v cekivani rezultati uklju\v cuju:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textit{Konstrukcija modela sa jasnom podelom nadle\v znost, po ugledu na organizaciju ra\v cunarstva u oblaku, prilago\dj eno druga\v cijem okru\v zenju izvr\v savanja, sa jasnim aplikativnim modelom koji \'ce mo\'c i da iskoristi novu, adaptoranu arhitekturu. Ovo se odnosi na prvo istra\v ziva\v cko pitanje, a tema je poglavlja~\ref{chapter:Micro_clouds}.}
+	\item \textit{Definisani model je dostupniji, elasti\v can sa manje ka\v cnjenja u pore\dj enju sa pojedina\v cnim malim serverima, i kao takav se \v siroj javnosti mo\v ze ponuditi kao usluga, kao bilo koja druga usluga u oblaku. Ovo se odnosi na drugo istra\v ziva\v cko pitanje i tema je poglavlja~\ref{chapter:Micro_clouds}.}
+	\item \textit{Konstruisani model je dobro opisan formalno, koriste\'ci \v cvrstu matemati\v cku osnovu, ali tako\dj e i lako pro\v siriv i formalni i tehni\v cki, lak je za razumevanje i obrazlo\v zenje. Ovo se odnosi na tre\'ce istra\v ziva\v cko pitanje i tema je poglavlja~\ref{chapter:Micro_clouds}.}
+\end{enumerate}
+
+\noindent
+Teza je organizovana u pet poglavlja.
+
+\noindent
+\textbf{Poglavlje~\ref{chapter:Intro}}
+
+\noindent
+\textbf{Poglavlje~\ref{chapter:Review}}
+
+\noindent
+\textbf{Poglavlje~\ref{chapter:Micro_clouds}}
+
+\noindent
+\textbf{Poglavlje~\ref{chapter:Implementation}}
+
+\noindent
+\textbf{Poglavlje~\ref{chapter:Conclusion}}\\
+
 \noindent
 \textbf{Klju\v c re\v ci:} distributed systems, cloud computing, micro clouds, edge computing, platform, as a service model.

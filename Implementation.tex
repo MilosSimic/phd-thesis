@@ -85,7 +85,7 @@ The actor system will monitor these actors, so in order that any of them crush f
 
 Before daemon starts, the user needs to specify some parameters for proper configuration like: 
 
-\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}] \label{imp:features}
 	\item \textbf{identifier}, represent uniqe identifier of the node. When node is not part of some cluster this can be whatever user want. Once node is part of some cluster, identifier will be updated, and it is not advised to change it manually afterwords.
 	\item \textbf{name}, represent name of the node. This property also can be changed when node is part of the cluster, otherwise it can be whatever we want.
 	\item \textbf{labels}, represent the specific features of the node. Labels are used to query for free nodes, and there are no formal restriction of what they can or can not be. This property can be changed when node is part of some cluster. It is advised, that as a labels we put some specific features of the node that might be beneficial for user who is looking for nodes to create new cluster/s.
@@ -221,11 +221,27 @@ Framework described in previous section is put the the test. For ease of testing
 \noindent
 as test heterogenious nodes for creating clusters, regions, and topologies. 
 
+%
+%
+\subsection{Experiment}\label{sec:experiment}
+%
 Using Go tooling, we were able to build daemon service without changes and dissiminate on all nodes without problems.
 
 We have run tests on different configurations and different nodes clusters using these nodes. All nodes were connected on the network, and experiments were conducted in a controlled environment. Nodes that should be part of the same claster are connected on same network for easier experiments.
 
 Experimental research was realized in the laboratory of the Department of Informatics at the Faculty of Technical Sciences in Novi Sad. The laboratory of the Department of Informatics is equipped with adequate computer, communication and software equipment on which the set goals in this thesis can be fully realized.
+
+Our experiment started with separating nodes into groups of \textbf{three}. This number is chosen because in DS, an odd number is used in cases when we need to reach some agreement and we need major majority like consensus, for example. This is not important for purpose of this thesis, we could pick any number, membership protocol do not makes a difference if ther are three or four or eleven nodes in the cluster.
+
+After nodes are separated,, for every node we created configuration file setting up default parameters for every property node daemon requred~\ref{imp:features}. After all services are up and running and, we turned nodes on, and health-check protocol~\ref{sec:health_check_protocol} started at uprfront defined time, that we set and for test purposes it was $one-minute$ interval. Logs, resources and other node details are set to $fifteen-seconds$ interval, so between health-check intervals, daemon will collect resource informations  four times before sending it to the rest of the system.
+
+For convenient testing all nodes have same set of labels, and as labels we choose OS name, OS version, architecture version, node name and some basics detail about resources of the nodes.
+
+After some time, we were able to see all nodes registered in the system. When all nodes are sending health-check ping for some time and we have stable system, we issued a mutate operation creating clusters of nodes that are logicaly close ot each other, and we initiated cluster formation protocol~\ref{sec:cluster_formation_protocol}. After the protocol is done, we ended up with four clusters as we intended. We tried to initiate same command again to test idempotency check~\ref{sec:idempotency}, and we get message that clusters already exists.
+
+To increase capaticity, we extended clusters by creating new ones using $three clusters$ with $four-nodes$. We created new new mutate file, and initiate new mutate command. After some time, we saw that one cluster is down and that we now have $three clusters$ with $four-nodes$, as we intended. After successful creation of new clusters, we dleted down cluster.
+
+Last test was to test health-check protocol once again, we disconeted one random node from the power supply, and since that node ping was missing, the system was able to detected what node is $down$. This concluds our experiment.
 %
 %
 \section{Applications}\label{sec:app}
