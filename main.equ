@@ -1,13 +1,17 @@
 \contentsline {myequations}{\numberline {1.1}Availability percentage formula}{8}{equation.1.2.1}% 
 \contentsline {myequations}{\numberline {1.2}Availability class formula}{9}{equation.1.2.2}% 
-\contentsline {myequations}{\numberline {1.2}Commutative formula}{9}{Item.27}% 
-\contentsline {myequations}{\numberline {1.2}Associative formula}{9}{Item.27}% 
-\contentsline {myequations}{\numberline {1.2}Idempotent formula}{10}{Item.27}% 
+\contentsline {myequations}{\numberline {1.2}Commutative formula}{9}{Item.35}% 
+\contentsline {myequations}{\numberline {1.2}Associative formula}{9}{Item.35}% 
+\contentsline {myequations}{\numberline {1.2}Idempotent formula}{10}{Item.35}% 
 \contentsline {myequations}{\numberline {1.3}Idempotency law formula}{25}{equation.1.3.3}% 
-\contentsline {myequations}{\numberline {3.0}Global type construction}{64}{subsection.3.6.1}% 
+\contentsline {myequations}{\numberline {3.0}Global type construction}{65}{subsection.3.6.1}% 
 \contentsline {myequations}{\numberline {3.0}Local type representation syntax}{65}{subsection.3.6.1}% 
-\contentsline {myequations}{\numberline {3.0}Health-check global protocol}{69}{definition.3.6.3}% 
-\contentsline {myequations}{\numberline {3.0}Global type $\ensuremath {{\sf G}}_1$ projection onto participants}{69}{definition.3.6.3}% 
-\contentsline {myequations}{\numberline {3.3}Server selector}{73}{equation.3.6.3}% 
-\contentsline {myequations}{\numberline {3.3}Cluster formation global protocol}{75}{Item.82}% 
-\contentsline {myequations}{\numberline {3.3}Global type $\ensuremath {{\sf G}}_2$ projections onto the participants}{77}{Item.84}% 
+\contentsline {myequations}{\numberline {3.0}Health-check global protocol.}{70}{definition.3.6.3}% 
+\contentsline {myequations}{\numberline {3.0}Health-check global protocol projection.}{70}{definition.3.6.3}% 
+\contentsline {myequations}{\numberline {3.3}Server selector}{74}{equation.3.6.3}% 
+\contentsline {myequations}{\numberline {3.3}Cluster formation global protocol.}{76}{Item.99}% 
+\contentsline {myequations}{\numberline {3.3}Cluster formation global protocol projection.}{78}{Item.101}% 
+\contentsline {myequations}{\numberline {3.3}Idempotency check global protocol.}{83}{Item.113}% 
+\contentsline {myequations}{\numberline {3.3}Idempotency check global protocol projection.}{84}{Item.115}% 
+\contentsline {myequations}{\numberline {3.3}List detail global protocol.}{87}{algocf.6}% 
+\contentsline {myequations}{\numberline {3.3}List detail global protocol projection.}{87}{algocf.6}% 

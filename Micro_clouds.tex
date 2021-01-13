@@ -79,9 +79,9 @@ To describe physical services, Jin et al.~\cite{JinCJL14} proposes three core co
 
 SoC is a vital part of any system, especially if creating a platform to offer as a service. We based our SoC model for ECC as a service on these concepts, with adaptations for our use case, separated in three layers depicted in Figure~\ref{fig:fig10}. 
 
-The first or bottom layer consists of various devices, and these devices are data creators and services consumers. 
+The first or bottom layer consists of various devices, and these devices represents \textit{data creators} and \textit{services consumers}. 
 
-The second layer represents resources. Resources have a spatial feature and indicate the range of their hosting devices~\cite{JinCJL14}. Developers at any time must know the resource utilization and spread, as well as application's state and health.~\label{soc:resources}
+The second layer represents resources. Resources have a spatial features, and they indicate the range of their hosting devices~\cite{JinCJL14}. Developers at any time must know topology, the resource utilization and spread, as well as application's state and health.~\label{soc:resources}
 
 Resources represent EC nodes, and to be part of the system, a node must satisfy four simple rules:
 
@@ -123,23 +123,36 @@ Traditional DCs and CC propose specially designed cloud-native applications~\cit
 Applications may be split in front and back processing services. Front processing service is an edge-native application running inside micro cloud to minimize latency, while the back service runs in traditional cloid as a cloud-native application to leverage greater resources. 
 
 These edge-native applications will handle user requests coming to nearby MDCs, and communicate to cloud-native applications when needed. Separation like that gives developers better flexibility and large design space. 
+%
+%
+\subsection{Execution models}\label{sec:execution_models}
+%
+Frontend services model should be packed in some standard way~\ref{sec:virtualization_techniques} and deployed in the wild, as an event-driven applications, with the subscription policy to message streams using topics~\cite{inproceedingsBeck}. The processing strategy is in the developer's hands, depending on the nature of the use-case. 
 
-Frontend services model should be event-driven, with a subscription policy to message streams using topics~\cite{inproceedingsBeck}. The processing strategy is in the developer's hands, depending on the nature of the use-case. 
-
-Some examples may include:
+If an services are subscribed to some stream or topic, it is naturally that events apear in their stream. There are basically two strategies for building a large-scale time-ordered event system:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{events} that notify users if some value is above or below some defined threshold 
-	\item \textbf{stream} or processing data as it comes to the system 
-	\item \textbf{batch} does processing in predefined times over some bigger collection of data 
-	\item \textbf{other}, something that falls outside these models, or it is composition of multiple operations at once. This type should get events from some topic as they arrive, and user can define his own strategy what it needs to be done and how it needs to be pcessed. Usec can contact other existing services, and user is responsabile for optimization.
+	\item \textbf{Fan out on write}, with this strategy every service has some form of inbox, and when event apear for some topic, that data is copied to every service that is subscribed. With this options, deads are fast, but writes are not because the more followers to the topic the longer it takes to persist all updates. 
+	\item \textbf{Fan in on read}, with this strategy every topic have a sort of outbox where it can store data. When services read their streams, the system will read the recent data from the outboxese. Writes are fast, and used storage is minimal, but reads are difficult because to do this properly on request-response deadline is not a trivial task to do.
 \end{enumerate}
 
-These types of applications could be implemented in may ways like those disccused in~\ref{sec:microservices}, or some adapted variant of those models.
+\noindent 
+to implemente those ideas withoout comlicated synchronization CRDTs could be used~\ref{crdts}, as companies like Soundcloud laready are using them for the same or similar tasks.
 
-Section~\ref{sec:packaging} argue about how applications could be packed and deployed in the wild.
+Some examples of applications may include:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{events} that notify users if some value is above or below some defined threshold; 
+	\item \textbf{stream} or processing data as it comes to the system;
+	\item \textbf{batch} does processing in predefined times over some bigger collection of data ;
+	\item \textbf{daemons} or processing that are doing some tasks or executions in the backgound without explicit user intervention, usually they their execution could be time defined but it is not mandatory;
+	\item \textbf{services} or applications that would operate over standard request-response model or some variantion of that protocol;
+	\item \textbf{other}, something that falls outside these models, or it is composition of multiple operations at once. This type should get events from some topic as they arrive, and user can define his own strategy what it needs to be done and how it needs to be pcessed. Usec can contact other existing services, and user is responsabile for optimization;
+\end{enumerate}
+
+These types of applications could be implemented in may ways like those disccused in~\ref{sec:microservices}, or some adapted variant of those models, and should have clear communicatoin interface offered to users or applications and other services.
 %
-\subsection{Packaging}\label{sec:packaging}
+\subsection{Packaging options}\label{sec:packaging}
 %
 Because their nature, micro clouds could be most likley composed of ARM devices. These devices in many cases are not able to run full VMs because their hardware restrictions. In recent years there are advances in VMs technology and their ability to run VMs on ARM devices. In~\cite{Ding12armvisor} Ding et al. show such possibility to run VMs on ARM devices.
 
@@ -189,10 +202,10 @@ Unfortunately, becasue of their nature DS cannot always be formally described by
 Infrastructure deployment will not happen until the process is trivial \cite{SatyanarayananBCD09}, hence the key is to simplify ECC management. The main problem is that going to every node is tedious and time consuming, especially in a geo-distributed environment. In such complex environemnt, formal models are of great help if we can model and prove that protocols that system reyls on are correct. The system we propose tackles this issue using remote configuration and it relies on four formaly modeled protocols: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{health-check} protocol informs the system about state of every node 
-	\item \textbf{cluster formation} protocol forms new clusters dinamicaly
-	\item \textbf{idempotency check} protocol for preventing creating existing infrastructure
-	\item \textbf{list detail} protocol shows the current state of the system to the user
+	\item \textbf{health-check} protocol informs the system about state of every node (cf. Section~\ref{sec:health_check_protocol})
+	\item \textbf{cluster formation} protocol forms new clusters dinamicaly (cf. Section~\ref{sec:cluster_formation_protocol})
+	\item \textbf{idempotency check} protocol for preventing creating existing infrastructure (cf. Section~\ref{sec:idempotency_protocol})
+	\item \textbf{list detail} protocol shows the current state of the system to the user (cf. Section~\ref{sec:list_detail_protocol})
 \end{enumerate}
 
 These three protocols are base of the geo-distribued Infrastructure deployment.
@@ -397,7 +410,7 @@ and then also connects $\mathtt{log}$ with the same message,
 \mathtt{nodes}\twoheadrightarrow \mathtt{log}{:}\mathit{free}(\T_2).\tend
 \end{array} \right.
 \end{align*}
-\myequations{Health-check global protocol}
+\myequations{Health-check global protocol.}
 
 Notice that in $\G_1$ we indeed have a choice of $\mathtt{nodes}$ sending either to $\mathtt{state}$ or to $\mathtt{log}$. Such communication pattern could not be directly modeled using standard MPST approaches. 
 Also, notice that $\mathtt{state}$ will be introduced into the session only when receiving from $\mathtt{nodes}$. 
@@ -431,7 +444,7 @@ Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, 
 \mathtt{nodes}{??}\mathit{free}(\T_2).\tend
 \end{array} \right.
 \end{align*}
-\myequations{Global type $\G_1$ projection onto participants}
+\myequations{Health-check global protocol projection.}
 
 where, for instance, type $\ST_\mathtt{nodes}$ specifies $\mathtt{nodes}$ can receive the ping message from $\mathtt{node}$, after which it will dynamically introduce either $\mathtt{state}$ or $\mathtt{log}$ into the session, where in the former case it also connects $\mathtt{log}$ (but now with message $\mathit{free}$). 
 %
@@ -591,7 +604,7 @@ The third branch is the only one in which protocol loops. Also, notice that $\ma
 \mathtt{user}\to\mathtt{state}{:} \mathit{query}(\T_1).\mathtt{state}\to\mathtt{nodes}{:}\mathit{query}(\T_1).\ty
 \end{array} \right.
 \end{align*}
-\myequations{Cluster formation global protocol}
+\myequations{Cluster formation global protocol.}
 
 The mutate protocol $\G'$, activated in the first branch in $\G_1$, starts with $\mathtt{user}$ sending 
 $\mathtt{create}$ message to $\mathtt{state}$, specifying also informations about new user desired state typed with $\T_3$, 
@@ -714,12 +727,220 @@ where
 \mathtt{pool}{!!}\mathit{update}(\T_6).
 \mathtt{pool}{?}\mathit{ok}().\tend
 \end{align*}
-\myequations{Global type $\G_2$ projections onto the participants}
+\myequations{Cluster formation global protocol projection.}
 
 For instance, type $\ST_\mathtt{sched}$ specifies that participant $\mathtt{sched}$ gets included in the session only after receiving from $\mathtt{state}$ message $\mathit{ids}$, then $\mathtt{sched}$ connects $\mathtt{pool}$ with $\mathit{update}$ message, after which expects to receive $\mathit{ok}$ message and finally terminates. 
 
 We remark global type $\G_2$ could also be modeled directly using standard MPST models (such as~\cite{HondaYC08}). However, in such models the projection of $G_2$ onto, for instance, participant $\mathtt{sched}$ would be undefined (cf.~\cite{HuY17}).
 Since we follow the approach of~\cite{HuY17} with explicit connections, projection of $\G_2$ onto $\mathtt{sched}$ is indeed defined as $\ST_\mathtt{sched}$.
+%
+%
+\subsection{Idempotency check protocol}\label{sec:idempotency_protocol}
+%
+Mutate operation should be atomic, immutable and idempotent. User can specify the same topology details, but in different order. We must ensure that new cluster formation protocol should \textbf{not} be initiated, if user change order of regions, clusters, nodes or labels in one or more node/s. If mutate operation fails, for whatever possible reason but infrastructure is created, or same infrastructure already exists, user can get message that infrastructure is formed. If user change the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start new protocol.
+
+But since we have different scenario then standard write to storage, and we do not specify steps how operations should be done, to implement idempotance correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
+
+Idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represebted as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in the two ways:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
+	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
+\end{enumerate}
+
+If we have cached idempotency data for user request, and if he tries to send same request we can test idempotency using set operation \textbf{intersection}.
+
+\begin{definition}\label{def:intersection_idempotent}
+	Intersection of two sets $x$ and $y$ $x \cap y$ is an idempotent operation, becasue $x \cap x$ is always equal to $x$. This means that the idempotency law~\ref{form:idempotency_law} $\forall x, x \cap x = x$ is always $true$.
+\end{definition}
+
+If we have stored user request on cluster formation protocol, and we receive new request with the same name, \textbf{than} we can take intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise request represents the new action, and new cluster formation protocol. 
+
+We can make this test a litle bit faster. If we first test does the same topology name is already present in idempotency store, that lookup will spare us of unnecessary comperiosson on sets.
+We can go little bit further, and use CRDTs and SEC to store and replicate deta on copies of the services that are required for idempotency test.
+
+Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{images/Figure13}
+	\end{center}
+	\vspace{-0.7cm}
+	\caption{Low level view of idempotency check communication.}
+	\label{fig:fig13}
+\end{figure}
+
+The participants follow the communication that we now describe informally: \label{informal_description_idempotency}
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{User} sends a list request to State service (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{State service} service that is wrapper aroud system main storage. Interacts with main storage in oreder to create new topologies, regions or clusters, or to get data from main storages about same entities.
+	\item \textbf{Idempotency storage} contains idempotent set for all \textbf{already} formed topologies, regions and clusters.
+	\item \textbf{Main storage} contains records about desired state for all formed topologies, regions and clusters.
+	\item \textbf{Log} contains records of operations. Users can query this service to see if their tasks are finished or have any problems (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Nodes} accept messages from State. If possible, it will reserve desired nodes, otherwise it will send an error message to Log service. On a health-check message, if a node is used in some cluster, it will inform that the node is alive (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Scheduler} waits for a message sent from State, and pushes clus- ter formation messages to desired nodes (same as~\ref{sec:cluster_formation_protocol});
+\end{enumerate}
+
+When testing is request idempotent we must have in mind that stored structure could be $(1)$ \textbf{flat keyspace} and \textbf{$(2)$ hierarhical keyspace} both options are valid as log as \textbf{structure is idempotent} and we can do \textbf{idempotent operation} over that structure. For example $set$ as a data structure and $intersection$ are good candidates. Algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
+
+\begin{algorithm}[H]
+	\SetKwFunction{idempotent}{idempotent}
+	\SetKwProg{Fn}{function}{:}{}
+	\Fn{\idempotent{$stored$, $topology$}}{
+		\ForEach{data $\in$ topology}{
+			\If{isNotSet(data)}{
+				\uIf{stored.intersection(data) = stored}{
+					\KwRet{true}
+				}
+				\KwRet{false}
+			}
+			\Else{\idempotent{$stored, data$}}
+		}
+	}
+	
+	\SetAlgoLined
+	\SetKwInOut{Input}{input}
+	\Input{request}
+	id $\leftarrow$ seenBefore(request.payload.name)\\
+	\uIf{id = null}{
+		return true;
+	}\Else{
+		stored $\leftarrow$ storage.findRequest(id)\\
+		topology $\leftarrow$ request.payload.topology\\
+		\KwRet{\idempotent{$stored, topology$}}
+	}
+	\caption{Mutate idempotency check}
+	\label{alg:alg6}
+\end{algorithm}
+
+Next we present a formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17}. The global protocol $\G_3$ (given bellow) conforms the informal description given at page~\pageref{informal_description_idempotency}. At this point, the $\mathtt{user}$ can choose one of two possible messages: 
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+\item $\mathit{quit}$, in which case the protocol terminates; or, 
+\item $\mathit{mutate}$, and the mutation process, described with global protocol $\G'$, starts;
+\end{enumerate}
+
+\begin{align*}
+\G_3 & = 
+\left\{
+\begin{array}{@{}l@{}}  
+\mathtt{user}\to\mathtt{service}{:} \mathit{quit}().\tend\\
+\mathtt{user} \to \mathtt{service}{:}\mathit{create}(\T_3).
+\mathtt{state} \to \mathtt{user}{:}\mathit{ok}().\G'
+\end{array} \right.
+\end{align*}
+\myequations{Idempotency check global protocol.}
+
+The mutate protocol $\G'$, activated in the first branch in $\G_3$, starts with $\mathtt{user}$ sending 
+$\mathtt{create}$ message to $\mathtt{state}$, specifying also informations about new user desired state typed with $\T_3$, 
+and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same as cluster formation protocol (cf. section~\ref{cluster_formation_informal_description}). Now we start specific communication protocol for idempotency check so $\mathtt{service}$ sends payload $T_3$ to $\mathtt{istorage}$ to test is this request $seen$ before. The $\mathtt{istorage}$ responds with payload $T_6$ to $\mathtt{service}$, and based on $Boolean$ response $\mathtt{service}$ can do one of two things:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+\item $\mathtt{service}$ sends message to $\mathtt{log}$ and this process terminates; or,
+\item $\mathtt{service}$ sends $\mathit{ids}$ of the nodes to be reserved (specified in the payload typed with $\T_4$) to $\mathtt{nodes}$;
+\end{enumerate}
+
+\noindent
+same as cluster formatoin protocol (cf. section~\ref{cluster_formation_informal_description}). For simplification, we can assume that all nodes are reserved, and now idempotency data store global protocol $\G''$, starts;
+
+\begin{align*}
+G' & = 
+\mathtt{service} \twoheadrightarrow \mathtt{istorage}{:}\mathit{try}(\T_3).
+\mathtt{istorage} \to \mathtt{service}{:}\mathit{resp}(Boolean).\\
+& \hspace{4mm}
+\left\{
+\begin{array}{@{}l@{}}
+\mathtt{service}\to\mathtt{log}{:} \mathit{done}(\mathsf{String}).\tend\\
+\mathtt{service}\to\mathtt{nodes}{:}\mathit{ids}(\T_4).
+\mathtt{nodes}\to \mathtt{state}{:}\mathit{rsrvd}().\G''
+\end{array} \right.
+\end{align*}
+
+The idempotency store protocol $\G''$, starts with $\mathtt{service}$ sending mutation payload $T_3$ to $\mathtt{mstorage}$. Then $\mathtt{mstorage}$ sends same payload to $\mathtt{istorage}$. When data is saved for future testing, $\mathtt{istorage}$ respond back to $\mathtt{mstorage}$, and finally $\mathtt{mstorage}$ respond back to $\mathtt{service}$. At this poing user payload $T_3$ is stored in both main storage and idempotency storage for future testing. Protocol continue with $\mathtt{state}$ connects $\mathtt{sched}$ (Scheduler) with message $\mathit{ids}$ and the payload that contains other data imported for mutation to be completed (typed with $\T_5$), and the rest of cluster formation protocol may continue.
+
+\begin{align*}
+\G'' = & 
+\mathtt{service} \to \mathtt{mstorage}{:}\mathit{store}(\T_3).
+\mathtt{mstorage} \to \mathtt{istorage}{:}\mathit{save}(\T_3).\\
+& \hspace{4mm}
+\mathtt{istorage} \to \mathtt{mstorage}{:}\mathit{saved}().
+\mathtt{mstorage} \to \mathtt{service}{:}\mathit{stored}().\\
+& \hspace{4mm}
+\mathtt{service} \to \mathtt{sched}{:}\mathit{ids}(\T_5).\tend
+\end{align*}
+
+We may now obtain the projections of global type $\G_3$ onto the participants $\mathtt{user}, \mathtt{service}, \mathtt{istorage}$, $\mathtt{mstorage}$, $\mathtt{log}$, $\mathtt{nodes}$: and $\mathtt{sched}$:
+
+\begin{align*}
+\hspace{-4mm}
+\ST_\mathsf{user} = &
+{+}
+\left\{
+\begin{array}{@{}l@{}}
+\mathtt{service}{!}\mathit{mutate}().\mathtt{service}{!}\mathit{create}(\T_3).\mathtt{service}{?}\mathit{ok}().\tend\\
+\mathtt{service}{!}\mathit{quit}().\tend\\
+\end{array} \right.\\
+%\end{align*}
+%
+%\begin{align*}
+\hspace{-4mm}
+\ST_\mathsf{service} = &
+{+}
+\left\{
+\begin{array}{@{}l@{}}
+\mathtt{user}{?}\mathit{mutate}().\mathtt{user}{?}\mathit{create}(\T_3).\mathtt{user}{!}\mathit{ok}().\ST'\\
+\mathtt{user}{?}\mathit{quit}().\tend \\
+\end{array} \right.
+\end{align*}
+where
+\begin{align*}
+\hspace{20mm}
+\ST' = &
+\mathtt{istorage}{!}\mathit{try}(\T_3).\mathtt{istorage}{?}\mathit{resp}(Boolean).\\
+&
+{+}
+\left\{
+\begin{array}{@{}l@{}}
+\mathtt{nodes}{!}\mathit{ids}(\T_4).\mathtt{nodes}{?}\mathit{rsrvd}().\ST''\\
+\mathtt{log}{!}\mathit{done}().\tend\\
+\end{array} \right.\\
+%\end{align*}
+%
+%\begin{align*}
+\hspace{-8mm}
+\ST'' = & 
+\mathtt{mstorage}{!}\mathit{store}(\T_3).\mathtt{mstorage}{?}\mathit{saved}().\\ & \hspace{-8mm}
+\mathtt{sched}{!}\mathit{ids}(\T_5).\tend\\
+%\end{align*}
+%
+%\begin{align*}
+\hspace{-8mm}
+\ST_\mathtt{mstorage} =  & \hspace{2mm}
+\mathtt{service}{?}\mathit{store}(\T_3).\mathtt{istorage}{!}\mathit{store}(\T_3).\\ & \hspace{-8mm}
+.\mathtt{istorage}{?}\mathit{saved}().\mathtt{service}{!}\mathit{stored}().\tend\\
+%\end{align*}
+%
+%\begin{align*}
+\hspace{-8mm}
+\ST_\mathtt{istorage} =  &
+\mathtt{service}{?}\mathit{try}(\T_3).\mathtt{service}{!}\mathit{resp}(Boolean).\\ & \hspace{-8mm}
+\mathtt{mstorage}{!}\mathit{store}(\T_3).\mathtt{mstorage}{!}\mathit{saved}()\\
+%\end{align*}
+%
+%\begin{align*}
+\hspace{-8mm}
+\ST_\mathtt{log} =  &
+\mathtt{iservice}{?}\mathit{done}(\T_3).\tend\\
+%\end{align*}
+%
+%\begin{align*}
+\ST_\mathtt{nodes} =  &
+\mathtt{service}{?}\mathit{ids}(\T_4).\mathtt{service}{!}\mathit{rsrvd}().\tend\\
+\end{align*}
+\myequations{Idempotency check global protocol projection.}
+
+Similarly as for $\G_2$ we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
 %
 %
 \subsection{List detail protocol}\label{sec:list_detail_protocol}
@@ -775,17 +996,18 @@ Algorithm \ref{alg:alg5} describes steps after the state receives a list message
 \end{algorithm}
 
 Next we present a formal description of the list communication protocol (cf. Figure \ref{fig:fig4}) by using~\cite{HuY17}.
-Global type $\G_3$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
+Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
 $(1)$ $\mathit{list}$, specifying a request for a detailed view, where sort $\T_1$ identifies which parts of the system user wants to view in details, after which $\mathtt{state}$ connects $\mathtt{nodes}$ with $\mathit{query}$ message, with a payload of sort $\T_2$  containing specification of which nodes need to show their metrics data, and then protocol proceeds as prescribed with $\G'$; 
 $(2)$ $\mathit{list^*}$, specifies no need for a detailed view is specified, where a payload of sort $\T_4$ denotes user specified parts of the system the user wants to view, but without greater details. In the latter case protocol follows global type $\G''$.
 \begin{align*}
-\G_3 &= 
+\G_4 &= 
 \left\{
 \begin{array}{@{}l@{}}  
 \mathtt{user} \twoheadrightarrow \mathtt{state}{:}\mathit{list}(\T_1).\mathtt{state}\twoheadrightarrow\mathtt{nodes}{:}\mathit{query}(\T_2). \G' \\
 \mathtt{user} \twoheadrightarrow \mathtt{state}{:}\mathit{list^*}(\T_4).\G''
 \end{array} \right.
 \end{align*}
+\myequations{List detail global protocol.}
 
 Global type $\G'$ starts with $\mathtt{nodes}$ replying to $\mathtt{state}$ $\mathit{result}$ message and a payload identifying parts of the system user wants to see in greater detail typed with $\T_3$. Then, $\mathtt{state}$ connects $\mathtt{log}$ with $\mathtt{details}$ and also sends $\mathtt{result}$ to $\mathtt{user}$, and finally terminates. 
 In $\G''$, $\mathtt{state}$ also connects $\mathtt{log}$ with $\mathit{brief}$ and a payload typed with $\T_5$ identifying parts of the system user wants to see without greater detail. Then, $\mathtt{state}$ replies to $\mathtt{user}$ with $\mathtt{result}$ message, and the protocol terminates.
@@ -798,7 +1020,7 @@ In $\G''$, $\mathtt{state}$ also connects $\mathtt{log}$ with $\mathit{brief}$ a
 \mathtt{state}\twoheadrightarrow \mathtt{log}{:}\mathit{brief}(\T_5).\mathtt{state}\to\mathtt{user}{:}\mathit{result}(\T_5).\tend
 \end{align*}
 
-Same as for the health-check and the cluster formation protocols, here we also present the projections of global type $\G_3$, modeling the list protocol, onto participants $\mathtt{user}$, $\mathtt{state}$, $\mathtt{nodes}$, and $\mathtt{log}$:
+Same as for the health-check and the cluster formation protocols, here we also present the projections of global type $\G_4$, modeling the list protocol, onto participants $\mathtt{user}$, $\mathtt{state}$, $\mathtt{nodes}$, and $\mathtt{log}$:
 \begin{align*}
 \ST_\mathtt{user} =& 
 {+}
@@ -836,126 +1058,11 @@ where
 \mathtt{state}{??}\mathit{brief}(\T_5).\tend \\
 \end{array} \right.
 \end{align*}
+\myequations{List detail global protocol projection.}
 
 For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in the session only after receiving from $\mathtt{state}$, either message $\mathit{detail}$, or message $\mathit{brief}$, and then terminates. 
 
-Similarly as for $\G_2$, we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
-%
-%
-\subsection{Idempotency}\label{sec:idempotency}
-%
-Mutate operation should be atomic, immutable and idempotent. User can specify the same topology details, but in different order. We must ensure that new cluster formation protocol should \textbf{not} be initiated, if user change order of regions, clusters, nodes or labels in one or more node/s. If mutate operation fails, for whatever possible reason but infrastructure is created, or same infrastructure already exists, user can get message that infrastructure is formed. If user change the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start new protocol.
-
-But since we have different scenario then standard write to storage, and we do not specify steps how operations should be done, to implement idempotance correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
-
-Idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represebted as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in the two ways:
-
-\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
-	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
-\end{enumerate}
-
-If we have cached idempotency data for user request, and if he tries to send same request we can test idempotency using set operation \textbf{intersection}.
-
-\begin{definition}\label{def:intersection_idempotent}
-	Intersection of two sets $x$ and $y$ $x \cap y$ is an idempotent operation, becasue $x \cap x$ is always equal to $x$. This means that the idempotency law~\ref{form:idempotency_law} $\forall x, x \cap x = x$ is always $true$.
-\end{definition}
-
-If we have stored user request on cluster formation protocol, and we receive new request with the same name, \textbf{than} we can take intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise request represents the new action, and new cluster formation protocol. 
-
-We can make this test a litle bit faster. If we first test does the same topology name is already present in idempotency store, that lookup will spare us of unnecessary comperiosson on sets.
-We can go little bit further, and use CRDTs and SEC to store and replicate deta on copies of the services that are required for idempotency test.
-
-Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
-
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[scale=0.7]{images/Figure13}
-	\end{center}
-	\vspace{-0.7cm}
-	\caption{Low level view of idempotency check communication.}
-	\label{fig:fig13}
-\end{figure}
-
-The participants follow the communication that we now describe informally:
-\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{User} sends a list request to State service (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{State service} service that is wrapper aroud system main storage. Interacts with main storage in oreder to create new topologies, regions or clusters, or to get data from main storages about same entities.
-	\item \textbf{Idempotency storage} contains idempotent set for all \textbf{already} formed topologies, regions and clusters.
-	\item \textbf{Main storage} contains records about desired state for all formed topologies, regions and clusters.
-	\item \textbf{Log} contains records of operations. Users can query this service to see if their tasks are finished or have any problems (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Nodes} accept messages from State. If possible, it will reserve desired nodes, otherwise it will send an error message to Log service. On a health-check message, if a node is used in some cluster, it will inform that the node is alive (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Scheduler} waits for a message sent from State, and pushes clus- ter formation messages to desired nodes (same as~\ref{sec:cluster_formation_protocol});
-\end{enumerate}
-
-When testing is request idempotent we must have in mind that stored structure could be $(1)$ flat keyspace and $(2)$ hierarhical keyspace both options are valid as log as structure is idempotent. Algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
-
-\begin{algorithm}[H]
-	\SetKwFunction{idempotent}{idempotent}
-	\SetKwProg{Fn}{function}{:}{}
-	\Fn{\idempotent{$stored$, $topology$}}{
-		\ForEach{data $\in$ topology}{
-			\If{isNotSet(data)}{
-				\uIf{stored.intersection(data) = stored}{
-					\KwRet{true}
-				}
-				\KwRet{false}
-			}
-			\Else{\idempotent{$stored, data$}}
-		}
-	}
-	
-	\SetAlgoLined
-	\SetKwInOut{Input}{input}
-	\Input{request}
-	id $\leftarrow$ seenBefore(request.payload.name)\\
-	\uIf{id = null}{
-		return true;
-	}\Else{
-		stored $\leftarrow$ storage.findRequest(id)\\
-		topology $\leftarrow$ request.payload.topology\\
-		\KwRet{\idempotent{$stored, topology$}}
-	}
-	\caption{Mutate idempotency check}
-	\label{alg:alg6}
-\end{algorithm}
-
-Next we present a formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17}.
-
-\begin{align*}
-\G_4 & = 
-\left\{
-\begin{array}{@{}l@{}}  
-\mathtt{user}\to\mathtt{state}{:} \mathit{quit}().\tend\\
-\mathtt{user} \to \mathtt{state}{:}\mathit{create}(\T_3).
-\mathtt{state} \to \mathtt{user}{:}\mathit{ok}().\G'
-\end{array} \right.
-\end{align*}
-
-\begin{align*}
-G' & = 
-\mathtt{service} \to \mathtt{istorage}{:}\mathit{try}(\T_3).
-\mathtt{istorage} \to \mathtt{service}{:}\mathit{resp}().\\
-& \hspace{4mm}
-\left\{
-\begin{array}{@{}l@{}}
-	\mathtt{state}\to\mathtt{log}{:} \mathit{done}(\mathsf{String}).\tend\\
-	\mathtt{state}\to\mathtt{nodes}{:}\mathit{ids}(\T_4).
-	\mathtt{nodes}\to \mathtt{state}{:}\mathit{rsrvd}().\G''
-\end{array} \right.
-\end{align*}
-
-\begin{align*}
-\G'' = & 
-\mathtt{service} \to \mathtt{mstorage}{:}\mathit{store}(\T_3).
-\mathtt{mstorage} \to \mathtt{istorage}{:}\mathit{save}(\T_3).\\
-& \hspace{4mm}
-\mathtt{istorage} \to \mathtt{mstorage}{:}\mathit{saved}().
-\mathtt{mstorage} \to \mathtt{service}{:}\mathit{stored}().\\
-& \hspace{4mm}
-\mathtt{service} \to \mathtt{sched}{:}\mathit{ids}(\T_5).\tend
-\end{align*}
+Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
 %
 %
 \section{Repercussion}\label{sec:repercussion}

@@ -147,7 +147,7 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 	\item \textbf{P}artition tolerance, which means that the cluster must continue to work despite any number of communication breakdowns between nodes in the system. It is important to state that in a distributed system, partitions can’t be avoided.
 \end{enumerate}
 
-Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems by only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be:
+Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems by only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be: \label{crdts}
 
 \begin{itemize}
 	\item \textbf{Commutative} $a*b = b*a$ \myequations{Commutative formula}
@@ -245,7 +245,7 @@ CC is giving a user an illusion that he is using single machine, while the backg
 %
 \subsection{Peer-to-peer networks}\label{sec:p2p_networks}
 %
-Peer-to-peer (P2P) communication is a networking architecture model that partitions tasks or workloads between peers~\cite{Schollmeier01}. All peers are created equally in the system, and there is no such thing as a node that is more important then others. Every Peer have a portion system resources, such as processing power, disk storage or network bandwidth, directly available to other network participants, without the need for central coordination by servers or stable hosts~\cite{Schollmeier01}. P2P nodes are connected and share resources without going through a separate server computer that is responsabile for routing. Figure~\ref{fig:fig2} show difference in network topology between P2P networks and client-server architecture.
+Peer-to-peer (P2P) communication is a networking architecture model that partitions tasks or workloads between peers~\cite{Schollmeier01}. All peers are created equally in the system, and there is no such thing as a node that is more important then others. Every Peer have a portion system resources, such as processing power, disk storage or network bandwidth, directly available to other network participants, without the need for central coordination by servers or stable hosts~\cite{Schollmeier01}. P2P nodes are connected and share resources without going through a separate server computer that is responsabile for routing. Figure~\ref{fig:fig2} show difference in network topology between P2P networks $(left)$ and client-server architecture $(right)$.
 
 \begin{figure}[H]
 	\begin{center}
@@ -306,7 +306,8 @@ To resolve this problem, Das et al.~\cite{DasGM02} introduced \textbf{S}calable 
 	\label{fig:fig15}
 \end{figure}
 
-Over the years, reserchers foud ways to improve the protocol, and there are other implementations to fine tune the SWIM, but base idea is still there.
+Over the years, reserchers foud ways to improve the protocol for example Dadgar et al. present Lifeguard protocol~\cite{DadgarPC18} for more
+acccurate failure detection, and there are other implementations to fine tune the SWIM, but base idea is still there. Today SWIM or SWIM-like protocols are standard membership procol whenever we are doing some node clustering.
 %
 %
 \subsection{Mobile computing}\label{sec:mobile_computing}
@@ -473,7 +474,9 @@ In this section we are going to shortly describe models that are similar to the 
 %
 \subsection{Parallel computing}\label{sec:parallel_computing}
 %
-DC and parallel computing seems like models that are the same, and that may share some features like simultaneously executing a set of computations in parallel. Broadly speaking, this is not far from the truth~\cite{Vera16}. But distinguished between the two can be presented as follows: in parallel computing all processor units have acces to the shared memory and have some way of the faster inter-process communication, while in DS and DC all processors have their own memory on their own machine and communicate over network to other nodes which is significantly slower. 
+DC and parallel computing seems like models that are the same, and that may share some features like simultaneously executing a set of computations in parallel. Broadly speaking, this is not far from the truth~\cite{Vera16}. 
+
+Distinguished between the two can be presented as follows: in parallel computing all processor units have acces to the shared memory and have some way of the faster inter-process communication, while in DS and DC all processors have their own memory on their own machine and communicate over network to other nodes which is significantly slower. 
 
 These models are similar, but they are not indentical, and the kind of problems they are designed to work on are different. Figure~\ref{fig:fig4} visually summarize the architectural  differences between DC $(up)$ and parallel computing $(down)$.
 
@@ -644,22 +647,22 @@ This cloud-like extension makes the whole system and applications more available
 %
 \section{Research Hypotheses, and Goals}\label{sec:research_hyphotesis_and_golas}
 %
-Based on reserach questions and motivation presented in~\ref{sec:problem_statement}, we derive the hypothesis around which the thesis is based. It can be summarized as follows:
+Based on reserach questions and motivation presented in~\ref{sec:problem_statement}, we derive the hypotheses around which the thesis is based. It can be summarized as follows:
 
-\begin{itemize}
-	\item Organize EC nodes in a standard way based on cloud architecture, with adaptation for an EC geo-distributed environment. Give users the ability to organize nodes in the best possible way in some geographic areas to serve only the local population in near proximity.
-	\item Offer it to researchers and developers to create new human-centered applications. If we need more resources on one side, we can take from one pool of resources and move to another one, or organize them any other way needed.
-	\item Present clear separation of concerns for the future EC as a service model, and establish a well-organized system where every part has an intuitive role. 
-	\item Present unified model that supports heterogeneous EC nodes, with a set of technical requirements that nodes must fulfil, if they want to join the system.
-	\item Present a clear application model so that users can use full potential of newly created infrastructure.
-\end{itemize}
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{Hypothesis:} \textit{It is possible to organize EC nodes in a standard way based on cloud architecture, with adaptation for an EC geo-distributed environment. Give users the ability to organize nodes in the best possible way in some geographic areas to serve only the local population in near proximity.}
+	\item \textbf{Hypothesis:} \textit{It is possible to offer it to researchers and developers to create new human-centered applications. If we need more resources on one side, we can take from one pool of resources and move to another one, or organize them any other way needed.}
+	\item \textbf{Hypothesis:} \textit{It is possible to present clear separation of concerns for the future EC as a service model, and establish a well-organized system where every part has an intuitive role.} 
+	\item \textbf{Hypothesis:} \textit{It is possible to present unified model that supports heterogeneous EC nodes, with a set of technical requirements that nodes must fulfil, if they want to join the system.}
+	\item \textbf{Hypothesis:} \textit{It is possible to present a clear application model so that users can use full potential of newly created infrastructure.}
+\end{enumerate}
 
-From this hypothesis, we ce derive the primary goals of this thesis, where the expected results include:
+From the previously defined hypotheses, we can derive the primary goals of this thesis, where the expected results include:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textit{The construction of a model with a clear separation of concerns for the model influenced by cloud organization, with adaptations for a different environment. With a model for EC applications utilizing these adaptations. This addresses the first research question, and is the topic of Chapter~\ref{chapter:Micro_clouds}.}
 	\item \textit{The constructed model is more available, resilient with less latency, and as such it can be offered to the general public as a service like any other service in the cloud. This addresses the second research question, and is the topic of Chapter~\ref{chapter:Micro_clouds}.}
-	\item \textit{The constructed is is well described formaly, using solid mathematical theory, but also easy to extend both formaly and technicaly, easy to understand and reason about. This addresses the third research question, and is the topic of Chapter~\ref{chapter:Micro_clouds}.}
+	\item \textit{The constructed model is described formaly well, using solid mathematical theory, but also easy to extend both formaly and technicaly, easy to understand and reason about. This addresses the third research question, and is the topic of Chapter~\ref{chapter:Micro_clouds}.}
 \end{enumerate}
 %
 %
@@ -671,7 +674,7 @@ Chapter~\ref{chapter:Review} presents the literature review, where we examine di
 
 Chapter~\ref{chapter:Micro_clouds} details our model, how it is related to other research and where it connects to other existing models and solutions. We further describe our solution as well as protocols requried for such sysrtem to be implemented foramly. We give examples of how exisintg infrastructure could be used, as well as familiar application model for developers. 
 
-Chapter~\ref{chapter:Implementation} present our implementation details, results possible applications with limitations.
+Chapter~\ref{chapter:Implementation} present implementation details of an framework developed to test hypotheses defined earlier in this chapter, but also model and foramly defined protocols defined in~\ref{chapter:Micro_clouds}. This chapter also show results after conducting experiments, current limitations of implemented system, and possible applications that could benefit from such system.
 
 Chapter~\ref{chapter:Conclusion} concludes our work and presents opportunities for further research and development.
 %
