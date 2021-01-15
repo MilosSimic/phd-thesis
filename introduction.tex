@@ -65,8 +65,6 @@ DS are hard to immplement because of their nature. James Gosling and Peter Deuts
 \end{enumerate}
 
 These fallacies are intruduced over the dacade ago, and more than four decades since we started building DS, but the characteristics and underlying problems remains pretty the same. It is interesting fact that designers, architects still asume that technology solves everything. This is not the case in DS, and these fallacies should not be forgoten. Because of these problems, DS are hard to implement corectly and they are hard to test and maintain.
-
-This section will explain different aspects of DS in computing systems, that are important for future parts of the thesis. Section~\ref{sec:scalability} gives more details about scalability and what it meens in modern day computer applications. Section~\ref{sec:cloud_computing} gives explanation what CC is, organizational aspects of CC as well as used models. Section~\ref{sec:p2p_networks} gives explanation what peer-to-peer networks are, and why are they important in modern DS. Section~\ref{sec:mobile_computing} gives general deffinition what mobile computing is and new ways of implementation DS.
 %
 %
 \subsection{Scalability}\label{sec:scalability}
@@ -243,32 +241,6 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 CC is giving a user an illusion that he is using single machine, while the backgroud implementaion is fairly complicated and consists of various elements that are composed of countles machines. CC is tipical example of horizontally scalable system presented in~\ref{sec:scalability}
 %
 %
-\subsection{Peer-to-peer networks}\label{sec:p2p_networks}
-%
-Peer-to-peer (P2P) communication is a networking architecture model that partitions tasks or workloads between peers~\cite{Schollmeier01}. All peers are created equally in the system, and there is no such thing as a node that is more important then others. Every Peer have a portion system resources, such as processing power, disk storage or network bandwidth, directly available to other network participants, without the need for central coordination by servers or stable hosts~\cite{Schollmeier01}. P2P nodes are connected and share resources without going through a separate server computer that is responsabile for routing. Figure~\ref{fig:fig2} show difference in network topology between P2P networks $(left)$ and client-server architecture $(right)$.
-
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[scale=0.7]{images/Figure2.png}
-	\end{center}
-	\vspace{-0.6cm}
-	\caption{P2P network and client-server network.}
-	\label{fig:fig2}
-\end{figure}
-
-Peers are creating a sense of virtual community. This community of peers can resolve a greater tasks, beyond those that individual peers can do. Yet, these tasks are beneficial to all the peers in the system~\cite{BandaraJ13}.
-
-Based on how the nodes are linked to each other within the overlay network, and how resources are indexed and located, we can classify networks as~\cite{KamelSE07}:
-
-\begin{itemize}
-	\item \textbf{Unstructured} do not have a particular structure by design, but they are formed by nodes that randomly form connections~\cite{FilaliBHB11}. Their strenght and weaknes at the same time is ther lack of structure. These networks and robust when peers join and leave network. But when doing query, they must found more possible peers that have same peace of data. Tipical example of this group is a Gossip-based protocols like~\cite{DasGM02}.
-	\item \textbf{Structured} peers are organized into a specific topology, and the protocol ensures that any node can efficiently search the network for a resource. The famos type of structured P2P network is a Distributed Hash Table (DHT). These networks maintain lists of neighbors to do more efficent lookup, and as such they are not so robust when nodes join or leave the network. DHT commonly used in resource loopkup systems~\cite{StoicaMKKB01}, and as efficent resource lookip management and scheduling of applications, or as an integral part of distributed storage systems and NoSQL\cite{Leavitt10} databases.
-	\item \textbf{Hybrid} combine previous two models in various ways.
-\end{itemize}
-
-P2P networks are great tool in many arsenals, but because their unique ability to act as a server and as a client at the same time we must be aware and pay more attention to security because they are more vulnerable to exploits~\cite{0024003}/
-%
-%
 \subsection{Membership protocol}\label{sec:memership_protocol}
 %
 A the start of this section we introduced DS, and we present two interesting assumptions by Tanenbaum et al.~\cite{SteenT16, 0019513}. If we take one more look at the~\ref{ds:asumption_2} assumption, we will see that user of the DS whether they are users or applications perceive DS as a single element. Inside this single elements nodes need to colaborate, so that they are albe to do various kinds of tasks.
@@ -327,11 +299,7 @@ EC models introduce small-scale servers that operate between data sources and th
 %
 DC can be defined as the use of a DS to solve one large problem by breaking it down into several smaller parts, where each part is computed in the individual node of the DS and coordinatio is done by passing messages to one another~\cite{0019513}. Computer programs that use this strategy and runs on DS are called \textbf{distributed programs} \cite{Vera16, andrews2000foundations}. 
 
-Similar to CC in Section~\ref{sec:cloud_computing}, to a normal user, DC systems appear as a single system similar to one he use every day on his personal computer.
-
-DC share same fallacies to DS presented in~\ref{sec:distributed_systems}.
-
-In this section we are going to explain examples of distributed programs that rely on DS that are important for future parts of the thesis. Section~\ref{sec:big_data} gives more details about using DS to process huge quantity of data. Section~\ref{sec:microservices} gives explanation how to build scalable applications that are able to whitstand huge request rate and large amout of users.
+Similar to CC in Section~\ref{sec:cloud_computing}, to a normal user, DC systems appear as a single system similar to one he use every day on his personal computer. DC share same fallacies to DS presented in~\ref{sec:distributed_systems}.
 %
 %
 \subsection{Big Data}\label{sec:big_data}
@@ -423,7 +391,25 @@ Microservices communicate over a network to fulfil some goal using message passi
 	\item Event-driven services, are services where communicatoin between services is done using events. Events are sent on some channel and other read messages that are received on other channel. These channels could be implemented either like message queues or message topics. Services connect to message queu or subscribe to the specific topic, and when messige arive, they can act acording to message type.
 \end{itemize}
  
- They are well aligned with text based protocols like HTTP/1 using $JSON$ for example, or binary protocols such as HTTP/2 using $protobuf$ and $gRPC$ for example, and even new faster version like HTTP/3 over new $QUIC$ protocol, designed by Google. 
+ They are well aligned with text based protocols like HTTP/1 using $JSON$ for example, or binary protocols such as HTTP/2 using $protobuf$ and $gRPC$ for example, and even new faster version like HTTP/3 over new $QUIC$ protocol, designed by Google. HTTP 3 is the latest version of the conventional and trusted HTTP protocol. It is very similar to HTTP 2, but it also offers a few important new features. Table~\ref{tab:table9} show important difference between versions of HTTP protocol.
+ 
+ \begin{table}[h!]
+ 	\begin{center}
+ 		\begin{tabular}{l|l|l|l}
+ 			\textbf{Feature} & \textbf{HTTP1} & \textbf{HTTP2} & \textbf{HTTP3}\\
+ 			\hline
+ 			\textbf{Transport} & text & binary & binary\\
+ 			\textbf{Parallelism} & No & Yes & Yes\\
+ 			\textbf{Protocol} & TCP & TCP & QUIC \\
+ 			\textbf{Space} & OS level & OS level & User level\\
+ 			\textbf{Server push} & No & Yes & Yes\\
+ 			\textbf{Compression} & Data & Data/Headers & Data/Headers\\
+ 		\end{tabular}
+ 	\end{center}
+ 	\vspace{-0.5cm}
+ 	\caption{Idempotent and non-idempotent operations.}
+ 	\label{tab:table9}
+ \end{table}
  
  To enshure vider range of devices that are able to comunicate with the rest of the systems, developrs usually have a gateway into the system that is REST service, and other services could be implemented in different way.
 
@@ -467,9 +453,62 @@ Other option that is comonly used is hasing user specified actions. This is usef
 Best chance to success when implementing microservices architecture, is to simply follow existing patters and use existing solutions with proven quality.
 %
 %
+\section{Distribution Models}\label{sec:distribution_models}
+%
+The role of distribution models is to determine the responsibility for the request, or to answer the fundamental question \say{who is in charge} for specific request. There are two ways to answer this question: $(1)$ all nodes in the system, or $(1)$ single node in the system.
+%
+%
+\subsection{Peer-to-peer}\label{sec:p2p_networks}
+%
+Peer-to-peer (P2P) communication is a networking architecture model that partitions tasks or workloads between peers~\cite{Schollmeier01}. All peers are created equally in the system, and there is no such thing as a node that is more important then others. Every Peer have a portion system resources, such as processing power, disk storage or network bandwidth, directly available to other network participants, without the need for central coordination by servers or stable hosts~\cite{Schollmeier01}. P2P nodes are connected and share resources without going through a separate server computer that is responsabile for routing. Figure~\ref{fig:fig2} show difference in network topology between P2P networks $(left)$ and client-server architecture $(right)$.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{images/Figure2.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{P2P network and client-server network.}
+	\label{fig:fig2}
+\end{figure}
+
+Peers are creating a sense of virtual community. This community of peers can resolve a greater tasks, beyond those that individual peers can do. Yet, these tasks are beneficial to all the peers in the system~\cite{BandaraJ13}. When request come to such network, node that accepted request is usually called \textbf{coordinator}, because he then is trying to found the right peer to send request to.
+
+Based on how the nodes are linked to each other within the overlay network, and how resources are indexed and located, we can classify networks as~\cite{KamelSE07}:
+
+\begin{itemize}
+	\item \textbf{Unstructured} do not have a particular structure by design, but they are formed by nodes that randomly form connections~\cite{FilaliBHB11}. Their strenght and weaknes at the same time is ther lack of structure. These networks and robust when peers join and leave network. But when doing query, they must found more possible peers that have same peace of data. Tipical example of this group is a Gossip-based protocols like~\cite{DasGM02}.
+	\item \textbf{Structured} peers are organized into a specific topology, and the protocol ensures that any node can efficiently search the network for a resource. The famos type of structured P2P network is a Distributed Hash Table (DHT). These networks maintain lists of neighbors to do more efficent lookup, and as such they are not so robust when nodes join or leave the network. DHT commonly used in resource loopkup systems~\cite{StoicaMKKB01}, and as efficent resource lookip management and scheduling of applications, or as an integral part of distributed storage systems and NoSQL\cite{Leavitt10} databases.
+	\item \textbf{Hybrid} combine previous two models in various ways.
+\end{itemize}
+
+P2P networks are great tool in many arsenals, but because their unique ability to act as a server and as a client at the same time we must be aware and pay more attention to security because they are more vulnerable to exploits~\cite{0024003}.
+%
+%
+\subsection{Master-slave}\label{sec:master_slave}
+%
+In the master-slave architecture, there is one node that is in charge -- \textbf{master}. This node accespt requests, and we usually do not communicate to rest of nodes or \textbf{slaves}. Master node is usually better and more expensive or even specialized hardware such as RAID drives to lower the crush probability. The cluster can also be configured with a \textbf{standby} master, and this node is continually updated from the master node.
+
+But no metter how specialized hardware master runs on, it is prone to fail for varios reasons, so he is a \textbf{single point of failure}. If crush happend, than standby master could continue to server as a master, or new \textbf{leader election} protocol~\cite{KorachKM90} is initiated to pick new master node. 
+
+Master node is responsible for processing any updates to that data. If the master fails, than  the slaves can still handle read requests. Failure of the standby master node, to take over from the master node is a real problem if we want to achieve high-availability system.
+
+Figure~\ref{fig:fig16} show difference between mater-slave $(left)$ and peer-to-peer $(right)$ request handling.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{images/Figure16.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{Handling requests master-slave and peer-to-peer}
+	\label{fig:fig16}
+\end{figure}
+
+Using the right distribution model usually depends on the business requirements. High availability requires a P2P network because no single point of failure. If we could manage data using batch jobs that run in off hours, then the simpler master-slave model might be the solution.
+%
+%
 \section{Similar computing models}\label{sec:similar_models}
 %
-In this section we are going to shortly describe models that are similar to the DS, and as such they may be the source of confusion.  Section~\ref{sec:parallel_computing} describes parallel computing compared to DC. Section~\ref{sec:decentralized_systems} describe decentralized computing compared to DS.
+In this section we are going to shortly describe models that are similar to the DS, and as such they may be the source of confusion.
 %
 %
 \subsection{Parallel computing}\label{sec:parallel_computing}
@@ -482,7 +521,7 @@ These models are similar, but they are not indentical, and the kind of problems 
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.9]{images/Figure4.png}
+		\includegraphics[scale=0.8]{images/Figure4.png}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Architectural difference between DC and parallel computing.}
@@ -523,7 +562,7 @@ With every virtualization technique, ultimate goal is to pack as much applicatio
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.9]{images/Figure5.png}
+		\includegraphics[scale=0.8]{images/Figure5.png}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Architectural differences between VMs, containers and unikernels.}

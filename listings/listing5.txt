@@ -1,0 +1,32 @@
+blackhole:
+  db: address
+  queue:
+    myqueue1:
+      namespace: mynamespace
+      retry:
+        delay: linear 
+        doubling: 1 
+        limit: 5000 
+      maxWorkers: 4 
+      capacity: 4 
+      tokens: 0 
+      fillInterval:  
+        interval: 1
+        rate: s 
+    myqueue2:
+      namespace: default
+      retry:
+        delay: exp 
+        doubling: 2 
+        limit: 50000 
+      maxWorkers: 5
+      capacity: 5
+      tokens: 0
+      fillInterval:
+        interval: 1
+        rate: s 
+  instrument:
+    address: address
+    stopic: topic
+    collect: interval
+    location: location

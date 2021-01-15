@@ -146,7 +146,7 @@ Some examples of applications may include:
 	\item \textbf{stream} or processing data as it comes to the system;
 	\item \textbf{batch} does processing in predefined times over some bigger collection of data ;
 	\item \textbf{daemons} or processing that are doing some tasks or executions in the backgound without explicit user intervention, usually they their execution could be time defined but it is not mandatory;
-	\item \textbf{services} or applications that would operate over standard request-response model or some variantion of that protocol;
+	\item \textbf{services} or applications that would operate over standard request-response model or some variantion of that protocol. For example NATS messageing system have request-replay form implemented over topics;
 	\item \textbf{other}, something that falls outside these models, or it is composition of multiple operations at once. This type should get events from some topic as they arrive, and user can define his own strategy what it needs to be done and how it needs to be pcessed. Usec can contact other existing services, and user is responsabile for optimization;
 \end{enumerate}
 
@@ -225,15 +225,17 @@ fairness). %\comment{Mozda ovo naglasiti jos od samog uvodjenja tipova sesija??}
 The first step in modeling the communications of a system using MPST theory 
 is to provide a \emph{global type}, that is a high-level description of the overall protocol from the neutral 
 point of view. 
-Following~\cite{HuY17}, the syntax of global types is constructed by:\\ 
-\[
-\G \; ::= \;
-\{\pp\dagger\pq_i{:}\ell_i(\T_i).\G_i\}_{i\in I}  \quad | \quad 
-\mu \ty.\G \quad | \quad 
-\ty \quad | \quad
-\tend
-\] 
+Following~\cite{HuY17}, the syntax of global types is constructed by:
+
+\begin{equation}
+	\G \; ::= \;
+	\{\pp\dagger\pq_i{:}\ell_i(\T_i).\G_i\}_{i\in I}  \quad | \quad 
+	\mu \ty.\G \quad | \quad 
+	\ty \quad | \quad
+	\tend
+\end{equation}
 \myequations{Global type construction}
+
 where $\dagger\in\{\to, \twoheadrightarrow\}$ and $I\not=\emptyset$. 
 In the above, $\{\pp\dagger\pq_i{:}\ell_i(\T_i).\G_i\}_{i\in I}$
 denotes that \emph{participant} $\pp$ can send (resp. connects) to one of the participants $\pq_i$, 
@@ -257,15 +259,17 @@ $\ST_\pp=\pq{!}\ell(\T)\ldots$ (resp. $\ST_\pp=\pq{!!}\ell(\T)\ldots$)
 when $\G=\pp\to\pq{:}\ell(\T)\ldots$ (resp. $\G=\pp\twoheadrightarrow\pq{:}\ell(\T)\ldots$), 
 and, dually, $\ST_\pp=\pq{?}\ell(\T)\ldots$ (resp. $\ST_\pp=\pq{??}\ell(\T)\ldots$) when $\G=\pq\to\pp{:}\ell(\T)\ldots$ 
 (resp. $\G=\pq\twoheadrightarrow\pp{:}\ell(\T)\ldots$), 
-while the projection operator ``skips'' the prefix of a global type if participant $\pp$ is not mentioned neither as sender nor as receiver. Furthermore, a local type must be represented by the following syntax:\\
-\[
-\ST \; ::= \; 
-{+}\{\pq_i\alpha\ell_i(\T_i).\ST_i\}_{i\in I}  \quad | \quad 
-\mu \ty.\ST \quad | \quad 
-\ty \quad | \quad
-\tend
-\]
-\myequations{Local type representation syntax}
+while the projection operator ``skips'' the prefix of a global type if participant $\pp$ is not mentioned neither as sender nor as receiver. Furthermore, a local type must be represented by the following syntax:
+
+\begin{equation}
+	\ST \; ::= \; 
+	{+}\{\pq_i\alpha\ell_i(\T_i).\ST_i\}_{i\in I}  \quad | \quad 
+	\mu \ty.\ST \quad | \quad 
+	\ty \quad | \quad
+	\tend
+\end{equation}
+\myequations{Local type representation syntax.}
+
 where $\alpha\in\{{!}, {!!}\}$ or  $\alpha\in\{{?}, {??}\}$ (in which case $\pq_i=\pq_j$ must hold for all $i,j \in I$, to ensure consistent external choice subjects, cf.~\cite[Page 6.]{HuY17}), and $I\not=\emptyset$.
 Interested reader can find details in~\cite{HuY17}.
 
@@ -337,9 +341,15 @@ Using node-id structure or some other trchnique, we can define free nodes in the
 \noindent 
 For example, if the received health-check message from the particular node contains only node-id, it is free, otherwise, it is not.\\ 
 
-If we have $n$ free nodes in the wild, denoted with $s_i$, where $i\in\{1, \ldots, n\},$ and they notify the system with a health-check ping that they are free, than we should add them to the server set and thus we have 
-$S_{\mathit{new}} = S_{\mathit{old}} \cup \bigcup%\limits
-_{i=1}^{n} \{s_i\}$. 
+If we have $n$ free nodes in the wild, denoted with $s_i$, where $i\in\{1, \ldots, n\},$ and they notify the system with a health-check ping that they are free, than we should add them to the server set and thus we have
+
+\begin{equation}
+	S_{\mathit{new}} = S_{\mathit{old}} \cup \bigcup%\limits
+	_{i=1}^{n} \{s_i\}
+\end{equation}
+\myequations{Extending free servers set.}
+ 
+\noindent 
 The order in which messages arrive is not important. 
 
 \begin{definition}
@@ -380,8 +390,13 @@ We can describe the $s_i$ server in the server set $S$ as a tuple $s_i = (L, R, 
 \end{itemize}
 
 If we want to assign $m$ (fresh) labels to the $i_\mathit{th}$ server, 
-we start with empty labels set $s_i[L]=\emptyset$, then we add labels to server. Therefore, we have $s_i[L]_\mathit{new} = s_i[L]_\mathit{old} \cup \bigcup%\limits
-_{j=1}^{m} \{(k_j,v_j)\}$.
+we start with empty labels set $s_i[L]=\emptyset$, then we add labels to server. Therefore, we have 
+
+\begin{equation}
+	s_i[L]_\mathit{new} = s_i[L]_\mathit{old} \cup \bigcup%\limits
+	_{j=1}^{m} \{(k_j,v_j)\
+\end{equation}
+\myequations{Extending label set.}
 
 \begin{definition}
 	Every server from set $S$ must have \emph{non-empty} set of labels, but the number of labels for every server may vary.
@@ -423,8 +438,9 @@ Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, 
 %
 %
 \ST_\mathtt{nodes} & = 
-\mathtt{node}{??}\mathit{health{\_}check}(\T_1).
-{+}
+\mathtt{node}{??}\mathit{health{\_}check}(\T_1). \\
+& \hspace{-2mm}
+{+} 
 \left\{
 \begin{array}{@{}l@{}}
 \mathtt{state}{!!}\mathit{active}(\T_2).\mathtt{log}{!!}\mathit{used}(\T_2).\tend\\
@@ -503,9 +519,15 @@ Algorithm \ref{alg:alg2} describes steps required to perform a proper node looku
 	\label{alg:alg2}
 \end{algorithm}
 
-We start with the empty selector $Q=\emptyset$, in which we append key-value pairs. Hence, when a user submits a set of $p$ key-value pairs we have that $Q_\mathit{new} = Q_\mathit{old} \cup \bigcup%\limits
-_{i=1}^{p} \{(k_i,v_i)\}$.  
+We start with the empty selector $Q=\emptyset$, in which we append key-value pairs. Hence, when a user submits a set of $p$ key-value pairs we have that 
 
+\begin{equation}
+	Q_\mathit{new} = Q_\mathit{old} \cup \bigcup%\limits
+	_{i=1}^{p} \{(k_i,v_i)\
+\end{equation}
+\myequations{Query selector formation.} 
+
+\noindent
 Once the query is submitted, for every server in the set $S$, we need to check: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
@@ -519,18 +541,24 @@ Once the query is submitted, for every server in the set $S$, we need to check:
 	\end{equation}
 \end{enumerate} 
 
-The $i_\mathit{th}$ server from the server set $S$ 
-will be present in the result set $R$,
-% if and only if, 
+The $i_\mathit{th}$ server from the server set $S$ will be present in the result set $R$, % if and only if, 
 iff both rules are satisfied:
+
 \begin{equation}\label{frm:query_rule}  
-R=\{ s_i \;|\; \left|s_i[L]\right|=\left|Q\right| \wedge P(Q, s_i),i\in\{1, \ldots, n\}\}
+	R=\{ s_i \;|\; \left|s_i[L]\right|=\left|Q\right| \wedge P(Q, s_i),i\in\{1, \ldots, n\}\}
 \end{equation} 
-\myequations{Server selector}
+\myequations{Server selector.}
 
 \noindent
 If the result set $R$ is not empty, we reserve nodes for configurable time so that other users cannot see (and try to use) them, and, finally, 
-we add reserved nodes with message data $\mathit{md}$ to the task queue set $TQ_\mathit{new} =TQ_\mathit{old}\cup \{(R, md)\}.$ 
+we add reserved nodes with message data $\mathit{md}$ to the task queue set 
+
+\begin{equation}
+	TQ_\mathit{new} =TQ_\mathit{old}\cup \{(R, md)\}.
+\end{equation}
+\myequations{Extending task queue set.}
+
+\noindent 
 When the task comes to execution, the task queue sends messages to every node. 
 
 Algorithm \ref{alg:alg3} describes the process required for cluster formation. 
@@ -620,8 +648,8 @@ Then, $\mathtt{state}$ sends $\mathit{ids}$ of the nodes to be reserved (specifi
 \begin{align*}
 \G' = & 
 \mathtt{user} \to \mathtt{state}{:}\mathit{create}(\T_3).
-\mathtt{state} \to \mathtt{user}{:}\mathit{ok}().%\\
-%& \hspace{2mm}
+\mathtt{state} \to \mathtt{user}{:}\mathit{ok}().\\
+& \hspace{2mm}
 \mathtt{state}\to\mathtt{nodes}{:}\mathit{ids}(\T_4). \\
 & \hspace{4mm}
 \left\{
@@ -636,10 +664,13 @@ Then, $\mathtt{sched}$ connects $\mathtt{pool}$ (Nodes Pool) with $\mathit{updat
 \begin{align*}
 \G'' = &
 \mathtt{state}\twoheadrightarrow\mathtt{sched}{:}\mathit{ids}(\T_5).
-\mathtt{sched}\twoheadrightarrow\mathtt{pool}{:}\mathit{update}(\T_6).\mathtt{pool}\to\mathtt{sched}{:}\mathit{ok}(). \\
+\mathtt{sched}\twoheadrightarrow\mathtt{pool}{:}\mathit{update}(\T_6). \\
+& \hspace{-2mm}
+\mathtt{pool}\to\mathtt{sched}{:}\mathit{ok}(). \\
 & %\hspace{2mm}
 \mathtt{pool}\twoheadrightarrow\mathtt{nodes}{:}\mathit{nids}(\T_4). 
-\mathtt{nodes}\to\mathtt{state}{:}\mathit{succ}().
+\mathtt{nodes}\to\mathtt{state}{:}\mathit{succ}(). \\
+& \hspace{2mm}
 \mathtt{state}\twoheadrightarrow \mathtt{log}{:}\mathit{succ}().\tend
 \end{align*}
 We may now obtain the projections of global type $\G_2$ onto the participants $\mathtt{user}, \mathtt{state}, \mathtt{nodes}$, $\mathtt{log}$, $\mathtt{pool}$, and $\mathtt{sched}$:
@@ -663,9 +694,10 @@ We may now obtain the projections of global type $\G_2$ onto the participants $\
 \mathtt{nodes}{!!}\mathit{query}(\T_1). %\\
 %& \hspace{2mm}
 \mu \ty. 
-\mathtt{nodes}{?}\mathit{resp}(\T_2). 
+\mathtt{nodes}{?}\mathit{resp}(\T_2).\\
+& \hspace{-4mm} 
 \mathtt{user}{!}\mathit{resp}(\T_2).\\
-& \hspace{2mm}
+& \hspace{-10mm}
 {+}
 \left\{
 \begin{array}{@{}l@{}}
@@ -678,7 +710,8 @@ We may now obtain the projections of global type $\G_2$ onto the participants $\
 where
 \begin{align*}
 \ST' = &
-{+}
+{+}\\
+& \hspace{-14mm}
 \left\{
 \begin{array}{@{}l@{}}
 \mathtt{nodes}{?}\mathit{rsrvd}().\mathtt{sched}{!!}\mathit{ids}(\T_5).\mathtt{nodes}{?}\mathit{succ}().\mathtt{log}{!!}\mathit{succ}().\tend\\
@@ -691,7 +724,7 @@ where
 \mathtt{state}{??}\mathit{query}(\T_1).
 \mu \ty.
 \mathtt{state}{!}\mathit{resp}(\T_2).\\
-& \hspace{-12mm}
+& \hspace{-14mm}
 {+}
 \left\{
 \begin{array}{@{}l@{}}
@@ -699,7 +732,8 @@ where
 {+}\left\{
 \begin{array}{@{}l@{}}
 \mathtt{state}{!}\mathit{rsrvd}().\tend\\
-\mathtt{state}{!}\mathit{err}(\mathsf{String}).\mathtt{poll}{??}\mathit{nids}(\T_4).\mathtt{state}{!}\mathit{succ}().\tend
+\mathtt{state}{!}\mathit{err}(\mathsf{String}).\mathtt{poll}{??}\mathit{nids}(\T_4).\\
+\mathtt{state}{!}\mathit{succ}().\tend
 \end{array} \right.	\\
 \mathtt{state}{?}\mathit{query}(\T_1).\ty
 \end{array} \right.\\
@@ -843,12 +877,12 @@ and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same a
 
 \noindent
 same as cluster formatoin protocol (cf. section~\ref{cluster_formation_informal_description}). For simplification, we can assume that all nodes are reserved, and now idempotency data store global protocol $\G''$, starts;
-
 \begin{align*}
 G' & = 
-\mathtt{service} \twoheadrightarrow \mathtt{istorage}{:}\mathit{try}(\T_3).
+\mathtt{service} \twoheadrightarrow \mathtt{istorage}{:}\mathit{try}(\T_3). \\
+& \hspace{1mm}
 \mathtt{istorage} \to \mathtt{service}{:}\mathit{resp}(Boolean).\\
-& \hspace{4mm}
+& \hspace{10mm}
 \left\{
 \begin{array}{@{}l@{}}
 \mathtt{service}\to\mathtt{log}{:} \mathit{done}(\mathsf{String}).\tend\\
