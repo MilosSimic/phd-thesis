@@ -104,7 +104,16 @@ But despite all the obvious benefits, for a DS to work properly, we need the wri
 
 For example users need to be aware when using DS, is related to distributed data storage systems. Storage implementations that relys on vertical scaling to ensure scalability and faulte tolerance, have one nasty feature. 
 
-This nasty feature is represented in theorem called \textbf{CAP theorem} presented by Eric Brewer~\cite{Brewer2000}. Proven after insepction~\cite{GilbertL02}, CAP theorem states that it is impossible for a distributed data store to simultaneously provide more than two out of three guarantees:
+This nasty feature is represented in theorem called \textbf{CAP theorem} presented by Eric Brewer~\cite{Brewer2000}, and proven after insepction by Bilbert et a.~\cite{GilbertL02}. The CAP theorem states that it is impossible for a distributed data store to simultaneously provide more than two out of three guarantees shown in Figure~\ref{fig:fig17}.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.9]{images/Figure17.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{Difference between cloud options and on-premises solution.}
+	\label{fig:fig17}
+\end{figure}
 
 \begin{enumerate} [start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{C}onsistency, which means that all clients will see the same data at the same time, no matter which node they are connected to. Clients my not be connected to the same node since data could be replicated on many nodes in different locations.
@@ -140,17 +149,17 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 	\begin{equation} 
 		e^{\log_{10} \frac{1}{ (1 - A)}} 
 	\end{equation}
-	\myequations{Availability class formula}
+	\myequations{Availability class formula.}
 	It is important to notice that even a 99\% available system gives almost four days of downtime in a year, which is unacceptable for services like Facebook, Google, AWS etc. And when service is down, companies are loosing customers.
 	\item \textbf{P}artition tolerance, which means that the cluster must continue to work despite any number of communication breakdowns between nodes in the system. It is important to state that in a distributed system, partitions can’t be avoided.
 \end{enumerate}
 
-Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems by only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be: \label{crdts}
+Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems, but only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be: \label{crdts}
 
 \begin{itemize}
-	\item \textbf{Commutative} $a*b = b*a$ \myequations{Commutative formula}
-	\item \textbf{Associative} $(a*b)*c = a*(b*c)$ \myequations{Associative formula}
-	\item \textbf{Idempotent} $(a * a) = a$ \myequations{Idempotent formula}
+	\item \textbf{Commutative} $a*b = b*a$ \myequations{Commutative formula.}
+	\item \textbf{Associative} $(a*b)*c = a*(b*c)$ \myequations{Associative formula.}
+	\item \textbf{Idempotent} $(a * a) = a$ \myequations{Idempotent formula.}
 \end{itemize}
 
 \noindent
@@ -562,7 +571,7 @@ With every virtualization technique, ultimate goal is to pack as much applicatio
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.8]{images/Figure5.png}
+		\includegraphics[scale=0.9]{images/Figure5.png}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Architectural differences between VMs, containers and unikernels.}

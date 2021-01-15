@@ -16,7 +16,7 @@ Problem nastaje (izme\dj u ostalog) kada je potrebno da se (veliki) podaci preba
 
 Centralizovana arhitektura ra\v cunarstva u oblaku sa ogromnim kapacitetima centara za obradu podataka stvara efikasnu ekonomiju obima \v cime se dolazi do smanjenja administrativnih tro\v kova celokupnog sistema~\cite{BariBEGPRZZ13}. Me\dj utim, kada takav sistem dod\dj e do svojih granica, centralizacija donosi vi\v se problema nego \v sto ih mo\v ze re\v siti~\cite{GunawiHSLSAE16, LopezMEDHIBFR15}. Uprkos svim prednostima ovog modela, servisi i usluge vremenom se suo\v cavaju sa ozbiljnom degradaciom kvaliteta odziva i performansi, usled velike propusnosti i ka\v snjenja~\cite {KarimIWGSYO16}. 
 
-To mo\v ze dovesti do nesagledivih posledica po biznise, ali potencijalno i ljudske živote. Organizacije koriste usluge u oblaku kako bi izbegle velike infrastrukturalne investicije~\cite {MonsalveCC18}, poput pravljenja i održavanja sopstvenih centara za obradu podataka. Oni koriste resurse koje su obezbedili drugi~\cite{Satyanarayanan17}, i pla\'caju shodno tome koliko vremenski koriste usluge -- a pay as you go model.
+To mo\v ze dovesti do nesagledivih posledica po biznis, ali potencijalno i ljudske živote. Organizacije koriste usluge u oblaku kako bi izbegle velike infrastrukturalne investicije~\cite {MonsalveCC18}, poput pravljenja i održavanja sopstvenih centara za obradu podataka. Oni koriste resurse koje su obezbedili drugi~\cite{Satyanarayanan17}, i pla\'caju shodno tome koliko vremenski koriste usluge -- a pay as you go model.
 
 Cilj ove teze je predstavi upotrebu formalnih modela na osnovu kojih mo\v zemo opisati, formalno verifikovati protokole i implementirati radni okvir za distribuirani sistem koriste\'ci geografski rasprostranjena okru\v zenja, nalik ra\v cunarstvu u oblaku. Opisani sistem mogu da koriste ne samo obi\v cni korisnici, ve\'ci pru\v zaoci usluga ra\v cunarstva u oblaku mogu ga integrisai u svoje servise kako bi se minimalizovao zastoj kritičnih sistemskih segmenata. \v Citav sistem mo\v zemo posmatrati kao skup mikro oblaka ili sloj obrade, koji u oblak \v salje samo va\v zne podatke smajuju\'c i tro\v skove korisnicima, ali i obezbe\dj uju\'ci ve\'cu dostupnost usluga ra\v cunarstva u oblaku.
 
@@ -51,11 +51,31 @@ U svom radu~\cite{GreenbergHMP09} Greenberg i saradnici ističu da se mikro cent
 
 Zonska organizacija malih servera koju su predstavili Guo i saradnici~\cite{GuoRG20} u primeni kod pametnih vozila, daje zanimljivu perspektivu o EC. Autori su pokazali kako modeli zasnovani na zonama omogućavaju kontinuitet dinami\v ckih usluga i smanjuju primopredaju veze. Tako\dj e, su pokazali kako da se pove\'ca pokrivenost malim serverima na ve\'cu zonu, \v cime se pro\v siruju ra\v cunarska snaga i kapacitet skladištenja podataka.
 
-MDC-ovi sa zonskom organizacijom servera dobra su polazna osnova za izgradnju EC-a koja mo\v ze biti ponu\dj na kao servis. Da bi to postigli, potreban nam je dostupniji i elasti\v cniji sistem sa manje ka\v snjenja.  
-
-EC poti\v ce iz peer-to-peer sistema~\cite{LopezMEDHIBFR15} kako su to pretpostavili L{\'{o}}pez i saradnici, ali ga pro\v siruje u novim pravcima i pru\v za mogu\'cnost integracije sa ra\v cunarstvom u oblaku. Me\dj utim, infrastrukture ne\'ce biti postavljena sve dok proces pode\v savanja i kori\v s\'cenja ne bude trivijaln~\cite{SatyanarayananBCD09}. Odlazak od \v cvora do \v cvora je dosadan i dugotrajan proces. Naro\v cito kada se uzme u obzir geografska rasprostranjenost \v cvorova. 
+EC poti\v ce iz peer-to-peer sistema~\cite{LopezMEDHIBFR15} kako su to pretpostavili L{\'{o}}pez i saradnici, ali ga pro\v siruje u novim pravcima i pru\v za mogu\'cnost integracije sa ra\v cunarstvom u oblaku.
 
 U som radu Kurniavan i saradnici~\cite {inbookKurniawan} su pokazali vrlo lo\v su skalabilnost u centralizovanim modelima mre\v za za isporuku sadr\v zaja u oblaku (CDN). Predlo\v zili su decentralizovano re\v senje koriste\'ci nano centre za obradu podataka sa\v cinjenu od mrežnih ure\dj aja u ku\'c~\cite{inbookKurniawan}. Ovi DC-ovi su tako\dj e opremljeni sa ne\v sto skladi\v sta. Autori su pokazali moguc\'u upotrebu nano centara za obradu podataka za neke velike primene, sa mnogo manjom potro\v snjom energije.
+
+MDC-ovi sa zonskom organizacijom servera dobra su polazna osnova za izgradnju EC-a koja mo\v ze biti ponu\dj na kao servis i mikro ra\v cunarstva u oblaku, jer možemo pro\v siriti ra\v cunarsku snagu i skladi\v sni kapacitet koji opslu\v zuju lokalno stanovništvo. Da bi to postigli, potreban nam je dostupniji i elasti\v cniji sistem sa manje ka\v snjenja. 
+
+Ako pogledamo dizajn CC, svaki deo doprinosi otpornijem i skalabilnom sistemu. Regioni ili centri za obradu podataka (DC) su izolovani i nezavisni jedni od drugih, a tako\dj e sadr\v ze resurse koji su potrebni aplikacijama za nesmetan rad. S\v cinjeni su od nekoliko dostupnih zona~\cite {SouzaMFAK19}. Ako zona iz bilo kog razloga postane nedostupna, ima ih jo\v s koje mogu da opslu\v ze korisni\v cke zahteve. Uz neke adaptacije, EC i mikro ra\v cunarsto u oblaku bi mogla da koristi vrlo sli\v cnu strategiju.
+
+\v Cvorove mo\v zemo grupisati u klastere, a vi\v se klastera \v cvorova u ve\'cu logi\v cku celinu -- \say{region}, povećavaju\'ci dostupnost i pouzdanost sistema kao i njegovih aplikacija. Kada pri\v camo o EC i mikro ra\v cunarstvu u oblaku, \v cesto mislimo na geografski rasprostranjene distribuirane sistemime, tako da imamo malo druga\v ciji scenario nego u standardnom CC modelu. 
+
+Koncept \say{regiona} u ra\v cunarstvu oblaka je fizi\v cki element~\cite{SouzaMFAK19}, dok se u mikro ra\v cunarstvu u oblaku region mo\v ze koristiti za opisivanje skupova klastera \v cvorova, preko proizvoljne geografske oblasti. 
+
+Regioni se sastoje od najmanje jednog klastera, ali mogu se sastojati i od vi\v se njih, tako da se postigne otporniji, skalabilniji i dostupniji sistem. Da bi se osiguralo manje ka\v snjenje u sistmu, u normalnim okolnostima treba izbegavati veliku udaljenost izme\dj u klastera. U tradicionalnom modelu ra\v cunarstva u oblaku, pro\v sirenje regiona zahteva fizi\v cko povezivanje modula sa ostatkom infrastrukture~\cite {Hamilton07}. 
+
+U mikro ra\v cunarstvu u oblaku, regioni mogu prihvatiti nove, ili osloboditi postoje\'ce klastere ali i klasteri mogu prihvatiti nove ili osloboditi postoje\'ce \v cvorove.
+
+Vi\v se regiona \v cine slede\'ci logi\v cki sloj -- \say{topologiju}. Topologija se sastoji od najmanje jednog regiona, a mo\v ze se prostirati i na vi\v se regiona. Prilikom dizajniranja topologije, posebno ako regioni trebaju da dele informacije ili treba na neki na\v cin da sara\dj uju, treba izbegavati veliku udaljenost izme\dj u regiona, ako je to mogu\'ce. 
+
+Ovim vrlo jednostavnim konceptima, mo\v zemo da pokrijemo bilo koju geografsku oblast sa sposobno\v s\'cu da smanjimo ili pro\v sirimo klastere, regione pa \v cak i topologije. Organizacija klastera, regiona i topologija u mikro ra\v cunarstvu u oblaku je isklju\v civo stvar dogovora, i kao takva sli\v cna je modeliranju u sistemima velikih podataka~\cite {SonbolOAA20, WangCAL14}.
+
+Na primer, klasteri mogu biti veliki kao \v citav jedan grad ili mali kao svi ure\dj aji u jednom doma\'cinstvu i sve izme\dj u ova dva ekstrema. Grad bi mogao predstavljati jedan region, sa delovima grada koji su organizovani u klastere. Topologiju grada mo\v zemo formirati tako što \'cemo grad podeliti na vi\v se regiona, koji sadr\v ze vi\v se klastera. Topologiju dr\v zave mo\v zemo formirati tako \v sto \'cemo \'cemo je podeliti na regione, pri \v cemu su gradovi regioni. 
+
+\v Cvorovi unutar svakog klastera treba da izvr\v savaju neki od protokol-a za odr\v zavanje klastera. Neki od \textit{Gossip} protokola poput \textit{SWIM}-a\cite {DasGM02}, mogu se koristiti u saradnji sa mehanizmima replikacije podataka~\cite {LiBCL20, CauCBFCEB16, CRDTS_Nuno} \v cine\'ci ceo sistem otpornijim na potencijalne gre\v ske. 
+
+U modelu koji opisuje sve resurse kao usluge~\cite {DuanFZSNH15}, EC i mikro ra\v cunarstvo u oblaku kao usluga se nalazi izme\dj u CaaS i PaaS, u zavisnosti od potreba korisnika.
 
 Dobro definisan sistem mogao bi se ponuditi kao usluga korisnicima, kao i bilo koji drugi resurs ra\v unarstva u obaku. Mo\v zemo ga ponuditi istra\v ziva\v cima i programerima da naprave nove aplikacije usmerene vi\v se ka raznim potrebama ljudi. Ako nam je potrebno vi\v se resursa na jednoj strani, mo\v zemo uzeti jedanu koli\v cinu resursa i premestiti gde nam ti resursi trebaju. Sa druge strane, kompanije koje pru\v zaju usluge ra\v cunarstva u oblaku mogu da integrisati model u svoj postoje\'ci sistem, skrivaju\'ci nepotrebnu slo\v zenost iza nekog komunikacionog interfejsa ili predlo\v zenog modela aplikacije.
 
@@ -63,7 +83,28 @@ Da bi se postiglo takvo pona\v sanje, neophodno je dinami\v cko upravljanje resu
 
 EC i MDC modelima nedostaje jasna dinami\v cka organizacija geografski raspore\dj nenih \v cvorova, dobro definisan model mati\v cnih aplikacija i jasno razdvajanje nadle\v znosti. Kao takvi ne mogu se ponuditi kao usluga korisnicima. Obi\v cno postoje nezavisno jedni od drugih, rasuti bez me\dj usobne komunikacije, a nude ih pru\v zaoci usluga, koji korisnike uglavnom zaklju\v cavaju u sopstveni ekosistem. Grupisani \v cvorovi treba da budu organizovani lokalno, \v cine\'ci kompletan sistem i aplikacije dostupnijim i pouzdanijim, ali tako\dj e pro\v siruju\'ci resurse izvan pojedina\v cnog \v cvora ili male grupe \v cvorova, odr\v zavaju\'ci dobre performanse za izgradnju servera i klastera~\cite{ArocaG12}.
 
-Ovo pro\v sirenje ra\v cunarstva u oblaku produbljuje i ja\v ca na\v se razumevanje oblasti u celini. Razdvajanjem nadle\v znosti, modela mati\v cnih aplikacija i objedinjenem organizacije \v cvorova, idemo ka ideji EC-a kao usluge. Na osnovu ovih ideja, definišemo problem koji ova teza obra\dj uje kroz slede\'ca tri istra\v ziva\v cka pitanja:
+Ovo pro\v sirenje ra\v cunarstva u oblaku produbljuje i ja\v ca na\v se razumevanje oblasti u celini. Razdvajanjem nadle\v znosti, modela mati\v cnih aplikacija i objedinjenem organizacije \v cvorova, idemo ka ideji EC-a kao usluge. 
+
+Me\dj utim, infrastrukture ne\'ce biti postavljena sve dok proces pode\v savanja i kori\v s\'cenja ne bude trivijaln~\cite{SatyanarayananBCD09}. Odlazak od \v cvora do \v cvora je dosadan i dugotrajan proces. Naro\v cito kada se uzme u obzir geografska rasprostranjenost \v cvorova. 
+
+Sistem koji je predlo\v zen u ovoj tezi, re\v sava problem pomo\'cu  pode\v svanja i formiranja prethodno definisanih elemenata, i oslanja se na tri protokola:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{provera stanja \v cvora} protokol obave\v stava sistem o stanju svakog \v cvora; 
+	\item \textbf{formiranje klastera} protokol formira nove klastere, regione i topologije;  
+	\item \textbf{pregled detalja} protokol prikazuje trenutno stanje sistema korisniku kroz razne nivoe detalja;
+\end{enumerate}
+
+Da bismo formalno jednostavno opisali servere ili \ cvorove (pojmovi se koriste naizmeni\v cno) u sistemu, mo\v zemo koristiti teoriju skupova. Prethodno definisane protokole mo\v zemo formalno modelirati korist\'ci~\cite {HuY17}, pro\v sirenje \emph{multiparty asynchronous session types} (MPST)~\cite {HondaYC08} --- klasa tipova pona\v sanja skrojena za opisivanje distribuiranih protokola oslanjaju\'ci se na asinhrone komunikacije.
+
+Ova matemati\v cka teorija nije samo korisna kao formalni opisi protokola, ve\'c se mo\v zemo iskoristiti i mogu\'cnosti teorije za verifikaciju da li na\v si protokoli zadovoljavaju MPST sigurnost (nema dostupnog stanja gre\v ske) i napredak (akcija se na kraju izvr\v sava, pod pretpostavkom po\v stenja). Proces modelovanja se odvija u dva koraka:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{Prvi korak} u modeliranju komunikacija sistema pomoću MPST teorije je da pru\v zimo \emph{globalni tip}, to je globalni opis celokupnog protokola sa neutralnog ta\v cka posmatranja.
+	\item \textbf{Drugi korak} u modeliranju protokola pomo\'cu MPST-a je pru\v zanje sintaksi\v cke projekcije protokola na svakog u\v cesnika kao lokalni tip, koji se zatim koristi za proveru tipa i implementacije krajnje ta\v cke.
+\end{enumerate}
+
+Na osnovu ovih ideja, definišemo problem koji ova teza obra\dj uje kroz slede\'ca tri istra\v ziva\v cka pitanja:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]\label{rez:questions}
 	\item \textit{Da li mo\v zemo da organizujemo geografski distribuirane \v cvorove na sli\v can na\v cin kao ra\v cunarstvo u oblaku, adaptiran za razli\v cito okru\v zenje, sa jasnom podelim nadle\v znosti, i poznatim modelom razvoja aplikacija za korisnike?}
@@ -96,9 +137,9 @@ Ova teza predstavlja mogu\'ce re\v senje za organizaciju geografski rasprostranj
 
 Ove apstrakcije omogu\'cavaju pokrivanje bilo kog geografskog područja i daju dostupniji i pouzdaniji sistem. Organizacija i reorganizacija ovih apstrakcija vr\v si se opisom zeljenog stanja bez direknog slanja komandi sistemu, a njihova veli\v cina odre\dj uje se potrebama stanovni\v stva.
 
-Predstavili smo preslikavanje ra\v cunarstva u oblaku na EC, i uz to smo prikazali formalni model sistema, sa jasnim modelom i sistemom podela nadleznosti i mati\v cnim modelom aplikacije za budu\'ci EC koji bi bio ponu\dj en kao usluga. 
+Predstavili smo preslikavanje ra\v cunarstva u oblaku na EC, i uz to smo prikazali formalni model sistema, sa jasnim modelom i sistemom podela nadle\v znosti i mati\v cnim modelom aplikacije za budu\'ci EC koji bi bio ponu\dj en kao usluga. 
 
-Teza tako\dj e prikazuje implementirano re\v senje koriste\'ci prethodno opisane koncepte i formalne modele. Iplementirano re\v senje mo\v ze koristiti kao samostalno re\v senje gde se kasnije mogu dodati potrebni podsistemi, ali tako\dj e pru\v za mogu\'cnost integracije u postoje\'ca re\v senja. Dati su primeri domena gde bi sistem mogao da se koristi zajdno sa primerima aplikacija gde bi korisnici imali benefit. Teza je organizovana u pet poglavlja.
+Teza tako\dj e prikazuje implementirano re\v senje koriste\'ci prethodno opisane koncepte i formalne modele. Implementirano re\v senje mo\v ze koristiti kao samostalno re\v senje gde se kasnije mogu dodati potrebni podsistemi, ali tako\dj e pru\v za mogu\'cnost integracije u postoje\'ca re\v senja. Dati su primeri domena gde bi sistem mogao da se koristi zajdno sa primerima aplikacija gde bi korisnici imali benefit. Teza je organizovana u pet poglavlja.
 
 U \textbf{poglavlju~\ref{chapter:Intro}} dali smo kratki uvod u temu distribuiranih sistema, sa fokusom na podru\v cja koja su va\v zna za razumevanje ove teze.
 
