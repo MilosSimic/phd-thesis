@@ -81,7 +81,22 @@ Dobro definisan sistem mogao bi se ponuditi kao usluga korisnicima, kao i bilo k
 
 Da bi se postiglo takvo pona\v sanje, neophodno je dinami\v cko upravljanje resursima i upravljanje ure\dj ajima. Moramo uvek imati dostupne informacije o resursima, konfiguraciju i zauzetosti \v cvorova~\cite{GubbiBMP13, WangZZWYW17}. Tradicionalni centri za obradu podataka predstavljaju dobro organizovan i povezan sistem. Sa druge strane, MDC-ovi se sastoje od razli\v itih ure\dj aja koji nisu~\cite{JiangCGZW19}. Ova ideja nas dovodi do problema sa kojim se bavi ova teza.
 
-EC i MDC modelima nedostaje jasna dinami\v cka organizacija geografski raspore\dj nenih \v cvorova, dobro definisan model mati\v cnih aplikacija i jasno razdvajanje nadle\v znosti. Kao takvi ne mogu se ponuditi kao usluga korisnicima. Obi\v cno postoje nezavisno jedni od drugih, rasuti bez me\dj usobne komunikacije, a nude ih pru\v zaoci usluga, koji korisnike uglavnom zaklju\v cavaju u sopstveni ekosistem. Grupisani \v cvorovi treba da budu organizovani lokalno, \v cine\'ci kompletan sistem i aplikacije dostupnijim i pouzdanijim, ali tako\dj e pro\v siruju\'ci resurse izvan pojedina\v cnog \v cvora ili male grupe \v cvorova, odr\v zavaju\'ci dobre performanse za izgradnju servera i klastera~\cite{ArocaG12}.
+EC i MDC modelima nedostaje jasna dinami\v cka organizacija geografski raspore\dj nenih \v cvorova, dobro definisan model mati\v cnih aplikacija i jasno razdvajanje nadle\v znosti. Kao takvi ne mogu se ponuditi kao usluga korisnicima. EC obi\v cno postoje nezavisno jedni od drugih, rasuti su bez me\dj usobne komunikacije i saradnje, a nude ih pru\v zaoci usluga, koji korisnike uglavnom zaklju\v cavaju u sopstveni ekosistem. Grupisani \v cvorovi treba da budu organizovani lokalno, \v cine\'ci kompletan sistem i aplikacije dostupnijim i pouzdanijim, ali tako\dj e pro\v siruju\'ci resurse izvan pojedina\v cnog \v cvora ili male grupe \v cvorova, odr\v zavaju\'ci dobre performanse za izgradnju servera i klastera~\cite{ArocaG12}.
+
+Da bi opisao fizi\v cke usluge, Jin~\cite {JinCJL14} i saradnici predla\v zu tri osnovna koncepta i precizira njihove odnose. Ovi koncepti su: $(1)$ ure\dj aji, $(2)$ resursi i $(3)$ servisi. Podela nadle\v znosti je bitan deo svakog sistema, posebno ako se stvara platformu koja se nudi kao usluga. Model podele nadle\v znosti koji ova teza predla\v ze zasnovan je na ovim konceptima, prilago\dj en za druga\v ciji slu\v caj kori\v s\'cenja, i podeljen u tri sloja \v sto se mo\v ze videti na slici~\ref {fig:fig10}. 
+
+Donji sloj \v cine razli\v citi ure\dj aji ili kreatori podataka i korisnici usluga odnosno servisa. Drugi sloj predstavlja resurse. Resursi imaju prostornu karakteristiku i ukazuju na mogu\'cnosti njihovih hosting ure\dj aja za obradu odnosno skladi\v stenje podataka~\cite{JinCJL14}. Programeri u bilo kom trenutku moraju znati iskori\v s\'cenost resursa, kao i stanje i dostupnost aplikacija. 
+
+Resursi predstavljaju EC \v cvorove, i da bi \v cvor bio deo sistema, on mora zadovoljiti \v cetiri jednostavna pravila: 
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+\item moraju biti sposobni da pokrenu operativni sistem sa sistemom datoteka;
+\item moraju biti u mogu\'cnosti da pokrene neki alat za izolaciju aplikacija, na primer kontejnere ili unikernele; 
+\item moraju imati dostupne resurse za kori\v s\'cenje (npr. CPU, GPU, disk itd.) ;
+\item moraju imaju stabilnu internet vezu;
+\end{enumerate}
+
+Servisi pru\v zaju resurse putem definisanog interfejsa i \v cine ih dostupnim preko Interneta~\cite {JinCJL14}. Servisi odmah odgovaraju na klijentske zahteve, ako je to mogu\'ce, ili mogu da skladi\v ste prona\dj enu informaciju za neke budu\'ce zahteve~\cite {SatyanarayananBCD09, YaoXWYZP20}. Servisi koji se izvrv\v savaju u oblaku treba da budu u stanju da prihvate unapred obra\dj ene podatke i odgovorne su za obradu i skladi\v stenje podataka \v ciji kapacitet prevazilazi mogu\'cnosti EC \v cvorova.
 
 Ovo pro\v sirenje ra\v cunarstva u oblaku produbljuje i ja\v ca na\v se razumevanje oblasti u celini. Razdvajanjem nadle\v znosti, modela mati\v cnih aplikacija i objedinjenem organizacije \v cvorova, idemo ka ideji EC-a kao usluge. 
 

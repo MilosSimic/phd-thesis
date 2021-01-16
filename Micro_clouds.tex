@@ -127,9 +127,9 @@ These edge-native applications will handle user requests coming to nearby MDCs, 
 %
 \subsection{Execution models}\label{sec:execution_models}
 %
-Frontend services model should be packed in some standard way~\ref{sec:virtualization_techniques} and deployed in the wild, as an event-driven applications, with the subscription policy to message streams using topics~\cite{inproceedingsBeck}. The processing strategy is in the developer's hands, depending on the nature of the use-case. 
+Frontend services model should be packed in some standard way~\ref{sec:virtualization_techniques} and deployed in the wild, as an event-driven applications, with the subscription policy to message streams, or infinite sequences~\cite{Rutten03} using topics~\cite{inproceedingsBeck}. The processing strategy is in the developer's hands, depending on the nature of the use-case. 
 
-If an services are subscribed to some stream or topic, it is naturally that events apear in their stream. There are basically two strategies for building a large-scale time-ordered event system:
+If an services are subscribed to some stream using topic for example, it is naturally that events apear in their stream. There are basically two strategies for building a large-scale time-ordered event system:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{Fan out on write}, with this strategy every service has some form of inbox, and when event apear for some topic, that data is copied to every service that is subscribed. With this options, deads are fast, but writes are not because the more followers to the topic the longer it takes to persist all updates. 
