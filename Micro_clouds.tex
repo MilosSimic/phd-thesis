@@ -59,7 +59,9 @@ Single $topology$ reflects one CC provider, so multiple $topologies$ are forming
 
 These micro-clouds have much less resources, copared to standard clouds but they are much closter to the user meaning they have much fater response. In case of storage, if data is not present in the time of user request, they can pull data from the cloud and cache it for latter.
 
-This 3 thier acrchitecture with numerous clients in the bottom, micro clouds in the middle, and cloud on the top kinda resembles cache level architecture in CPU~\cite{FarshinRMK19}. On lower levels we have fastest response time, since data is on the device. But at the same time, we have very limited storage capacity and processing power. As we go on upper tiers, we have more and more storage capacity and processing power, but contrary the response time is higher and higher.  Esspecially when we take distance into consideration, and huge volumes of data that need to be moved to the cloud.
+This 3 thier acrchitecture with numerous clients in the bottom, micro clouds in the middle, and cloud on the top kinda resembles cache level architecture in CPU~\cite{FarshinRMK19}. 
+
+On lower levels we have fastest response time, since data is on the device. But at the same time, we have very limited storage capacity and processing power. As we go on the upper tiers, we have more and more storage capacity and processing power, but contrary the response time is higher and higher.  Esspecially when we take distance into consideration, and huge volumes of data that need to be moved to the cloud.
 
 Figure~\ref{fig:fig9}. shows the 3 tier architecture, with the response time and resource avelability.
 
@@ -123,6 +125,8 @@ Traditional DCs and CC propose specially designed cloud-native applications~\cit
 Applications may be split in front and back processing services. Front processing service is an edge-native application running inside micro cloud to minimize latency, while the back service runs in traditional cloid as a cloud-native application to leverage greater resources. 
 
 These edge-native applications will handle user requests coming to nearby MDCs, and communicate to cloud-native applications when needed. Separation like that gives developers better flexibility and large design space. 
+
+With this model we venture even deeper into understanding and applying concept of \textbf{data locality} presented on page~\pageref{ds:data_locality}. Since we have split into front and bakc processing, we are committed to do processing data closer to their soruce, instead of moving data to the cloud. But restriction is that, at the moment, these EC nodes are not equiped with huge processing and storage capacity. But nonetheless, we are moved processing even closer to the data, instead moving huge volumes of data to computing. This is most important part of the data locality.
 %
 %
 \subsection{Execution models}\label{sec:execution_models}
@@ -881,13 +885,13 @@ same as cluster formatoin protocol (cf. section~\ref{cluster_formation_informal_
 G' & = 
 \mathtt{service} \twoheadrightarrow \mathtt{istorage}{:}\mathit{try}(\T_3). \\
 & \hspace{1mm}
-\mathtt{istorage} \to \mathtt{service}{:}\mathit{resp}(Boolean).\\
+\mathtt{istorage} \to \mathtt{service}{:}\mathit{resp}(\mathsf{Boolean}).\\
 & \hspace{10mm}
 \left\{
 \begin{array}{@{}l@{}}
-\mathtt{service}\to\mathtt{log}{:} \mathit{done}(\mathsf{String}).\tend\\
-\mathtt{service}\to\mathtt{nodes}{:}\mathit{ids}(\T_4).
-\mathtt{nodes}\to \mathtt{state}{:}\mathit{rsrvd}().\G''
+\mathtt{service} \twoheadrightarrow\mathtt{log}{:} \mathit{done}(\mathsf{String}).\tend\\
+\mathtt{service} \twoheadrightarrow\mathtt{nodes}{:}\mathit{ids}(\T_4).
+\mathtt{nodes} \to \mathtt{service}{:}\mathit{rsrvd}().\G''
 \end{array} \right.
 \end{align*}
 
@@ -895,13 +899,13 @@ The idempotency store protocol $\G''$, starts with $\mathtt{service}$ sending mu
 
 \begin{align*}
 \G'' = & 
-\mathtt{service} \to \mathtt{mstorage}{:}\mathit{store}(\T_3).
-\mathtt{mstorage} \to \mathtt{istorage}{:}\mathit{save}(\T_3).\\
+\mathtt{service} \twoheadrightarrow \mathtt{mstorage}{:}\mathit{store}(\T_3).
+\mathtt{mstorage} \twoheadrightarrow \mathtt{istorage}{:}\mathit{save}(\T_3).\\
 & \hspace{4mm}
 \mathtt{istorage} \to \mathtt{mstorage}{:}\mathit{saved}().
 \mathtt{mstorage} \to \mathtt{service}{:}\mathit{stored}().\\
 & \hspace{4mm}
-\mathtt{service} \to \mathtt{sched}{:}\mathit{ids}(\T_5).\tend
+\mathtt{service} \twoheadrightarrow \mathtt{sched}{:}\mathit{ids}(\T_5).\tend
 \end{align*}
 
 We may now obtain the projections of global type $\G_3$ onto the participants $\mathtt{user}, \mathtt{service}, \mathtt{istorage}$, $\mathtt{mstorage}$, $\mathtt{log}$, $\mathtt{nodes}$: and $\mathtt{sched}$:
@@ -912,8 +916,8 @@ We may now obtain the projections of global type $\G_3$ onto the participants $\
 {+}
 \left\{
 \begin{array}{@{}l@{}}
-\mathtt{service}{!}\mathit{mutate}().\mathtt{service}{!}\mathit{create}(\T_3).\mathtt{service}{?}\mathit{ok}().\tend\\
 \mathtt{service}{!}\mathit{quit}().\tend\\
+\mathtt{service}{!}\mathit{create}(\T_3).\mathtt{service}{?}\mathit{ok}().\tend\\
 \end{array} \right.\\
 %\end{align*}
 %
@@ -923,54 +927,54 @@ We may now obtain the projections of global type $\G_3$ onto the participants $\
 {+}
 \left\{
 \begin{array}{@{}l@{}}
-\mathtt{user}{?}\mathit{mutate}().\mathtt{user}{?}\mathit{create}(\T_3).\mathtt{user}{!}\mathit{ok}().\ST'\\
 \mathtt{user}{?}\mathit{quit}().\tend \\
+\mathtt{user}{?}\mathit{create}(\T_3).\mathtt{user}{!}\mathit{ok}().\ST'\\
 \end{array} \right.
 \end{align*}
 where
 \begin{align*}
 \hspace{20mm}
 \ST' = &
-\mathtt{istorage}{!}\mathit{try}(\T_3).\mathtt{istorage}{?}\mathit{resp}(Boolean).\\
+\mathtt{istorage}{!!}\mathit{try}(\T_3).\mathtt{istorage}{?}\mathit{resp}(\mathsf{Boolean}).\\
 &
 {+}
 \left\{
 \begin{array}{@{}l@{}}
-\mathtt{nodes}{!}\mathit{ids}(\T_4).\mathtt{nodes}{?}\mathit{rsrvd}().\ST''\\
-\mathtt{log}{!}\mathit{done}().\tend\\
+\mathtt{log}{!!}\mathit{done}(\mathsf{String}).\tend\\
+\mathtt{nodes}{!!}\mathit{ids}(\T_4).\mathtt{nodes}{?}\mathit{rsrvd}().\ST''\\
 \end{array} \right.\\
 %\end{align*}
 %
 %\begin{align*}
 \hspace{-8mm}
 \ST'' = & 
-\mathtt{mstorage}{!}\mathit{store}(\T_3).\mathtt{mstorage}{?}\mathit{saved}().\\ & \hspace{-8mm}
-\mathtt{sched}{!}\mathit{ids}(\T_5).\tend\\
+\mathtt{mstorage}{!!}\mathit{store}(\T_3).\mathtt{mstorage}{?}\mathit{stored}().\\ & \hspace{-8mm}
+\mathtt{sched}{!!}\mathit{ids}(\T_5).\tend\\
 %\end{align*}
 %
 %\begin{align*}
 \hspace{-8mm}
 \ST_\mathtt{mstorage} =  & \hspace{2mm}
-\mathtt{service}{?}\mathit{store}(\T_3).\mathtt{istorage}{!}\mathit{store}(\T_3).\\ & \hspace{-8mm}
-.\mathtt{istorage}{?}\mathit{saved}().\mathtt{service}{!}\mathit{stored}().\tend\\
+\mathtt{service}{??}\mathit{store}(\T_3).\mathtt{istorage}{!!}\mathit{save}(\T_3).\\ & \hspace{-8mm}
+\mathtt{istorage}{?}\mathit{saved}().\mathtt{service}{!}\mathit{stored}().\tend\\
 %\end{align*}
 %
 %\begin{align*}
 \hspace{-8mm}
 \ST_\mathtt{istorage} =  &
-\mathtt{service}{?}\mathit{try}(\T_3).\mathtt{service}{!}\mathit{resp}(Boolean).\\ & \hspace{-8mm}
-\mathtt{mstorage}{!}\mathit{store}(\T_3).\mathtt{mstorage}{!}\mathit{saved}()\\
+\mathtt{service}{??}\mathit{try}(\T_3).\mathtt{service}{!}\mathit{resp}(\mathsf{Boolean}).\\ & \hspace{-8mm}
+\mathtt{mstorage}{??}\mathit{save}(\T_3).\mathtt{mstorage}{!}\mathit{saved}().\tend\\
 %\end{align*}
 %
 %\begin{align*}
 \hspace{-8mm}
 \ST_\mathtt{log} =  &
-\mathtt{iservice}{?}\mathit{done}(\T_3).\tend\\
+\mathtt{service}{??}\mathit{done}(\mathsf{String}).\tend\\
 %\end{align*}
 %
 %\begin{align*}
 \ST_\mathtt{nodes} =  &
-\mathtt{service}{?}\mathit{ids}(\T_4).\mathtt{service}{!}\mathit{rsrvd}().\tend\\
+\mathtt{service}{??}\mathit{ids}(\T_4).\mathtt{service}{!}\mathit{rsrvd}().\tend\\
 \end{align*}
 \myequations{Idempotency check global protocol projection.}
 
