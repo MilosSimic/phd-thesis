@@ -246,7 +246,7 @@ After nodes are separated,, for every node we created configuration file setting
 
 For convenient testing all nodes have same set of labels, and as labels we choose OS name, OS version, architecture version, node name and some basics detail about resources of the nodes.
 
-After some time, we were able to see all nodes registered in the system. When all nodes are sending health-check ping for some time and we have stable system, we issued a mutate operation creating clusters of nodes that are logicaly close ot each other, and we initiated cluster formation protocol~\ref{sec:cluster_formation_protocol}. After the protocol is done, we ended up with four clusters as we intended. We tried to initiate same command again to test idempotency check~\ref{sec:idempotency}, and we get message that clusters already exists.
+After some time, we were able to see all nodes registered in the system. When all nodes are sending health-check ping for some time and we have stable system, we issued a mutate operation creating clusters of nodes that are logicaly close ot each other, and we initiated cluster formation protocol~\ref{sec:cluster_formation_protocol}. After the protocol is done, we ended up with four clusters as we intended. We tried to initiate same command again to test idempotency check~\ref{sec:idempotency_protocol}, and we get message that clusters already exists.
 
 To increase capaticity, we extended clusters by creating new ones using $three clusters$ with $four-nodes$. We created new new mutate file, and initiate new mutate command. After some time, we saw that one cluster is down and that we now have $three clusters$ with $four-nodes$, as we intended. After successful creation of new clusters, we dleted down cluster.
 

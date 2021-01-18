@@ -1103,6 +1103,25 @@ For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in 
 Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
 %
 %
+\section{Access pattern}\label{sec:access_pattern}
+%
+In section~\ref{sec:application_model}, we already disccus system accesspattern from applications point of view, using streams and topics. In this section we are going to venture in dashboard and system access described in~\ref{sec:distribution_models}. 
+
+To acces the system, requests are going over some \textit{master process}. This process is not responsable to any sort of synchronization, agreement or something like that, but just to show dashboards and various system details since cloud is avalible anywhere in the world, while micro-cloud should serve local population. 
+
+One question that could come to the mind is, what if some cloud provider offering micro-cloud functionality, or running our master process goes down, should rest of the micro-clouds go to \textit{read-only} mode and only accept \textbf{read} requests?
+
+All communication is not exclusive to go over that master process, but if user is nearby to micro-cloud should be able initiate commands direcly to clusters, regions and topologies. But for dashboards and full informations about his micro-clouds cloud would be better solution, just because of more avalibe resources.
+
+If some cloud provider goes down for whatever reason, we should foreseen this and to resolve it we could use multiple cloud providers using \textit{Multi-Cloud Computing}~\cite{HongDSH19, Ardagna15}, so that one cloud provider is master process and many others are backup in case the whole cloud provider goes down.
+
+Here inevitably we have some state synchornization, and here we could rely on SEC and CRDTs to do synchrnoization without some expensive coordination between providers.
+
+This is not generally a problem, if applicatoins that are running in micro-clouds are not dependent on some process, location, sensors od services etc. If we this is the case, than we can connect micro-clouds in sort of P2P network and give them some logic to just route request to proper location on the globe. 
+
+This might not be that fast, since even light is afected by the distance, but we would be able to issue requests to cluster on totally different part of the world.
+%
+%
 \section{Repercussion}\label{sec:repercussion}
 %
 Model presented in this chapter, have two possible repercussions:
@@ -1115,7 +1134,9 @@ Model presented in this chapter, have two possible repercussions:
 %
 \section{Limitations}\label{sec:limitations}
 %
-Since the perfect model never existed, model that is proposed in this thesis have some limitations, that we must be aware of. Either to work on improvements, or use the model as is. When talking about small scale servers and micro-clouds, we must be aware of the few things. 
+Since the perfect model never existed, model that is proposed in this thesis have some limitations, that we must be aware of. Either to work on improvements, or use the model as is. 
+
+When talking about small scale servers and micro-clouds, we must be aware of the few things. 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item not all companies and organizations will be able to deploy them, due to the high investments required~\cite{MonsalveCC18}. Similar to the cloud where massive DCs are built by a few companies and used by many others. These small servers could be deployed by government authorities or large cloud companies for their own needs. The general public can use them, similarly to the cloud --- pay as you go, model.
@@ -1123,6 +1144,7 @@ Since the perfect model never existed, model that is proposed in this thesis hav
 	\item These small scale servers must be out of reach of people, and protected in some way so that not everyone have access to them. Some degree of phisical security mut be implemented.
 	\item places where these small scale servers will be deployd must have stable internet connection, and ability to integrate SDN or other similar techologies, so that complex network topologies could be implemented properly.
 	\item these servers can have some open architecture or could be custom built by other providers. In both cases they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
+	\item spliting into two parts processing and possibility that users can be responsabile for micro-clouds may rise some legal concerns. Either to develop interesting applications, use tham as a firewall or simply use them as a privacy level for data there must be legal agreement that might not be that easy to achieve.
 \end{enumerate}
 %
 %

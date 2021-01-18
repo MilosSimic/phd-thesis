@@ -275,7 +275,7 @@ To resolve this problem, Das et al.~\cite{DasGM02} introduced \textbf{S}calable 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{Failure detection}, this component works so that one node will select random node in the group, and it will send him $ping$ message, expecting $ack$ message in return --- \textbf{direct ping}. If such message is not received, he will pick $n$ nodes to probe through a $ping-req$ message --- \textbf{indirect ping}. If this fail, node will be marked as $suspected$, and it will be marked as $dead$ after some timeout. If node get alive, he will ping some other node and he will get back into the group. Figure~\ref{fig:fig15} show message passing in \textbf{direct} $(left)$, and \textbf{indirect} $(right)$ ping in SWIM protocol.
-	\item \textbf{Information dissemination}, with previous strategy, we can disseminate information by piggybacking the data on multiple messages ($ping$, $ping-req$ and $ack$), and avoid using the multicast solution.
+	\item \textbf{Information dissemination}, with previous strategy, we can disseminate information by \textbf{piggybacking} the data on multiple messages ($ping$, $ping-req$ and $ack$), and avoid using the multicast solution.
 \end{enumerate}
 
 \begin{figure}[H]
@@ -499,7 +499,7 @@ In the master-slave architecture, there is one node that is in charge -- \textbf
 
 But no metter how specialized hardware master runs on, it is prone to fail for varios reasons, so he is a \textbf{single point of failure}. If crush happend, than standby master could continue to server as a master, or new \textbf{leader election} protocol~\cite{KorachKM90} is initiated to pick new master node. 
 
-Master node is responsible for processing any updates to that data. If the master fails, than  the slaves can still handle read requests. Failure of the standby master node, to take over from the master node is a real problem if we want to achieve high-availability system.
+Master node is responsible for processing any updates to that data. If the master fails, than  the slaves can still handle \textbf{read} requests. Failure of the standby master node, to take over from the master node is a real problem if we want to achieve high-availability system.
 
 Figure~\ref{fig:fig16} show difference between mater-slave $(left)$ and peer-to-peer $(right)$ request handling.
 
