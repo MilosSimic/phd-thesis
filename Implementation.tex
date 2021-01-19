@@ -25,6 +25,8 @@ All services, are higly customizable and all have their own configuratoin file t
 
 The system operates with four commands, where three of them follow formal models described in previous chapter. Last command is simple command to list logs for every user.
 
+Regarding~\ref{sec:access_pattern}, framework operate as master process is running in Kubernetes, and through that process all comands are issued. Future applications can comunicate with nodes as stated in~\ref{sec:application_model}. They do not requre communicatoin with master process at all, they can communicate with formed cluster using topics and streams.
+
 In the rest of this section we will see details about all operations, as well as used technologies to implement whole system. We will describe possible applicatinos and give future directions for applicatoin development. System architecture is shown in Figure~\ref{fig:fig11}.
 
 \begin{figure}[H]

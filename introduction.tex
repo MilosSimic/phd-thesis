@@ -199,7 +199,7 @@ By the ownership, CC can be categorized into three categories:
 	\item \textbf{Hybrid cloud} is such environment that uses both public and private clouds. Examples include: IBM, HP, VMWare vCloud etc.
 \end{itemize}
 
-Table~\ref{tab:table4} show comparison of public, private and hybrid cloud capabilities.
+Table~\ref{tab:table4} show comparison of public, private and hybrid cloud capabilities.\label{sec_types}
 
 \begin{table}[h!]
 	\begin{center}
@@ -246,6 +246,12 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 	\caption{Common examples of SaaS, PaaS, and IaaS.}
 	\label{tab:table2}
 \end{table}
+
+In recent years there is one extensoin of CC from series stand point callend \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15}. 
+
+A multi-cloud environment is such environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers, that each delivers a specific application or service. A multicloud can be comprised of any model presented on page~\pageref{sec_types}.
+
+This model raly on possibility that if one cloud provider fails for whatever reson, next one will be able to serve user requests.
 
 CC is giving a user an illusion that he is using single machine, while the backgroud implementaion is fairly complicated and consists of various elements that are composed of countles machines. CC is tipical example of horizontally scalable system presented in~\ref{sec:scalability}
 %
@@ -391,6 +397,8 @@ Since their inception, microservices architecture is gone through some adaptatio
 	\item \textbf{Service Mesh} is designed to standardize the runtime operations of applications~\cite{LiLGZH19}. As part of the microservices ecosystem,
 	this dedicated communication layer can provide a number of benefits, such as: $(1)$ observability, $(2)$ providing secure connections, or $(3)$ automating retries and backoff for failed requests. With these features, developers only focus on implementation of buisniss logic, while operators gain out-of-the-box traffic policies, observability, and insights from the services. Advocates of microservice movemant, nowdays recommend using service mesh architecture when running microservices in production environments.
 \end{itemize}
+
+Previous models are not explicilty different, they all can be viewd as cloud-native applicatoins. The enumeration is give for the sake of pointing out their different models and aspects of working.
 
 Microservices communicate over a network to fulfil some goal using message passing technique and technology-agnostic protocols such as HTTP. They can be implemented as:
 
