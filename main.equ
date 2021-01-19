@@ -9,13 +9,13 @@
 \contentsline {myequations}{\numberline {3.3}Extending free servers set.}{71}{equation.3.6.3}% 
 \contentsline {myequations}{\numberline {3.4}Extending label set.}{72}{equation.3.6.4}% 
 \contentsline {myequations}{\numberline {3.4}Health-check global protocol.}{73}{definition.3.6.3}% 
-\contentsline {myequations}{\numberline {3.4}Health-check global protocol projection.}{73}{definition.3.6.3}% 
-\contentsline {myequations}{\numberline {3.5}Query selector formation.}{76}{equation.3.6.5}% 
+\contentsline {myequations}{\numberline {3.4}Health-check global protocol projection.}{74}{definition.3.6.3}% 
+\contentsline {myequations}{\numberline {3.5}Query selector formation.}{77}{equation.3.6.5}% 
 \contentsline {myequations}{\numberline {3.8}Server selector.}{77}{equation.3.6.8}% 
 \contentsline {myequations}{\numberline {3.9}Extending task queue set.}{77}{equation.3.6.9}% 
-\contentsline {myequations}{\numberline {3.9}Cluster formation global protocol.}{79}{Item.108}% 
-\contentsline {myequations}{\numberline {3.9}Cluster formation global protocol projection.}{81}{Item.110}% 
-\contentsline {myequations}{\numberline {3.9}Idempotency check global protocol.}{86}{Item.122}% 
-\contentsline {myequations}{\numberline {3.9}Idempotency check global protocol projection.}{87}{Item.124}% 
-\contentsline {myequations}{\numberline {3.9}List detail global protocol.}{90}{algocf.6}% 
-\contentsline {myequations}{\numberline {3.9}List detail global protocol projection.}{90}{algocf.6}% 
+\contentsline {myequations}{\numberline {3.9}Cluster formation global protocol.}{80}{Item.108}% 
+\contentsline {myequations}{\numberline {3.9}Cluster formation global protocol projection.}{82}{Item.110}% 
+\contentsline {myequations}{\numberline {3.9}Idempotency check global protocol.}{87}{Item.122}% 
+\contentsline {myequations}{\numberline {3.9}Idempotency check global protocol projection.}{89}{Item.124}% 
+\contentsline {myequations}{\numberline {3.9}List detail global protocol.}{91}{algocf.6}% 
+\contentsline {myequations}{\numberline {3.9}List detail global protocol projection.}{92}{algocf.6}% 

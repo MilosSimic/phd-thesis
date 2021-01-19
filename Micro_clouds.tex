@@ -223,6 +223,7 @@ We can model communication protocols %from node to the system
 using~\cite{HuY17}, an extension of \emph{multiparty asynchronous session types} (MPST)~\cite{HondaYC08} %, HondaYC16} 
 --- a class of behavioral types tailored for describing distributed protocols relying on asynchronous
 communications. 
+
 The type specifications are not only useful as formal descriptions of the protocols, but we can also rely on a modeling-based approach developed in~\cite{HuY17} to validate our protocols satisfies multiparty session types safety (there is no reachable error state) and progress (an action is eventually executed, assuming
 fairness). %\comment{Mozda ovo naglasiti jos od samog uvodjenja tipova sesija??}
 
@@ -438,9 +439,9 @@ Hence, if the session after the first ping from $\mathtt{node}$ to $\mathtt{node
 Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, \mathtt{state}$ and $\mathtt{log}$ we obtain local types:
 \begin{align*}
 \ST_\mathtt{node}  & = 
-\mathtt{nodes}{!!}\mathit{health{\_}check}(\T_1).\tend \\
-%
-%
+\mathtt{nodes}{!!}\mathit{health{\_}check}(\T_1).\tend
+\end{align*}
+\begin{align*}
 \ST_\mathtt{nodes} & = 
 \mathtt{node}{??}\mathit{health{\_}check}(\T_1). \\
 & \hspace{-2mm}
@@ -449,13 +450,13 @@ Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, 
 \begin{array}{@{}l@{}}
 \mathtt{state}{!!}\mathit{active}(\T_2).\mathtt{log}{!!}\mathit{used}(\T_2).\tend\\
 \mathtt{log}{!!}\mathit{free}(\T_2).\tend
-\end{array} \right.\\
-%
-%
+\end{array} \right.
+\end{align*}
+\begin{align*}
 \ST_\mathtt{state} &= 
-\mathtt{nodes}{??}\mathit{active}(\T_2).\tend\\
-%
-%
+\mathtt{nodes}{??}\mathit{active}(\T_2).\tend
+\end{align*}
+\begin{align*}
 \ST_\mathtt{log} &= 
 {+}
 \left\{
@@ -465,7 +466,6 @@ Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, 
 \end{array} \right.
 \end{align*}
 \myequations{Health-check global protocol projection.}
-
 where, for instance, type $\ST_\mathtt{nodes}$ specifies $\mathtt{nodes}$ can receive the ping message from $\mathtt{node}$, after which it will dynamically introduce either $\mathtt{state}$ or $\mathtt{log}$ into the session, where in the former case it also connects $\mathtt{log}$ (but now with message $\mathit{free}$). 
 %
 %
@@ -689,81 +689,76 @@ We may now obtain the projections of global type $\G_2$ onto the participants $\
 \mathtt{state}{!}\mathit{mutate}().\mathtt{state}{!}\mathit{create}(\T_3).\mathtt{state}{?}\mathit{ok}().\tend\\
 \mathtt{state}{!}\mathit{quit}().\tend\\
 \mathtt{state}{!}\mathit{query}(\T_1).\ty
-\end{array} \right.\\
-%\end{align*}
-%
-%\begin{align*}
-\ST_\mathsf{state} = &
-\mathtt{user}{??}\mathit{query}(\T_1).
-\mathtt{nodes}{!!}\mathit{query}(\T_1). %\\
-%& \hspace{2mm}
-\mu \ty. 
-\mathtt{nodes}{?}\mathit{resp}(\T_2).\\
-& \hspace{-4mm} 
-\mathtt{user}{!}\mathit{resp}(\T_2).\\
-& \hspace{-10mm}
-{+}
-\left\{
-\begin{array}{@{}l@{}}
-\mathtt{user}{?}\mathit{mutate}().\mathtt{user}{?}\mathit{create}(\T_3).\mathtt{user}{!}\mathit{ok}().
-\mathtt{nodes}{!}\mathit{ids}(\T_4).\ST'\\
-\mathtt{user}{?}\mathit{quit}().\tend \\
-\mathtt{user}{?}\mathit{query}(\T_1).\mathtt{nodes}{!}\mathit{query}(\T_1).\ty
 \end{array} \right.
+\end{align*}
+\begin{align*}
+	\ST_\mathsf{state} = &
+	\mathtt{user}{??}\mathit{query}(\T_1).
+	\mathtt{nodes}{!!}\mathit{query}(\T_1). %\\
+	%& \hspace{2mm}
+	\mu \ty. 
+	\mathtt{nodes}{?}\mathit{resp}(\T_2).\\
+	& \hspace{-4mm} 
+	\mathtt{user}{!}\mathit{resp}(\T_2).\\
+	& \hspace{-10mm}
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}
+	\mathtt{user}{?}\mathit{mutate}().\mathtt{user}{?}\mathit{create}(\T_3).\mathtt{user}{!}\mathit{ok}().
+	\mathtt{nodes}{!}\mathit{ids}(\T_4).\ST'\\
+	\mathtt{user}{?}\mathit{quit}().\tend \\
+	\mathtt{user}{?}\mathit{query}(\T_1).\mathtt{nodes}{!}\mathit{query}(\T_1).\ty
+	\end{array} \right.
 \end{align*}
 where
 \begin{align*}
-\ST' = &
-{+}\\
-& \hspace{-14mm}
-\left\{
-\begin{array}{@{}l@{}}
-\mathtt{nodes}{?}\mathit{rsrvd}().\mathtt{sched}{!!}\mathit{ids}(\T_5).\mathtt{nodes}{?}\mathit{succ}().\mathtt{log}{!!}\mathit{succ}().\tend\\
-\mathtt{nodes}{?}\mathit{err}(\mathsf{String}).\mathtt{log}{!!}\mathit{err}(\mathsf{String}).\tend
-\end{array} \right.\\
-%\end{align*}
-%
-%\begin{align*}
-\ST_\mathtt{nodes} =  &
-\mathtt{state}{??}\mathit{query}(\T_1).
-\mu \ty.
-\mathtt{state}{!}\mathit{resp}(\T_2).\\
-& \hspace{-14mm}
-{+}
-\left\{
-\begin{array}{@{}l@{}}
-\mathtt{state}{?}\mathit{ids}(\T_4).
-{+}\left\{
-\begin{array}{@{}l@{}}
-\mathtt{state}{!}\mathit{rsrvd}().\tend\\
-\mathtt{state}{!}\mathit{err}(\mathsf{String}).\mathtt{poll}{??}\mathit{nids}(\T_4).\\
-\mathtt{state}{!}\mathit{succ}().\tend
-\end{array} \right.	\\
-\mathtt{state}{?}\mathit{query}(\T_1).\ty
-\end{array} \right.\\
-%\end{align*}
-%
-%\begin{align*}
-\ST_\mathtt{log} =& 
-{+}
-\left\{
-\begin{array}{@{}l@{}}
-\mathtt{state}{??}\mathit{succ}().\tend\\
-\mathtt{state}{??}\mathit{err}(\mathsf{String}).\tend
-\end{array} \right.\\
-%\end{align*}
-%
-%\begin{align*}
-\ST_\mathtt{pool} =&
-\mathtt{sched}{??}\mathit{update}(\T_6).
-\mathtt{sched}{!}\mathit{ok}(). 
-\mathtt{nodes}{!!}\mathit{nids}(\T_4).\tend\\
-%\end{align*}
-%\begin{align*}
-\ST_\mathtt{sched} =& 
-\mathtt{state}{??}\mathit{ids}(\T_5).
-\mathtt{pool}{!!}\mathit{update}(\T_6).
-\mathtt{pool}{?}\mathit{ok}().\tend
+	\ST' = &
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}
+	\mathtt{nodes}{?}\mathit{rsrvd}().\mathtt{sched}{!!}\mathit{ids}(\T_5).\mathtt{nodes}{?}\mathit{succ}().\mathtt{log}{!!}\mathit{succ}().\tend\\
+	\mathtt{nodes}{?}\mathit{err}(\mathsf{String}).\mathtt{log}{!!}\mathit{err}(\mathsf{String}).\tend
+	\end{array} \right.
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{nodes} =  &
+	\mathtt{state}{??}\mathit{query}(\T_1).
+	\mu \ty.
+	\mathtt{state}{!}\mathit{resp}(\T_2).\\
+	& \hspace{-14mm}
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}
+	\mathtt{state}{?}\mathit{ids}(\T_4).
+	{+}\left\{
+	\begin{array}{@{}l@{}}
+	\mathtt{state}{!}\mathit{rsrvd}().\tend\\
+	\mathtt{state}{!}\mathit{err}(\mathsf{String}).\mathtt{poll}{??}\mathit{nids}(\T_4).\\
+	\mathtt{state}{!}\mathit{succ}().\tend
+	\end{array} \right.	\\
+	\mathtt{state}{?}\mathit{query}(\T_1).\ty
+	\end{array} \right.
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{log} =& 
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}
+	\mathtt{state}{??}\mathit{succ}().\tend\\
+	\mathtt{state}{??}\mathit{err}(\mathsf{String}).\tend
+	\end{array} \right.
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{pool} =&
+	\mathtt{sched}{??}\mathit{update}(\T_6).
+	\mathtt{sched}{!}\mathit{ok}(). 
+	\mathtt{nodes}{!!}\mathit{nids}(\T_4).\tend
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{sched} =& 
+	\mathtt{state}{??}\mathit{ids}(\T_5).
+	\mathtt{pool}{!!}\mathit{update}(\T_6).
+	\mathtt{pool}{?}\mathit{ok}().\tend
 \end{align*}
 \myequations{Cluster formation global protocol projection.}
 
@@ -911,73 +906,62 @@ The idempotency store protocol $\G''$, starts with $\mathtt{service}$ sending mu
 We may now obtain the projections of global type $\G_3$ onto the participants $\mathtt{user}, \mathtt{service}, \mathtt{istorage}$, $\mathtt{mstorage}$, $\mathtt{log}$, $\mathtt{nodes}$: and $\mathtt{sched}$:
 
 \begin{align*}
-\hspace{-4mm}
 \ST_\mathsf{user} = &
 {+}
 \left\{
 \begin{array}{@{}l@{}}
 \mathtt{service}{!}\mathit{quit}().\tend\\
 \mathtt{service}{!}\mathit{create}(\T_3).\mathtt{service}{?}\mathit{ok}().\tend\\
-\end{array} \right.\\
-%\end{align*}
-%
-%\begin{align*}
-\hspace{-2mm}
-\ST_\mathsf{service} = &
-{+}
-\left\{
-\begin{array}{@{}l@{}}
-\mathtt{user}{?}\mathit{quit}().\tend \\
-\mathtt{user}{?}\mathit{create}(\T_3).\mathtt{user}{!}\mathit{ok}().\ST'\\
 \end{array} \right.
+\end{align*}
+\begin{align*}
+	\ST_\mathsf{service} = &
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}
+	\mathtt{user}{?}\mathit{quit}().\tend \\
+	\mathtt{user}{?}\mathit{create}(\T_3).\mathtt{user}{!}\mathit{ok}().\ST'\\
+	\end{array} \right.
 \end{align*}
 where
 \begin{align*}
-\hspace{20mm}
-\ST' = &
-\mathtt{istorage}{!!}\mathit{try}(\T_3).\mathtt{istorage}{?}\mathit{resp}(\mathsf{Boolean}).\\
-&
-{+}
-\left\{
-\begin{array}{@{}l@{}}
-\mathtt{log}{!!}\mathit{done}(\mathsf{String}).\tend\\
-\mathtt{nodes}{!!}\mathit{ids}(\T_4).\mathtt{nodes}{?}\mathit{rsrvd}().\ST''\\
-\end{array} \right.\\
-%\end{align*}
-%
-%\begin{align*}
-\hspace{-8mm}
-\ST'' = & 
-\mathtt{mstorage}{!!}\mathit{store}(\T_3).\mathtt{mstorage}{?}\mathit{stored}().\\ & \hspace{-8mm}
-\mathtt{sched}{!!}\mathit{ids}(\T_5).\tend\\
-%\end{align*}
-%
-%\begin{align*}
-\hspace{-8mm}
-\ST_\mathtt{mstorage} =  & \hspace{2mm}
-\mathtt{service}{??}\mathit{store}(\T_3).\mathtt{istorage}{!!}\mathit{save}(\T_3).\\ & \hspace{-8mm}
-\mathtt{istorage}{?}\mathit{saved}().\mathtt{service}{!}\mathit{stored}().\tend\\
-%\end{align*}
-%
-%\begin{align*}
-\hspace{-8mm}
-\ST_\mathtt{istorage} =  &
-\mathtt{service}{??}\mathit{try}(\T_3).\mathtt{service}{!}\mathit{resp}(\mathsf{Boolean}).\\ & \hspace{-8mm}
-\mathtt{mstorage}{??}\mathit{save}(\T_3).\mathtt{mstorage}{!}\mathit{saved}().\tend\\
-%\end{align*}
-%
-%\begin{align*}
-\hspace{-8mm}
-\ST_\mathtt{log} =  &
-\mathtt{service}{??}\mathit{done}(\mathsf{String}).\tend\\
-%\end{align*}
-%
-%\begin{align*}
-\ST_\mathtt{nodes} =  &
-\mathtt{service}{??}\mathit{ids}(\T_4).\mathtt{service}{!}\mathit{rsrvd}().\tend\\
+	\ST' = &
+	\mathtt{istorage}{!!}\mathit{try}(\T_3).\mathtt{istorage}{?}\mathit{resp}(\mathsf{Boolean}).\\
+	&
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}
+	\mathtt{log}{!!}\mathit{done}(\mathsf{String}).\tend\\
+	\mathtt{nodes}{!!}\mathit{ids}(\T_4).\mathtt{nodes}{?}\mathit{rsrvd}().\ST''\\
+	\end{array} \right.
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{mstorage} =  & \hspace{2mm}
+	\mathtt{service}{??}\mathit{store}(\T_3).\mathtt{istorage}{!!}\mathit{save}(\T_3).\\ & \hspace{-8mm}
+	\mathtt{istorage}{?}\mathit{saved}().\mathtt{service}{!}\mathit{stored}().\tend
+\end{align*}
+\begin{align*}
+	\ST'' = & 
+	\mathtt{mstorage}{!!}\mathit{store}(\T_3).\mathtt{mstorage}{?}\mathit{stored}().\\ & \hspace{-8mm}
+	\mathtt{sched}{!!}\mathit{ids}(\T_5).\tend
+	%\end{align*}
+	%
+	%\begin{align*}
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{istorage} =  &
+	\mathtt{service}{??}\mathit{try}(\T_3).\mathtt{service}{!}\mathit{resp}(\mathsf{Boolean}).\\ & \hspace{-8mm}
+	\mathtt{mstorage}{??}\mathit{save}(\T_3).\mathtt{mstorage}{!}\mathit{saved}().\tend
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{log} =  &
+	\mathtt{service}{??}\mathit{done}(\mathsf{String}).\tend
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{nodes} =  &
+	\mathtt{service}{??}\mathit{ids}(\T_4).\mathtt{service}{!}\mathit{rsrvd}().\tend
 \end{align*}
 \myequations{Idempotency check global protocol projection.}
-
 Similarly as for $\G_2$ we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
 %
 %
@@ -1046,58 +1030,59 @@ $(2)$ $\mathit{list^*}$, specifies no need for a detailed view is specified, whe
 \end{array} \right.
 \end{align*}
 \myequations{List detail global protocol.}
-
 Global type $\G'$ starts with $\mathtt{nodes}$ replying to $\mathtt{state}$ $\mathit{result}$ message and a payload identifying parts of the system user wants to see in greater detail typed with $\T_3$. Then, $\mathtt{state}$ connects $\mathtt{log}$ with $\mathtt{details}$ and also sends $\mathtt{result}$ to $\mathtt{user}$, and finally terminates. 
 In $\G''$, $\mathtt{state}$ also connects $\mathtt{log}$ with $\mathit{brief}$ and a payload typed with $\T_5$ identifying parts of the system user wants to see without greater detail. Then, $\mathtt{state}$ replies to $\mathtt{user}$ with $\mathtt{result}$ message, and the protocol terminates.
 \begin{align*}
-\G' =  & 
-\mathtt{nodes}\to\mathtt{state}{:}\mathit{result}(\T_3).\mathtt{state}\twoheadrightarrow \mathtt{log}{:}\mathit{detail}(\T_3). \\
-& \hspace{2mm}
-\mathtt{state}\to\mathtt{user}{:}\mathit{result}(\T_3).\tend\\
-\G'' = &
-\mathtt{state}\twoheadrightarrow \mathtt{log}{:}\mathit{brief}(\T_5).\mathtt{state}\to\mathtt{user}{:}\mathit{result}(\T_5).\tend
+\begin{split}
+	\G' =  & 
+	\mathtt{nodes}\to\mathtt{state}{:}\mathit{result}(\T_3).\mathtt{state}\twoheadrightarrow \mathtt{log}{:}\mathit{detail}(\T_3). \\
+	& \hspace{2mm}
+	\mathtt{state}\to\mathtt{user}{:}\mathit{result}(\T_3).\tend
+\end{split}
+\end{align*}
+\begin{align*}
+	\G'' = &
+	\mathtt{state}\twoheadrightarrow \mathtt{log}{:}\mathit{brief}(\T_5).\mathtt{state}\to\mathtt{user}{:}\mathit{result}(\T_5).\tend
 \end{align*}
 
 Same as for the health-check and the cluster formation protocols, here we also present the projections of global type $\G_4$, modeling the list protocol, onto participants $\mathtt{user}$, $\mathtt{state}$, $\mathtt{nodes}$, and $\mathtt{log}$:
 \begin{align*}
-\ST_\mathtt{user} =& 
-{+}
-\left\{
-\begin{array}{@{}l@{}}  
-\mathtt{state}{!!}\mathit{list}(\T_1).\mathtt{state}{?}\mathit{result}(\T_3).\tend \\
-\mathtt{state}{!!}\mathit{list^*}(\T_4).\mathtt{state}{?}\mathit{result}(\T_5).\tend 
-\end{array} \right. \\
-%
-%
-\ST_\mathtt{state} =&
-{+}
-\left\{
-\begin{array}{@{}l@{}}  
-\mathtt{user}{??}\mathit{list}(\T_1).\mathtt{nodes}{!!}\mathit{query}(\T_2).\ST'\\
-\mathtt{user}{??}\mathit{list^*}(\T_4).\mathtt{log}{!!}\mathit{brief}(\T_5).\mathtt{user}{!}\mathit{result}(\T_5).\tend
-\end{array} \right. 
+	\ST_\mathtt{user} =& 
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}  
+	\mathtt{state}{!!}\mathit{list}(\T_1).\mathtt{state}{?}\mathit{result}(\T_3).\tend \\
+	\mathtt{state}{!!}\mathit{list^*}(\T_4).\mathtt{state}{?}\mathit{result}(\T_5).\tend 
+	\end{array} \right.
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{state} =&
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}  
+	\mathtt{user}{??}\mathit{list}(\T_1).\mathtt{nodes}{!!}\mathit{query}(\T_2).\ST'\\
+	\mathtt{user}{??}\mathit{list^*}(\T_4).\mathtt{log}{!!}\mathit{brief}(\T_5).\mathtt{user}{!}\mathit{result}(\T_5).\tend
+	\end{array} \right. 
 \end{align*}
 where
 \begin{align*}
-%
-\ST'  =& 
-\mathtt{nodes}{?}\mathit{result}(\T_3).\mathtt{log}{!!}\mathit{detail}(\T_3).\mathtt{user}{!}\mathit{result}(\T_3).\tend\\
-%
-%
-\ST_\mathtt{nodes} = &
-\mathtt{state}{??}\mathit{query}(\T_2).\mathtt{state}{!}\mathit{result}(\T_3).\tend \\
-%
-%
-\ST_\mathtt{log} = & 
-{+}
-\left\{
-\begin{array}{@{}l@{}}  
-\mathtt{state}{??}\mathit{detail}(\T_3).\tend \\
-\mathtt{state}{??}\mathit{brief}(\T_5).\tend \\
-\end{array} \right.
+	\ST'  =& 
+	\mathtt{nodes}{?}\mathit{result}(\T_3).\mathtt{log}{!!}\mathit{detail}(\T_3).\mathtt{user}{!}\mathit{result}(\T_3).\tend
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{nodes} = &
+	\mathtt{state}{??}\mathit{query}(\T_2).\mathtt{state}{!}\mathit{result}(\T_3).\tend
+\end{align*}
+\begin{align*}
+	\ST_\mathtt{log} = & 
+	{+}
+	\left\{
+	\begin{array}{@{}l@{}}  
+	\mathtt{state}{??}\mathit{detail}(\T_3).\tend \\
+	\mathtt{state}{??}\mathit{brief}(\T_5).\tend \\
+	\end{array} \right.
 \end{align*}
 \myequations{List detail global protocol projection.}
-
 For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in the session only after receiving from $\mathtt{state}$, either message $\mathit{detail}$, or message $\mathit{brief}$, and then terminates. 
 
 Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
