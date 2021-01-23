@@ -1,18 +1,26 @@
 %!TEX root =  main.tex
 \chapter{Micro clouds and edge computing as a service}\label{chapter:Micro_clouds}
 %
-This section explains the model of EC as a service compared to the traditional CC model. We present the formation of such a system with a formal model and proof of concept implementation based on the proposed model.
+In this section, we are going to present a core idea of this thesis from point of view how such a model can be formed and described, and what is important so that such a system operates properly. We will describe a micro-service model, based on the CC organizational model.  The presented model will be able to support EC as a service, amongst other applications and use-cases. 
 
-In Section~\ref{sec:configurable_model_structure} present configurable model used to describe our system. in Section~\ref{sec:separation_of_concerns} we present separation of concerns for our model. In Section~\ref{sec:as_a_service_model} we discuss how this system could be offered as a service model and could be used for EC as a service. In Section~\ref{sec:application_model} we present possible application model and how users can utilize newly created architecture fully, using existing application models. Section~\ref{sec:immutable_infrastructure} present desired option for infrastructure deployment. In Section~\ref{sec:formal_model} we present why formal models are important in computer science and DS in particular, as well as model of our system with all protocols and nodes properties. Section~\ref{sec:repercussion} give repercussion of proposed model, and how it can be used as stand alone model where other features could be implemented on top of that or used as service for other, existing, systems. Finally, section~\ref{sec:limitations} present limitation of our model.
+Throughout this section, we are going to rely on research presented in chapter~\ref{chapter:Intro} and chapter~\ref{chapter:Review} and make a connection with the existing CC model.
+
+In Section~\ref{sec:configurable_model_structure} we present a high overview of the system. We present an architecture that is influenced by the standard CC model but adopted for a different environment. In Section~\ref{sec:separation_of_concerns} we introduce the separation of concerns model, for previously defined system architecture. In Section~\ref{sec:application_model} we present a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. In Section~\ref{sec:as_a_service_model} we discuss how this system could be offered as a service, and what options can be offered to the potential users for developing their applications. Section~\ref{sec:immutable_infrastructure} presents desired option for infrastructure and application deployment, and why immutability is important in a micro-cloud geo=distributed environment. In Section~\ref{sec:formal_model} we present why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation. Section~\ref{sec:access_pattern} show access patterns that could be used in micro-clouds and geo=distributed environments. Section~\ref{sec:repercussion} gives repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems. Finally, we conclude this chapter wi section~\ref{sec:limitations} present limitations of our model.
 %
 %
 \section{Configurable Model Structure}\label{sec:configurable_model_structure}
 %
-Satyanarayanan et al.~\cite{SatyanarayananK19} propse architecture eparated into 3 tiers. Combained with MDCs and a zone-based server organization we get a good starting point for building EC as a service and micro cloud system, because we can extend the computing power and storage capacity serving local population. But, we need a more available and resilient system with less latency. To do that we need to extend these concepts and adopt them for different usage scenario.
+In his work~\cite{SatyanarayananK19} Satyanarayanan et al. propose a new architecture pattern and separation into the three tiers, where every tier or layer has a distinct role. This idea is a very powerful one because we can now split and optimize applications into parts for a specific role in the global picture. On the other hand, too many moving parts meaning more problems, and the whole system is potentially more prone to errors and failures.
 
-If we take a look at the CC design, every part contributes to a more resilient and scalable system. Regions (or DCs) are isolated and independent from each other, and also contain resources application needs. They are usually composed of few availability zones~\cite{SouzaMFAK19}. If the one zone fails, there are still more of them to serve user requests. With some adaptations, EC could use a similar proven strategy. That strategy could be than used in applications beyound just EC.
+If we take the previous model and combine it with MDCs and a zonally-based server organization we get a good starting point for building micro-cloud infrastructure, and EC as a service. This extension is an interesting move because we can then extend the computing power and storage capacity that is serving the nearby population. This base model is just a starting point that is promising but to make a fully functional model, we need to make it more available and resilient with less latency. To achieve such behavior, we need to extend these concepts and adapt them for different usage scenarios but never losing a geo-distributed idea from our vision.
 
-Table~\ref{tab:table5} shows similar concepts between CC and edge centric computing (ECC) concepts, with accent on difference what is the physical part, and what are logical concepts.
+To extend the system in a new direction, we can look for some inspiration in existing systems that are proven and working. This is especially important in DS, so we want to lower down the complexity and avoid known problems by sticking to existing models and algorithms. When we observer the CC design, we can see that every single part in that system, contributes to a more resilient and scalable system. On the high level, the CC architecture is separated into few building blocks that make the whole system lot easier to understand, maintain and operate.
+
+The first building block of CC architecture is a cluster, and a cluster can be defined as a set of nodes or servers that operate as a single unit to achieve some goal. This is where resources are, and this is where user applications are running on. The next building block that consists of multiple clusters is called Regions (or DCs). Regions are isolated and independent from each other, and they contain resource application needs. These resources come in form of clusters. Regions are usually composed of a few availability zones~\cite{SouzaMFAK19}. These zones are the defense against the fail. If for whatever reason, one zone fails or goes offline, there are still more of them to serve user requests, we have better availability, scalability, and resilience.
+
+If we now observer micro-clouds as geo-distributed systems, we can use a similar model, with some adaptations. Rely on a similar proven strategy, do not reinvent the wheel, but adopt for the different use-case.
+
+Table~\ref{tab:table5} present similar concepts between CC and edge-centric computing (ECC) concepts. Here we want to put an accent on the difference between the physical logical concepts in the two models.
 
 \begin{table}[h!]
 	\begin{center}
@@ -29,41 +37,54 @@ Table~\ref{tab:table5} shows similar concepts between CC and edge centric comput
 	\label{tab:table5}
 \end{table}
 
-We can combine multiple node clusters into a bigger logical concept of $region$, increasing availability and reliability of both system and applications. We are talking about geo-distributed systems, so we have a bit of a different scenario than in the standard CC model. The cloud region is a physical thing~\cite{SouzaMFAK19}, while in the ECC a region could be represented in a different way. We now give a forma definition of a $region$ in ECC as:
+\noindent
+Since we are talking about geo-distributed systems, our scenario is a little bit different than one used in the standard CC model. We can still combine multiple EC nodes into clusters, that is what MDCs already propose. If we want to go a little bit further, we can then combine multiple node clusters into a next bigger logical concept of $region$. A region will increase the availability and reliability of both the system and applications. 
+
+But the region in CC and ECC is not fully the same thing. In the standard CC model, the region is a physical thing or element of the existing infrastructure~\cite{SouzaMFAK19}, while in the ECC a region could be view differently, not as a physical element but rather as a logical element. We can now give a formal definition of a $region$ in ECC as:
 
 \begin{definition}
-	In geo-distributed ECC and micro clouds, a regoin is used to describe a set of clusters over an arbitrary geographic region. 
+	In a geo-distributed environment like ECC and micro-clouds, a concept of region is used to describe a set of clusters (that could be) scattered over an arbitrary geographic region. Regions are fully capable to accept or release clusters in the same way that clusters can accept or release nodes.
 \end{definition}
 
-Regions can accept or release clusters and clusters can accept or release nodes. Based on this property, we can define minimum size of an ECC region as:
+In MDCs, a cluster is as big as the population nearby that is using it~\cite{GreenbergHMP09}. If we combine this with the previous definition than we can formally define the minimum size of an ECC region as:
 
 \begin{definition}
-	ECC regions are composed of at least one cluster, but can be composed of much more, so as to achieve a more resilient, scalable, and available system. 
+	Geo-distributed regions are composed of at least one cluster but can be composed of much more to achieve a more resilient, scalable, and available system.
 \end{definition}
 
-To ensure less latency in the system, vast distance between clusters should be avoided in normal circumstances. In a CC, region extension requires physically connecting modules to the rest of the infrastructure \cite{Hamilton07}.\\ 
+With the previous definition, we have to be careful to not introduce huge latency in the system. To lower the region latency, the vast distances between clusters should be strongly avoided in normal circumstances. To extend the CC region, we need to bring new nodes and connect them physically to the rest of the infrastructure~\cite{Hamilton07}, while in the ECC we should extend the region just by changing the definition to whom specific cluster belongs.
 
-Multiple regions form a second logical layer - $topology$. Formaly, we can define a $topology$ in ECC as:
+Multiple regions should be able to form a second logical layer -- $topology$. In the geo-distributed systems such as ECC or micro-clouds, we can formally define a $topology$ as:
 
 \begin{definition}
-In geo-distributed ECC and micro clouds, topology is a logical concept composed of a minimum one region, and could span over more regions. 
+In geo-distributed systems, topology represents the highest logical concept that is composed of a minimum of one region and could span over multiple regions. Topology is fully capable to accept new or release the existing regions. 
 \end{definition}
 
-When designing a topology, especially if regions need to share information, vast distance between regions should be avoided, if possible. With these simple abstractions, we can cover any geographic region with the ability to shrink or expand clusters, regions, and topology. Separation on $clusters$, $regions$, and $topologies$ is a matter of agreement and usages similar to modeling in Big Data systems~\cite{SonbolOAA20, WangCAL14}. 
+With these simple abstractions, we can easily cover any geographic region with the ability to shrink or expand clusters, regions, and topologies. Size and formation of $clusters$, $regions$, and $topologies$ should be a matter of need, agreement, and usages of nearby population similar to the size of MDCs~\cite{GreenbergHMP09}, and modeling in Big Data systems~\cite{SonbolOAA20, WangCAL14}. This separation and organization give us one interesting feature. We can follow a more natural administrative division of some region, and organize resources by population usages.
 
-For example, clusters could be as wide as the whole city or small as all devices in a single household and everything in between. The city could be one region with parts of the city being organized into clusters. We can form a city topology by splitting the city into multiple regions containing multiple clusters, or we can form a country topology by splitting the country into regions, with cities being regions. We can follow a more natural administrative division of some region, and organize resources by population usages.
+The organization of these concepts should be fully optional. So for example, we could fit clusters in an interval of nano-DCs~\cite{inbookKurniawan} and MDCs~\cite{GreenbergHMP09} or as wide as the whole city or small as all devices in a single household and everything in between. Formaly, we can represent the size of some cluster $c$ like:
 
-Nodes inside the cluster should run some membership protocol. Gossip style protocols, like SWIM~\cite{DasGM02}, could be used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16,CRDTS_Nuno} making the whole system more resilient. In~\cite{inproceedingsSimic2} Simi\' c et al. take a look from theoretical point of view on conflict free replicated data types (CRDTs) usage, to achieve SEC in EC and conclude that CRDTs could be natural fit to EC as long as we are aware of potential pitfals of CDRTs.
+\begin{equation}
+	c \in \left[ nano DCs, MDCs \right]
+\end{equation}
+\myequations{Cluster size limits}
 
-Single $topology$ reflects one CC provider, so multiple $topologies$ are forming $micro-clouds$ that are able to help CC with huge latency issues, pre-processing in huge volumes of data and relax and decentralize strict centralized CC model.
+\noindent
+If we go a little bit further, we can represent the city as one region, where parts of the city are organized into clusters. We can even form a city topology by splitting the city into multiple regions containing multiple clusters, and ultimately or we can form a country topology by splitting the country into regions, with cities being clusters.\\ 
 
-These micro-clouds have much less resources, copared to standard clouds but they are much closter to the user meaning they have much fater response. In case of storage, if data is not present in the time of user request, they can pull data from the cloud and cache it for latter.
+Nodes that belong to the same cluster should run some form of membership protocol presented in~\ref{sec:memership_protocol}. Gossip style protocols, like SWIM~\cite{DasGM02} (cf. page~\pageref{swim}), are standard in the cloud environment. The same strategy could be applied here, used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16, CRDTS_Nuno} making the whole system more resilient. 
 
-This 3 thier acrchitecture with numerous clients in the bottom, micro clouds in the middle, and cloud on the top kinda resembles cache level architecture in CPU~\cite{FarshinRMK19}. 
+Replication could be used not only in nodes inside the cluster, but we can also replicate data in clusters inside the region and even in regions inside topology. This property should exist, but it should be controlled by users depending on how resilient and available the system he wants and needs. In~\cite{inproceedingsSimic2} Simi\' c et al. take a look from a theoretical point of view on CRDTs usage, to achieve SEC in EC. the authors conclude that CRDTs could be a natural fit to EC as long as we are aware of the potential pitfalls of CRDTs.
 
-On lower levels we have fastest response time, since data is on the device. But at the same time, we have very limited storage capacity and processing power. As we go on the upper tiers, we have more and more storage capacity and processing power, but contrary the response time is higher and higher.  Esspecially when we take distance into consideration, and huge volumes of data that need to be moved to the cloud.
+Single $topology$ reflects one CC provider, so multiple topologies are forming micro-clouds that can help CC with huge latency issues, pre-processing in huge volumes of data, and relax and decentralize strict centralized CC model.
 
-Figure~\ref{fig:fig9}. shows the 3 tier architecture, with the response time and resource avelability.
+These micro-clouds have much fewer resources, compared to standard clouds but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later.
+
+Three-tier architecture with numerous clients in the bottom, micro clouds in the middle, and cloud on the top kinda resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
+
+On lower levels, we have the fastest response time, since data is on the device. But at the same time, we have very limited storage capacity and processing power. As we go on the upper tiers, we have more and more storage capacity and processing power, but contrary the response time is higher and higher.  Especially when we consider distance, and huge volumes of data that need to be moved to the cloud.
+
+Figure~\ref{fig:fig9}. shows the three-tier architecture, with the response time and resource avelability.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{images/Figure9}
@@ -72,29 +93,38 @@ Figure~\ref{fig:fig9}. shows the 3 tier architecture, with the response time and
 	\label{fig:fig9}
 \end{figure}
 
-In everything as a service model~\cite{DuanFZSNH15}, EC as a service fits in between CaaS and PaaS, depending on users needs. 
+In everything as a service model~\cite{DuanFZSNH15}, ECC as a service fits in between CaaS and PaaS, depending on the user needs. 
 %
 %
 \section{Separation of concers}\label{sec:separation_of_concerns}
 %
-To describe physical services, Jin et al.~\cite{JinCJL14} proposes three core concepts and specifies their relationships. These concepts are: $(1)$ Devices, $(2)$ Resources, and $(3)$ Services. 
+In his work, Jin et al.~\cite{JinCJL14} introduces three core concepts to fully describe physical services, and specifies their relationships. Concepts that authors propose are: $(1)$ Devices, $(2)$ Resources, and $(3)$ Services. This separation is interesting because we can rely on it in a geo-distributed environment, to describe SoC for micro-clouds.
 
-SoC is a vital part of any system, especially if creating a platform to offer as a service. We based our SoC model for ECC as a service on these concepts, with adaptations for our use case, separated in three layers depicted in Figure~\ref{fig:fig10}. 
+One of the most important of every system is the SoC model. This is especially important if we are going to create a platform to offer as a service. With some adaptations, we can base our SoC model on concepts proposed by Jin et al. in three layers as depicted in Figure~\ref{fig:fig10}. 
 
-The first or bottom layer consists of various devices, and these devices represents \textit{data creators} and \textit{services consumers}. 
+The layer on the very bottom of the three-tier architecture (cf.~Figure~\ref{fig:fig10}) consists of various devices. These devices are important because they represent main \textit{data creators} but at the same time, they are main \textit{services consumers}. 
 
-The second layer represents resources. Resources have a spatial features, and they indicate the range of their hosting devices~\cite{JinCJL14}. Developers at any time must know topology, the resource utilization and spread, as well as application's state and health.~\label{soc:resources}
-
-Resources represent EC nodes, and to be part of the system, a node must satisfy four simple rules:
+The layer in the middle (cf.~Figure~\ref{fig:fig10}) represents resources or EC nodes. These resources have a very important spatial feature, and as such, they indicate the range of their hosting devices~\cite{JinCJL14}. This means that the developers at any given time must know the topology of the system, the resource spread, and utilization across clusters. Besides that main information, users must know the state and health of every application.~\label{soc:resources}. If some EC node desire to be part of the system, a node must obey four simple rules:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-\item run an operating system with a file system 
-\item be able to run some application isolation engine, for example a container or unikernels 
-\item have available resources for utilization 
-\item have stable internet connection
+\item a node must run an operating system with a usable file system;
+\item a node must be able to run some isolation engine for applications, for example, containers or unikernels;
+\item a node must have available resources for utilization so that we can run  applications or store data;
+\item a node must have a stable internet connection;
 \end{enumerate}
 
-Services expose resources through an interface and make them available on the Internet~\cite{JinCJL14}. These services respond to clients immediately if possible, or cache information~\cite{SatyanarayananBCD09,YaoXWYZP20} for future requests. Services in the cloud should be able to accept pre-processed data, and they are responsible for computation and storage that is beyond the capabilities of ECC nodes. Services in the cloud should be able to take direct requests from client just in case that something catastrific happend to the micro-cloud that is close to the user.
+\noindent
+One thing that is important to notice, is that all nodes in clusters, regions, and topologies are \textbf{equal} and there are \textbf{no special nodes}. Every node that joins the system must be able to store and process information.
+
+Last but certainly not least layer represent services. These services expose resources through some interface and make them available over the internet~\cite{JinCJL14}. These services respond to the client requests immediately, if possible, or cache information~\cite{SatyanarayananBCD09,YaoXWYZP20} for future use. Unlike the previous two layers, services have one specific feature and span over two tiers of the system (cf.~Figure~\ref{fig:fig10}):
+
+\begin{enumerate}[start=1,label={(\bfseries \roman*)}]\label{services}
+	\item Services that exist in the micro-cloud, and they are responsible for filtering and data pre-processing before send it to the cloud. Or cache information that was not available on a previous user request for some future use.
+	\item Services in the standard cloud that should be able to accept pre-processed data, and they are responsible for computation and storage that is beyond the capabilities of ECC nodes. Services in the cloud should be able to take direct requests from the clients in a case when something catastrophic happened to the micro-cloud that is close to the user, and he is not able anymore to accept user requests.
+\end{enumerate}
+
+\noindent
+This kind of services separation creates new application model that we present in detal in the secion~\ref{sec:application_model}. 
 
 Figure~\ref{fig:fig10}. shows the proposed SoC for every layer of the ECC as a service model.
 
@@ -106,42 +136,34 @@ Figure~\ref{fig:fig10}. shows the proposed SoC for every layer of the ECC as a s
 \end{figure}
 %
 %
-\section{As a service model}\label{sec:as_a_service_model}
-%
-Users should be able to develop their applications using two different models:
- 
-\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{microPaaS or mPaaS}, where the platform is doing all the management and offers a simple interface for developers to deploy their applications. This model is similar to PaaS, and the only difference is that this is running in micro-cloud and synchronize with CC.
-	\item \textbf{microCaaS or mCaaS}, if users require more control over resources requirements, deployment and orchestration decisions. This model is similar to CaaS, and the only difference is that this is running in micro-cloud and synchronize with CC.
-\end{enumerate}
-
-Both variants should not stand alone, at least not for now. Fot that same reason we do not have microSaaS or mSaaS option, since that woul requre that whole application is running \textbf{only} in micro-clouds. But both options could be included, and part of any cloud model presented in~\ref{sec:cloud_computing}, or offered separatly.
-%
-%
 \section{Applications Model}\label{sec:application_model}
 %
-Traditional DCs and CC propose specially designed cloud-native applications~\cite{GannonBS17}, that are easier to scale, more available, and less error-prone when compared to traditional web applications~\cite{GannonBS17}. Edge-native applications~\cite{SatyanarayananK19} should use the full potential of EC infrastructure, and keep good features of their cloud counterparts. 
+Modern-day applications that should run in the cloud are advised to follow the cloud-native model~\cite{GannonBS17}. With this approach, we get applications that are easier to scale, more available, and less error-prone when compared to traditional web applications~\cite{GannonBS17}. 
 
-Applications may be split in front and back processing services. Front processing service is an edge-native application running inside micro cloud to minimize latency, while the back service runs in traditional cloid as a cloud-native application to leverage greater resources. 
+Satyanarayanan et al. present the edge-native applications model~\cite{SatyanarayananK19} that should use the full potential of EC infrastructure, and keep good features of their cloud counterparts. 
 
-These edge-native applications will handle user requests coming to nearby MDCs, and communicate to cloud-native applications when needed. Separation like that gives developers better flexibility and large design space. 
+When we introduced SoC for the micro-cloud model (cf. page~\pageref{services}), we described services that have one specific feature, and that is that these services span over two tiers of the system. This information is crucial for application development because we want to use the full potential of formed infrastructure, and keep good features of their cloud counterparts.
 
-With this model we venture even deeper into understanding and applying concept of \textbf{data locality} presented on page~\pageref{ds:data_locality}. Since we have split into front and bakc processing, we are committed to do processing data closer to their soruce, instead of moving data to the cloud. But restriction is that, at the moment, these EC nodes are not equiped with huge processing and storage capacity. But nonetheless, we are moved processing even closer to the data, instead moving huge volumes of data to computing. This is most important part of the data locality.
+To satisfy the previously defined SoC model (cf. page~\pageref{services}), we can split existing applications into the \textbf{front} and \textbf{back} processing services. The front processing service is an edge-native application running inside some previously formed cluster to minimize latency, while the back service runs in the traditional cloud as a cloud-native application to leverage greater resources.
+
+The front processing service will handle user requests coming to the nearby cluster, and communicate with the back processing services when needed to synchronize the pieces of information, cache data, or pass filtered or pre-processed data. Separation like that gives developers better flexibility and large design space when creating and optimizing their workloads.
+
+With this model, we venture even deeper into understanding and applying the concept of \textbf{data locality} (cf. page~\pageref{ds:data_locality}). Since we have front and back processing services, we are committed to doing processing data closer to their source, instead of moving data to the cloud. We reduced latency and save some users money on storing and processing unnecessary data.
 %
 %
 \subsection{Execution models}\label{sec:execution_models}
 %
-Frontend services model should be packed in some standard way~\ref{sec:virtualization_techniques} and deployed in the wild, as an event-driven applications, with the subscription policy to message streams, or infinite sequences~\cite{Rutten03} using topics~\cite{inproceedingsBeck}. The processing strategy is in the developer's hands, depending on the nature of the use-case. 
+Frontend services model should be packed in some standard way~\ref{sec:virtualization_techniques} and deployed in the wild, as an event-driven application, with the subscription policy to message streams, or infinite sequences~\cite{Rutten03} using topics~\cite{inproceedingsBeck}. The processing strategy is in the developer's hands, depending on the nature of the use-case. 
 
-If an services are subscribed to some stream using topic for example, it is naturally that events apear in their stream. There are basically two strategies for building a large-scale time-ordered event system:
+If a service is subscribed to some stream using a topic, for example, it is natural that events appear in their stream. There are two strategies for building a large-scale time-ordered event system:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Fan out on write}, with this strategy every service has some form of inbox, and when event apear for some topic, that data is copied to every service that is subscribed. With this options, deads are fast, but writes are not because the more followers to the topic the longer it takes to persist all updates. 
-	\item \textbf{Fan in on read}, with this strategy every topic have a sort of outbox where it can store data. When services read their streams, the system will read the recent data from the outboxese. Writes are fast, and used storage is minimal, but reads are difficult because to do this properly on request-response deadline is not a trivial task to do.
+	\item \textbf{Fan out on write}, with this strategy, every service has some form of inbox, and when an event appears for some topic, that data is copied to every service that is subscribed to that topic. With these options, reads are fast, but writes are not. The more subscribers to the topic, the longer it takes to persist all updates. 
+	\item \textbf{Fan in on read}, with this strategy, every topic has a sort of outbox where it can store data. When services read their streams, the system will read the recent data from the outboxes. Writes are fast, and used storage is minimal, but reads are difficult because to do this properly on a request-response deadline is not a trivial task to do.
 \end{enumerate}
 
 \noindent 
-to implemente those ideas withoout comlicated synchronization CRDTs could be used~\ref{crdts}, as companies like Soundcloud laready are using them for the same or similar tasks.
+to implement those ideas without complicated synchronization, CRDTs could be used~\ref{crdts}. Companies like Soundcloud and Bet365 are already using them for the same or similar tasks.
 
 Some examples of applications may include:
 
@@ -149,52 +171,73 @@ Some examples of applications may include:
 	\item \textbf{events} that notify users if some value is above or below some defined threshold; 
 	\item \textbf{stream} or processing data as it comes to the system;
 	\item \textbf{batch} does processing in predefined times over some bigger collection of data ;
-	\item \textbf{daemons} or processing that are doing some tasks or executions in the backgound without explicit user intervention, usually they their execution could be time defined but it is not mandatory;
-	\item \textbf{services} or applications that would operate over standard request-response model or some variantion of that protocol. For example NATS messageing system have request-replay form implemented over topics;
-	\item \textbf{other}, something that falls outside these models, or it is composition of multiple operations at once. This type should get events from some topic as they arrive, and user can define his own strategy what it needs to be done and how it needs to be pcessed. Usec can contact other existing services, and user is responsabile for optimization;
+	\item \textbf{daemons} or processing that are doing some tasks or executions in the background without explicit user intervention, usually their execution could be time defined but it is not mandatory;
+	\item \textbf{services} or applications that would operate over standard request-response model or some variation of that protocol. For example, the NATS messaging system has a request-reply form implemented over topics;
+	\item \textbf{other}, something that falls outside these models, or it is a composition of multiple operations at once. This type should get events from some topic as they arrive, and a user can define his strategy what needs to be done and how it needs to be processed. Users can contact other existing services, and the user is responsible for optimization;
 \end{enumerate}
 
-These types of applications could be implemented in may ways like those disccused in~\ref{sec:microservices}, or some adapted variant of those models, and should have clear communicatoin interface offered to users or applications and other services.
+These types of applications could be implemented in many ways like those discussed in section~\ref{sec:microservices}, or some adapted variant of those models, and should have a clear communication interface offered to users or applications and other services. 
+
+Users should be given the option to develop their applications in various available languages, not forcing them to use a strict one. But we must advise users about outcomes of their choice. For example, some languages might be slower or use more resources than others due to virtual machine execution, or some other tooling that is required to be started as well. The second important thing would be that users can do proper logging and tracing of their services. If something fails, the user must be able to go over the logs and traces to found problems.
 %
 \subsection{Packaging options}\label{sec:packaging}
 %
-Because their nature, micro clouds could be most likley composed of ARM devices. These devices in many cases are not able to run full VMs because their hardware restrictions. In recent years there are advances in VMs technology and their ability to run VMs on ARM devices. In~\cite{Ding12armvisor} Ding et al. show such possibility to run VMs on ARM devices.
+Because of their nature, micro-clouds could be most likely be composed of ARM devices. These devices in many cases are not able to run full VMs because of their hardware restrictions. In recent years there are advances in VMs technology and its ability to run VMs on ARM devices. In~\cite{Ding12armvisor} Ding et al. show such possibility to run VMs on ARM devices.
 
-But even if VMs are fully compatable with ARM devices, we still inherite VMs large footprint, already descused in~\ref{sec:virtualization_techniques} if we try to use tham $as is$.
+But even if VMs are fully compatible with ARM devices, we still inherit VMs large footprint, already discussed in section~\ref{sec:virtualization_techniques} if we try to use them $as is$.
 
-On contrary, containers and unikernels give us $more for less$ same functionality but using less resources, meaning we can run more services in containers and even more in unikernels. But untill unikernels are fulkly ready to be used they will fall in nice to have category, and we should stick to containers. But even with containers we need to be aware of their limitations and pitfalls, and know that there is no $silver bullit$ and there is no one solution for all scenarios.
+On the contrary, containers, and unikernels give us $more for less$ same functionality but using fewer resources, meaning we can run more services in containers and even more in unikernels. But until unikernels are fully ready to be used they will fall in nice to have a category, and we should stick to containers. But even with containers we need to be aware of their limitations and pitfalls and know that there is no $silver bullit$ and there is no one solution for all scenarios.
 
-At the moment, containers are more matured solution than unikernels, and require less resources than VMs. On top of that, there are numerous of tools already existing using containers that could be utilized. Knowing all this, at first stages of micro-clouds, containres should be option to go. 
+At the moment, containers are a more mature solution than unikernels and require fewer resources than VMs. On top of that, there are numerous tools already existing using containers that could be utilized. Knowing all this, at the first stages of micro-clouds, containers should be an option to go. 
 
-In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containres in large sclae edge computing systems from theoretical point of vew, by looking into architecture difference. Authors focus on differences between VMS and containers in cases where services needs to be runned on ARM devices with limited resources.
+In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containers in large scale edge computing systems from the theoretical point of view, by looking into architecture difference. Authors focus on differences between VMs and containers in cases where services need to run on ARM devices with limited resources.
 
-In future and when unikernels are more matured and tested, they could be used for paritical use-cases and applications, esspecially like events or serverless implementations. Containres will probably not be fully replaced, but they can co-exist with unikernels in some cases where we need more controll over running single function.
+In the future and when unikernels are more matured and tested, they could be used for particular use-cases and applications, especially like events or serverless implementations. The containers will probably not be fully replaced, but they can co-exist with unikernels in some cases where we need more control over running a single function.
 
-Like any other system, users can create their own variants of the systems and different flavours optimized for certen solutions. In that cases, they may favorized one solution over the other one. But in general case containers and unikernels should be prefered way to package, run and distributed user applicatoins in micro-clouds environment.
+Like any other system, users can create variants of the systems and different flavors optimized for certain solutions. In that cases, they may favor one solution over the other one. But in general case containers and unikernels should be the preferred way to package, run, and distributed user applications in a micro-clouds environment.
 %
 %
-
-\section{Immutable infrastructure}\label{sec:immutable_infrastructure}
+\section{As a service model}\label{sec:as_a_service_model}
 %
-As described in~\ref{sec:deployment}, we have few options when it comes to setup and deply infrastructure and/or applications. This thesis propose DS model that is build with three tier architecture that should operate in geo-distributed environment we blieve that \textbf{immutable deployment} model would be good fit. It will simplify deployment process, since we want to rely on atomic operations and do not want to left misconfigured system at any level. If something like that happend, we will end up in problem, that would be hard to properly address and resolve.
-
-Geo-distributed micro-clouds model that is described in this chaper, should operate in two levels of deployment that are build one on top of the another:
-
+Depends on their needs, users should be able to develop their applications using familiar models. Depending on how much control user require over the process of service scheduling, resource selection, etc. we can distinguish two models:
+ 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Infrastructure deployement}, update and change should be atomic and immutable. Users should do changes declaratively --- mutations of the system, by telling the system what new state should be, and let the system to figure out the best way how to do user specified changes. In this category, we can account any change that is doing on the cluster, region or topology that user/s operate on. For example create of new cluster, region, topology or doing configurations of the setup system. The only change that could possible be done by imperative strategy is updates on the nodes itself. But even for this strategy, it would be beneficial if we could usedeclarative way \textbf{if possible}. It is important to notice that \textbf{mutation} does not mean in place change, but just name of operation. This deployment strategy is reserved for operations people, but if compay or team is small any developer could do this. Developers should not be dealing with this part of the deployment.
-	\item \textbf{Services deployment}, make sense only if previous action is takane. We must have infrastructure setup already, in order do put any sort of services (applications) into the system. As previous model, this should be done declaratively as well, and all changes dould be done immutably without any in place change. User should specify his new state or \say{view of the word} declaratively and let system do all the changes he wants. All user services should be packed as described in~\ref{sec:packaging} because this simplifies way services are put to the nodes. When done properly, this allow operations people to do faster changes with almost zero downtime deployments with all strategies already discused in~\ref{sec:deployment}. this part of the deployemnt should be done by developers, since they done implementation and testing. They know hos much resources they need for their service, what type of service they had developed. This deployment could be done in colaboration between operations and deveopers, if compay is big or time is properly separated.
+	\item \textbf{microPaaS or mPaaS}, where the platform is doing all the management and offers a simple interface for developers to deploy their applications. This model is similar to PaaS, and the only difference is that this is running in micro-cloud and should synchronize with CC.
+	\item \textbf{microCaaS or mCaaS}, if users require more control over resource requirements, deployment, and orchestration decisions. This model is similar to CaaS (or even IaaS), and the only difference is that this is running in micro-cloud and should synchronize with CC.
+	\item \textbf{microSaaS or mSaaS}, with this option, we do not synchronize data with the CC, but all processing and storage is done in the micro-cloud. As such, this option should be used vigilantly, or not used \textbf{at all}.
 \end{enumerate}
 
-It is important to notice, that both deployments should be closley followed, for posible errors and problems so that users can act accordingly. This deployment messages, logs and traces should be stored in centralized log system, for convenient lookup, alerting and reporting.
+\noindent
+It is important to note, that both variants \textbf{mCaaS} and \textbf{mPaaS} should \textbf{not} stand alone, at least not for now. We do not advise using \textbf{mSaaS} option for now, since that would require that the whole application is running \textbf{only} in the micro-clouds. In the future, when EC nodes gain more power and storage, this might change. 
+
+Both options \textbf{mCaaS} and \textbf{mPaaS} could be included, and part of any cloud model (cf. section~\ref{sec:cloud_computing}) or offered separately.
+%
+%
+\section{Immutable infrastructure}\label{sec:immutable_infrastructure}
+%
+As described in section~\ref{sec:deployment}, we have few options when it comes to setup and deploys infrastructure and/or applications. This thesis proposes a DS model that is built with a three-tier architecture that should operate in the geo-distributed environment we believe that \textbf{immutable deployment} model would be a good fit. It will simplify the deployment process since we want to rely on atomic operations and do not want to left the misconfigured system at any level. If something like that happens, we will end up in a problem, that would be hard to properly address and resolve.
+
+Geo-distributed micro-clouds model that is described in this chapter should operate in two levels of deployment that are built one on top of the other:
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{Infrastructure deployement}, update and change should be atomic and immutable. Users should do changes declaratively -- mutations of the system, by telling the system what new state should be, and let the system figure out the best way how to do user-specified changes. In this category, we can account for any change that is doing on the cluster, region, or topology that user/s operate on. For example create the new cluster, region, topology, or doing configurations of the setup system. The only change that could be done by imperative strategy updates on the nodes themselves. But even for this strategy, it would be beneficial if we could use declarative way \textbf{if possible}. It is important to notice that \textbf{mutation} does not mean in place change, but just the name of the operation. This deployment strategy is reserved for operations people, but if the company or team is small any developer could do this. Developers should not be dealing with this part of the deployment.
+	\item \textbf{Services deployment}, make sense only if the previous action is taken. We must have infrastructure setup already, to put any sort of services (applications) into the system. Like the previous model, this should be done declaratively as well, and all changes should be done immutably without an in-place change. The user should specify his new state or \say{view of the word} declaratively and let the system do all the changes he wants. All user services should be packed as described in section~\ref{sec:packaging} because this simplifies the way services are put to the nodes. When done properly, this allows operations people to do faster changes with almost zero downtime deployments with all strategies already discussed in section~\ref{sec:deployment}. this part of the deployment should be done by developers since they did implementation and testing. They know how many resources they need for their service, what type of service they had developed. This deployment could be done in collaboration between operations and developers if a company is big or time is properly separated.
+\end{enumerate}
+
+\noindent
+It is important to notice, that both deployments should be closely followed, for possible errors and problems so that users can act accordingly. These deployment messages, logs, and traces~\cite{36356} should be stored in a centralized log system, for convenient lookup, alerting, and reporting.
 
 Separation like this, simplify deployment and usage for both application development spectrums: 
 
 \begin{enumerate}[start=1,label={(\bfseries \roman*)}]
-	\item operation people like \textbf{devops} who should be dealing with infrastructure deployment, tooling setup, applications deployment, monitoring and in general health of applications and infrastructure.
-	\item \textbf{developers} who should be dealing with development of the services, their interactions, and cloud to micro cloud and vice-verca synchrnonizations.
+	\item operation people like \textbf{devops} who should be dealing with infrastructure deployment, tooling set up, applications deployment, monitoring, and in the general health of applications and infrastructure.
+	\item \textbf{developers} who should be dealing with the development of the services, their interactions, and cloud to micro-cloud and vice-versa synchronization.
 \end{enumerate}
 
-Only with tight colaboration with those two development roles, such complex system like one presetned in this chapter can be alive, well and servig user requests withoyt collaps.
+\noindent
+Only with tight collaboration with those two development roles, such a complex system like one presented in this chapter can be alive, well, and serving user requests without collapse.
+
+It is important to note that every action in the system should be logged and traced properly. Since we are dealing with multi-tier architecture chance that something will fail is increased. Logs and traces should be available to operations people who are responsible for the infrastructure maintenance. At the same time, actions should be traced by the company that offers these micro-clouds. For security reason, any of these logs and traces should not be visible to others \textbf{but} responsible individuals, and the level of details and personal pieces of information should be different.
 %
 %
 \section{Formal model}\label{sec:formal_model}
@@ -1090,46 +1133,45 @@ Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using 
 %
 \section{Access pattern}\label{sec:access_pattern}
 %
-In section~\ref{sec:application_model}, we already disccus system accesspattern from applications point of view, using streams and topics. In this section we are going to venture in dashboard and system access described in~\ref{sec:distribution_models}. 
+n section~\ref{sec:application_model}, we already discuss system access patterns from the applications point of view, using streams and topics. In this section, we are going to venture into the dashboard and system access described in~\ref{sec:distribution_models}. 
 
-To acces the system, requests are going over some \textit{master process}. This process is not responsable to any sort of synchronization, agreement or something like that, but just to show dashboards and various system details since cloud is avalible anywhere in the world, while micro-cloud should serve local population. 
+To access the system, requests are going over some \textit{master process}. This process is not responsible for any sort of synchronization, agreement, or something like that, but just to show dashboards and various system details since the cloud is available anywhere in the world, while micro-cloud should serve the local population. 
 
-One question that could come to the mind is, what if some cloud provider offering micro-cloud functionality, or running our master process goes down, should rest of the micro-clouds go to \textit{read-only} mode and only accept \textbf{read} requests?
+One question that could come to mind is, what if some cloud provider offering micro-cloud functionality, or running our master process goes down, should the rest of the micro-clouds go to \textit{read-only} mode and only accept \textbf{read} requests?
 
-All communication is not exclusive to go over that master process, but if user is nearby to micro-cloud should be able initiate commands direcly to clusters, regions and topologies. But for dashboards and full informations about his micro-clouds cloud would be better solution, just because of more avalibe resources.
+All communication is not exclusive to go over that master process, but if the user is nearby to micro-cloud should be able to initiate commands directly to clusters, regions, and topologies. But for dashboards and full pieces of information about his micro-clouds cloud would be a better solution, just because of more available resources.
 
-If some cloud provider goes down for whatever reason, we should foreseen this and to resolve it we could use multiple cloud providers using \textit{Multi-Cloud Computing}~\cite{HongDSH19, Ardagna15}, so that one cloud provider is master process and many others are backup in case the whole cloud provider goes down.
+If some cloud provider goes down for whatever reason, we should foresee this and to resolve it we could use multiple cloud providers using \textit{Multi-Cloud Computing}~\cite{HongDSH19, Ardagna15} so that one cloud provider is a master process and many others are backup in case the whole cloud provider goes down.
 
-Here inevitably we have some state synchornization, and here we could rely on SEC and CRDTs to do synchrnoization without some expensive coordination between providers.
+Here inevitably we have some state synchronization, and here we could rely on SEC and CRDTs to do synchronization without some expensive coordination between providers.
 
-This is not generally a problem, if applicatoins that are running in micro-clouds are not dependent on some process, location, sensors od services etc. If we this is the case, than we can connect micro-clouds in sort of P2P network and give them some logic to just route request to proper location on the globe. 
+This is not generally a problem if applications that are running in micro-clouds are not dependent on some process, location, sensors of services, etc. If we this is the case then we can connect micro-clouds in sort of P2P network and give them some logic to just route request to the proper location on the globe. 
 
-This might not be that fast, since even light is afected by the distance, but we would be able to issue requests to cluster on totally different part of the world.
+This might not be that fast, since even light is affected by the distance, but we would be able to issue requests to cluster in a different part of the world.
 %
 %
 \section{Repercussion}\label{sec:repercussion}
 %
-Model presented in this chapter, have two possible repercussions:
+The model presented in this chapter, have three possible execution repercussions:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be valiable option in the CC.
-	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because --- the communication should implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an  organization tool.
+	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be a viable option in the CC.
+	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because -- the communication should be implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an organization tool.
+	\item \textbf{Combination}, this approach can be done over multi-cloud principles.
 \end{enumerate} 
 %
 %
 \section{Limitations}\label{sec:limitations}
 %
-Since the perfect model never existed, model that is proposed in this thesis have some limitations, that we must be aware of. Either to work on improvements, or use the model as is. 
-
-When talking about small scale servers and micro-clouds, we must be aware of the few things. 
+Since the perfect model never existed, the model that is proposed in this thesis has some limitations, that we must be aware of. Either to work on improvements or use the model as is. When talking about small-scale servers and micro-clouds, we must be aware of a few things.
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item not all companies and organizations will be able to deploy them, due to the high investments required~\cite{MonsalveCC18}. Similar to the cloud where massive DCs are built by a few companies and used by many others. These small servers could be deployed by government authorities or large cloud companies for their own needs. The general public can use them, similarly to the cloud --- pay as you go, model.
-	\item there is no guarantiee that existing public cloud providers will allow nodes that are not built, resigned or deployed by them. If we are building private cloud, thant we can make different decision. One way to resolve this issue is that whole platform become open-source, so that public cloud providers can engage into development, and eventually use tham as a solution.
-	\item These small scale servers must be out of reach of people, and protected in some way so that not everyone have access to them. Some degree of phisical security mut be implemented.
-	\item places where these small scale servers will be deployd must have stable internet connection, and ability to integrate SDN or other similar techologies, so that complex network topologies could be implemented properly.
-	\item these servers can have some open architecture or could be custom built by other providers. In both cases they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
-	\item spliting into two parts processing and possibility that users can be responsabile for micro-clouds may rise some legal concerns. Either to develop interesting applications, use tham as a firewall or simply use them as a privacy level for data there must be legal agreement that might not be that easy to achieve.
+	\item We must be aware that not all organizations will be able to deploy micro-clouds, due to the high initial investments required~\cite{MonsalveCC18}. We can rely on government authorities, large cloud providers, or other big companies to build the initial infrastructure for their own needs, and lease it to others similar to the cloud. The general public can use them, similarly to the cloud -- pay as you go, model.
+	\item There is no guarantee that existing public cloud providers will allow nodes that are not built, resigned, or deployed by them. If we are building a private cloud, that we can make a different decision. One way to resolve this issue is that the whole platform becomes open-source so that public cloud providers can engage in the development, and eventually use them as a solution.
+	\item These small-scale servers must be out of reach of people and protected in some way so that not everyone has access to them. Some degree of physical security must be implemented.
+	\item The places where these small scale servers will be deployed must have a stable internet connection, and the ability to integrate SDN or other similar technologies, so that complex network topologies could be implemented properly.
+	\item these servers can have some open architecture or could be custom built by other providers. In both cases, they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
+	\item Splitting the processing into two parts and the possibility that users can be responsible for micro-clouds may raise some legal concerns. Either to develop interesting applications, use them as a firewall or simply use them as a privacy level for data there must be a legal agreement that might not be that easy to achieve.
 \end{enumerate}
 %
 %
