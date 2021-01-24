@@ -1,5 +1,5 @@
 %!TEX root =  main.tex
-\chapter{Micro clouds and edge computing as a service}\label{chapter:Micro_clouds}
+\chapter{Micro clouds}\label{chapter:Micro_clouds}
 %
 In this section, we are going to present a core idea of this thesis from point of view how such a model can be formed and described, and what is important so that such a system operates properly. We will describe a micro-service model, based on the CC organizational model.  The presented model will be able to support EC as a service, amongst other applications and use-cases. 
 
@@ -242,95 +242,94 @@ It is important to note that every action in the system should be logged and tra
 %
 \section{Formal model}\label{sec:formal_model}
 %
-Ensuring reliability and correctness of any system is very difficult, and should be mathematically based. Formal methods are techniques that allow us specification and verification of complex (software and hardware) systems based on mathematics and formal logic. There are several options how to formaly describe DS: TLA+, $pi$ calculus, combinational topology, asynchronous session types (MST), etc. 
+Ensuring the reliability and correctness of any D is very difficult, and should be mathematically based. Formal methods are techniques that allow us to create specifications and verification of complex (software and hardware) systems based on mathematics and formal logic. There are several options for how to formally describe DS: TLA+, $pi$ calculus, combinational topology, asynchronous session types (MST), etc. 
 
-Unfortunately, becasue of their nature DS cannot always be formally described by any of the existing models. But if the nature of the DS that is developing is such that can be formaly described, it is recomended and beneficial. Formaly described and corect model, can save hours, days and event months of hard debugging, testing to reveal all bugs and problems in the system.
+Unfortunately, because of their nature DS cannot always be formally described by any of the existing techniques. There are a lot of variables that could influence this. But if the nature of the DS that is developing is such that can be formally described, it is recommended and beneficial. A formally described and correct model can save hours, days, and even months of hard debugging, testing to reveal all bugs and problems in the system that may only happen in some specific circumstances that are hard to initiate.
 
-Infrastructure deployment will not happen until the process is trivial \cite{SatyanarayananBCD09}, hence the key is to simplify ECC management. The main problem is that going to every node is tedious and time consuming, especially in a geo-distributed environment. In such complex environemnt, formal models are of great help if we can model and prove that protocols that system reyls on are correct. The system we propose tackles this issue using remote configuration and it relies on four formaly modeled protocols: 
+Infrastructure deployment will not happen overnight, and it might take years. It might not be started at all until the whole process is trivial \cite{SatyanarayananBCD09}. Because of those properties, the key problem that needs to be resolved is how to simplify ECC or micro-cloud management. The naive approach would require going to every node and do it manually. This process is super tedious and time-consuming, especially if we consider a geo-distributed environment. 
+
+In such a complex environment, formal models are of great help if we can model and prove that protocols that the system relies on are correct. The system we propose tackles this issue using remote configuration and it relies on four formally modeled protocols:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{health-check} protocol informs the system about state of every node (cf. Section~\ref{sec:health_check_protocol})
-	\item \textbf{cluster formation} protocol forms new clusters dinamicaly (cf. Section~\ref{sec:cluster_formation_protocol})
-	\item \textbf{idempotency check} protocol for preventing creating existing infrastructure (cf. Section~\ref{sec:idempotency_protocol})
-	\item \textbf{list detail} protocol shows the current state of the system to the user (cf. Section~\ref{sec:list_detail_protocol})
+	\item \textbf{health-check protocol} informs the system about state of every node (cf. Section~\ref{sec:health_check_protocol})
+	\item \textbf{cluster formation protocol} forms new clusters dinamicaly (cf. Section~\ref{sec:cluster_formation_protocol})
+	\item \textbf{idempotency check protocol} prevents system from creating existing infrastructure (cf. Section~\ref{sec:idempotency_protocol})
+	\item \textbf{list detail protocol} shows the current state of the system to the user (cf. Section~\ref{sec:list_detail_protocol})
 \end{enumerate}
 
-These three protocols are base of the geo-distribued Infrastructure deployment.
-
-In Section~\ref{sec:multiparty} we give short introduction what MST are and what properties they guarantee. Section~\ref{sec:health_check_protocol} describe formal model of healh-check protocol. Section~\ref{sec:cluster_formation_protocol} describe cluster formation protocol. Section~\ref{sec:list_detail_protocol} describe protocol that return data based on some query.
+\noindent
+These three protocols are base on the geo-distributed Infrastructure deployment.
 %
 %
 \subsection{Multiparty asynchronous session types}\label{sec:multiparty}
 %
-We can model communication protocols %from node to the system 
-using~\cite{HuY17}, an extension of \emph{multiparty asynchronous session types} (MPST)~\cite{HondaYC08} %, HondaYC16} 
---- a class of behavioral types tailored for describing distributed protocols relying on asynchronous
-communications. 
+Communication protocols that operate from node to the system can be modeled using~\cite{HuY17}, an extension of \emph{MPST}~\cite{HondaYC08} -- a class of behavioral types specifically designed for describing distributed protocols that rely on asynchronous communications. 
 
-The type specifications are not only useful as formal descriptions of the protocols, but we can also rely on a modeling-based approach developed in~\cite{HuY17} to validate our protocols satisfies multiparty session types safety (there is no reachable error state) and progress (an action is eventually executed, assuming
-fairness). %\comment{Mozda ovo naglasiti jos od samog uvodjenja tipova sesija??}
+The type specifications give us one additional benefit. They are not only useful to formally describe protocols, but we can also rely on them for a modeling-based approach developed in~\cite{HuY17} to validate our protocols are they satisfy multiparty session types safety (there is no reachable error state) and progress (an action is eventually executed, assuming fairness).
 
-The first step in modeling the communications of a system using MPST theory 
-is to provide a \emph{global type}, that is a high-level description of the overall protocol from the neutral 
-point of view. 
-Following~\cite{HuY17}, the syntax of global types is constructed by:
+The modeling process is done in two steps.
 
-\begin{equation}
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{The first step} in modeling the communications of a system using MPST theory is to provide a \emph{global type}, that is a high-level description of the overall protocol from the neutral point of view. Following~\cite{HuY17}, the syntax of global types are constructed by:
+	
+	\begin{equation}
 	\G \; ::= \;
 	\{\pp\dagger\pq_i{:}\ell_i(\T_i).\G_i\}_{i\in I}  \quad | \quad 
 	\mu \ty.\G \quad | \quad 
 	\ty \quad | \quad
 	\tend
-\end{equation}
-\myequations{Global type construction}
-
-where $\dagger\in\{\to, \twoheadrightarrow\}$ and $I\not=\emptyset$. 
-In the above, $\{\pp\dagger\pq_i{:}\ell_i(\T_i).\G_i\}_{i\in I}$
-denotes that \emph{participant} $\pp$ can send (resp. connects) to one of the participants $\pq_i$, 
-for $\dagger=\to$ (resp. $\dagger=\twoheadrightarrow$), 
-a \emph{message} $\ell_i$ with the \emph{payload} of \emph{sort} $\T_i$, 
-and then the protocol continues as prescribed with $\G_i$.  
-$\mu \ty.\G_1$ is a recursive type, and $\ty$ is a recursive variable, 
-while $\tend$ denotes a terminated protocol. We assume all participants are (implicitly) disconnected at the end of each session (cf.~\cite{HuY17}). 
-
-The advance of using approach of~\cite{HuY17}, when compared to standard MPST (e.g.,~\cite{HondaYC08}),
-is in a relaxed form of choice (a participant can choose between sending to different participants), 
-and, $\twoheadrightarrow$, that explicitly connects two participants, hence (possibly) dynamically 
-introducing participants in the session.
-Both of these features will be significant for modeling our protocols (we will return to this point).
-
-The second step in modeling protocols by MPST is providing a syntactic projection of the protocol onto each participant as a local type, that is then used to
-type check the endpoint implementations.  
-We use the definition of projection operator given in~\cite[Figure \ref{fig:fig2}]{HuY17}. 
-In essence, the projection of global type $\G$ onto participant $\pp$ can result in 
-$\ST_\pp=\pq{!}\ell(\T)\ldots$ (resp. $\ST_\pp=\pq{!!}\ell(\T)\ldots$) 
-when $\G=\pp\to\pq{:}\ell(\T)\ldots$ (resp. $\G=\pp\twoheadrightarrow\pq{:}\ell(\T)\ldots$), 
-and, dually, $\ST_\pp=\pq{?}\ell(\T)\ldots$ (resp. $\ST_\pp=\pq{??}\ell(\T)\ldots$) when $\G=\pq\to\pp{:}\ell(\T)\ldots$ 
-(resp. $\G=\pq\twoheadrightarrow\pp{:}\ell(\T)\ldots$), 
-while the projection operator ``skips'' the prefix of a global type if participant $\pp$ is not mentioned neither as sender nor as receiver. Furthermore, a local type must be represented by the following syntax:
-
-\begin{equation}
+	\end{equation}
+	\myequations{Global type construction}
+	
+	\noindent
+	where $\dagger\in\{\to, \twoheadrightarrow\}$ and $I\not=\emptyset$. 
+	In the above, $\{\pp\dagger\pq_i{:}\ell_i(\T_i).\G_i\}_{i\in I}$
+	denotes that \emph{participant} $\pp$ can send (resp. connects) to one of the participants $\pq_i$, 
+	for $\dagger=\to$ (resp. $\dagger=\twoheadrightarrow$), 
+	a \emph{message} $\ell_i$ with the \emph{payload} of \emph{sort} $\T_i$, 
+	and then the protocol continues as prescribed with $\G_i$.  
+	$\mu \ty.\G_1$ is a recursive type, and $\ty$ is a recursive variable, 
+	while $\tend$ denotes a terminated protocol. We assume all participants are (implicitly) disconnected at the end of each session (cf.~\cite{HuY17}). 
+	
+	The advance of using approach of~\cite{HuY17}, when compared to standard MPST (e.g.,~\cite{HondaYC08}),
+	is in a relaxed form of choice (a participant can choose between sending to different participants), 
+	and, $\twoheadrightarrow$, that explicitly connects two participants, hence (possibly) dynamically 
+	introducing participants in the session.
+	Both of these features will be significant for modeling our protocols (we will return to this point).
+	
+	\item \textbf{The second step} in modeling protocols by MPST is providing a syntactic projection of the protocol onto each participant as a local type, that is then used to
+	type check the endpoint implementations.  
+	We use the definition of projection operator given in~\cite[Figure \ref{fig:fig2}]{HuY17}. 
+	In essence, the projection of global type $\G$ onto participant $\pp$ can result in 
+	$\ST_\pp=\pq{!}\ell(\T)\ldots$ (resp. $\ST_\pp=\pq{!!}\ell(\T)\ldots$) 
+	when $\G=\pp\to\pq{:}\ell(\T)\ldots$ (resp. $\G=\pp\twoheadrightarrow\pq{:}\ell(\T)\ldots$), 
+	and, dually, $\ST_\pp=\pq{?}\ell(\T)\ldots$ (resp. $\ST_\pp=\pq{??}\ell(\T)\ldots$) when $\G=\pq\to\pp{:}\ell(\T)\ldots$ 
+	(resp. $\G=\pq\twoheadrightarrow\pp{:}\ell(\T)\ldots$), 
+	while the projection operator ``skips'' the prefix of a global type if participant $\pp$ is not mentioned neither as sender nor as receiver. Furthermore, a local type must be represented by the following syntax:
+	
+	\begin{equation}
 	\ST \; ::= \; 
 	{+}\{\pq_i\alpha\ell_i(\T_i).\ST_i\}_{i\in I}  \quad | \quad 
 	\mu \ty.\ST \quad | \quad 
 	\ty \quad | \quad
 	\tend
-\end{equation}
-\myequations{Local type representation syntax.}
+	\end{equation}
+	\myequations{Local type representation syntax.}
+	
+	\noindent
+	where $\alpha\in\{{!}, {!!}\}$ or  $\alpha\in\{{?}, {??}\}$ (in which case $\pq_i=\pq_j$ must hold for all $i,j \in I$, to ensure consistent external choice subjects, cf.~\cite[Page 6.]{HuY17}), and $I\not=\emptyset$.
+	Interested reader can find details in~\cite{HuY17}.
+\end{enumerate}
 
-where $\alpha\in\{{!}, {!!}\}$ or  $\alpha\in\{{?}, {??}\}$ (in which case $\pq_i=\pq_j$ must hold for all $i,j \in I$, to ensure consistent external choice subjects, cf.~\cite[Page 6.]{HuY17}), and $I\not=\emptyset$.
-Interested reader can find details in~\cite{HuY17}.
-
-For simplicity, we consider all participants are communicating within a single private session, and that all sent messages, but not yet received, are buffered in a single queue that preserves their order. 
-
-Actually, the order is preserved only for pairs of messages having the same sender and receiver, while other pairs of massages can be swapped, since these are asynchronously independent.
+\noindent
+For simplicity reasons, we will consider that all participants are communicating in a single private session. All sent messages, but not yet received, are buffered in a single queue that preserves their order. The order is preserved only for pairs of messages having the same sender and receiver, while other pairs of massages can be swapped since these are asynchronously independent.
 %
 %
 \subsection{Health-check protocol}\label{sec:health_check_protocol}
 %
-In a clustered environment, every node has a channel where it sends metrics, as a health-check mechanism. We can use this channel or create a new one to spread actions to the nodes, for example, a cluster formation message. 
+Nodes that exist in the clustered environment usually have a channel where they can send metrics and other data in a form of a health-check mechanism. This channel could be used this channel to reach nodes to send some actions to them, for example, a cluster formation message. 
 
-Figure \ref{fig:fig6}. shows a low-level health-check protocol between a single node and the rest of the system, involving the following participants: Node, Nodes, State, and Log.
+In figure~\ref{fig:fig6}. we can see a low-level health-check protocol between a single node and the rest of the system. This process involves the following participants: Node, Nodes, State, and Log.
 
 \begin{figure}[H]
 	\begin{center}
@@ -341,18 +340,20 @@ Figure \ref{fig:fig6}. shows a low-level health-check protocol between a single 
 	\label{fig:fig6}
 \end{figure} 
 
-The participants which are included in Figure \ref{fig:fig6} follow the next protocol:\label{informal_description_health-check} that is described informally below:
+\noindent
+These participants included in Figure~\ref{fig:fig6} follow the health-check protocol~\label{informal_description_health-check} that is informally described below:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Node} sends a health-check signal to the nodes service;
-	\item \textbf{Nodes} accept health-check signals for every node, update node metrics and if node is used in some cluster, inform that cluster about the node state;
+	\item \textbf{Node} sends a health-check signal to the Nodes service;
+	\item \textbf{Nodes} accept health-check signals from every node, update node metrics and if node is used in some cluster, inform that cluster about the node state;
 	\item \textbf{State} contains information about nodes in the clusters, regions and topologies;
 	\item \textbf{Log} contains records of operations. Users can query this service. 
 \end{enumerate}
 
-Every node will inform the system that it exists via health-check ping. However, the rest of the system will be informed about that ping if and only if (henceforth iff) the node is used in some cluster. 
+\noindent
+Nodes service will be informed about node existence on his health-check ping. However, the system state will not be updated, changed, or even informed about this ping if the node is not used in some cluster.
 
-In the following, we present Algorithm \ref{alg:alg1} to describe how the system will store the node data and determine if the node is free or used.
+In the following algorithm~\ref{alg:alg1} we describe steps required by the system to determine if the node is free or used and how node information is stored.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -378,18 +379,19 @@ In the following, we present Algorithm \ref{alg:alg1} to describe how the system
 	\label{alg:alg1}
 \end{algorithm}
 
-To describe servers or nodes (terms are used interchangeably) in the system formally, we can use set theory. In the beginning, the server set $S$ is empty, denoted with $S=\emptyset$. To determine the node state, we can use a node-id structure, for example. 
+\noindent
+To formally describe servers or nodes (terms are used interchangeably) properties in the system, we could use set theory. In the beginning, the system will have an empty server set $S$ denoted with $S=\emptyset$. To determine node state, we could use existing node properties. One approach may be that we use a node-id structure, for example. 
 
-Using node-id structure or some other trchnique, we can define free nodes in the systems as follows:
+Whatever approach we use, formally we can define free nodes as follows:
 
 \begin{definition}
-	Nodes are free iff they do not belong to any cluster.
+	Nodes are free if and only if (henceforth iff) they do not belong to any cluster.
 \end{definition}
 
 \noindent 
-For example, if the received health-check message from the particular node contains only node-id, it is free, otherwise, it is not.\\ 
+If we take node-id, for example, when the new health-check message from the particular node is received node-id structure will determine the node state. When the node is free, he will home some random or user-defined id, while when he is used in some cluster, the node-id structure will reflect this.\\
 
-If we have $n$ free nodes in the wild, denoted with $s_i$, where $i\in\{1, \ldots, n\},$ and they notify the system with a health-check ping that they are free, than we should add them to the server set and thus we have
+If we, for example, have $n$ free nodes in the wild, this can be denoted with $s_i$, where $i\in\{1, \ldots, n\},$. If all of them send the health-check ping to the system, we need to determine their state. If a node $s_i$ is free, we should add it to the server set, and thus we have:
 
 \begin{equation}
 	S_{\mathit{new}} = S_{\mathit{old}} \cup \bigcup%\limits
@@ -398,17 +400,16 @@ If we have $n$ free nodes in the wild, denoted with $s_i$, where $i\in\{1, \ldot
 \myequations{Extending free servers set.}
  
 \noindent 
-The order in which messages arrive is not important. 
+IIt is important to notice, that the order in which messages arrive is not important. The only thing that is important is that every message eventually comes into the system. We can now formally define node roles in the system like:
 
 \begin{definition}
-	Nodes in the same cluster are equal as free nodes, and there are no special nodes. 
+	All nodes in the system are equal, no matter are they part of some cluster or are not. One node can be used in one cluster only.
 \end{definition}
 
 \noindent
-The only thing we care of is that nodes are alive and ready to accept some jobs. \\
+The previous definition gives us a strong background in the further formal definition of the system because the only thing that we should care about is that node is alive and well and that he is ready to accept some jobs.\\
 
-Algorithm \ref{alg:alg1} describes how the system stores the node data and determine if the node is free or used.
-We can describe the $s_i$ server in the server set $S$ as a tuple $s_i = (L, R, A, I)$, where:
+We described in algorithm~\ref{alg:alg1} how the system stores the node data, but also how to determine if the node is free or used using the node-id structure. Every node $s_i$ in the system that is part of the server set $S$ could be described as a tuple $s_i = (L, R, A, I)$, where:
 
 \begin{itemize}
 	%
@@ -437,8 +438,8 @@ We can describe the $s_i$ server in the server set $S$ as a tuple $s_i = (L, R, 
 	\item $I$ represent a set of general node information like: name, location, IP address, id, cluster id, region id, topology id, etc.
 \end{itemize}
 
-If we want to assign $m$ (fresh) labels to the $i_\mathit{th}$ server, 
-we start with empty labels set $s_i[L]=\emptyset$, then we add labels to server. Therefore, we have 
+\noindent
+If we want to assign $m$ (fresh) labels to the $i_\mathit{th}$ server, we start with empty labels set $s_i[L]=\emptyset$, then we add labels to server. Therefore, we have 
 
 \begin{equation}
 	s_i[L]_\mathit{new} = s_i[L]_\mathit{old} \cup \bigcup%\limits
@@ -446,23 +447,26 @@ we start with empty labels set $s_i[L]=\emptyset$, then we add labels to server.
 \end{equation}
 \myequations{Extending label set.}
 
+\noindent
+We can now formally define the number of labels per single server $s_i$ in the system like:
+
 \begin{definition}
-	Every server from set $S$ must have \emph{non-empty} set of labels, but the number of labels for every server may vary.
+	Every node from the server set $S$ \textbf{must have} \emph{non-empty} set of labels. The number of labels for every server $s_i$ in the server set $S$ may vary.
 \end{definition}
 
 \noindent
-For the label definition, we can use arbitrary alphanumeric text for both key and value, separated with colon sign (e.g.,  os:linux, arch:arm, model:rpi, cpu:$2$, memory:$16$GB, disk:$300$GB, etc.).\\
+Since labels are an important part of the system (more in future sections), they should be picked carefully and agreed on upfront. It should be possible also to change them if such a thing is required. 
 
-Labels should be chosen carefully and agreed on upfront, but should be able to be changed if needed. Usually, labels include server resources, geolocation, and possibly some specific features that might be valuable for developers or administrators to target (e.g., SSD drive).
+Labels should stick out some distinctive features of the node, that might be valuable for developers or administrators to target. For example, server resources, server features (e.g., SSD drive), geolocation, etc. They can be created as follows:
 
-Following the above, we now present a formal description of the low-level health-check communication protocol (cf. Figure~\ref{fig:fig6}). 
-The global protocol $\G_1$ (given bellow) conforms the informal description given at 
-page~\pageref{informal_description_health-check}: $\mathtt{node}$ connects $\mathtt{nodes}$ with $\mathit{health{\_}check}$ message and a payload of type $\T_1$ that is required by the system to properly register node. 
+\begin{definition}
+	Labels are created using arbitrary long alphanumeric text, for both keys and values, separated by colon sign. For example os:linux, arch:arm, model:rpi, cpu:$2$, memory:$16$GB, disk:$300$GB, etc.
+\end{definition}
 
-Then, depending on the received information, $\mathtt{nodes}$ {\bf either} connects $\mathtt{state}$ with $\mathit{active}$ 
-message, informing the node status with a payload typed with $\T_2$ (that contains information required to register active health-check sender),
-and then also connects $\mathtt{log}$ with the same message, 
-{\bf or} directly connects $\mathtt{log}$ informing the node is $\mathit{free}$.
+\noindent
+Following all things presented above, we can now give a formal description for the low-level health-check communication protocol (cf. Figure~\ref{fig:fig6}). The global protocol $\G_1$ (given bellow) conforms the informal description given at page~\pageref{informal_description_health-check}: $\mathtt{node}$ connects $\mathtt{nodes}$ with $\mathit{health{\_}check}$ message and a payload of type $\T_1$ required by the system to properly register node into the system. 
+
+Based on the received information, $\mathtt{nodes}$ {\bf either} connects $\mathtt{state}$ with $\mathit{active}$ message, informing the node status alongside payload typed with $\T_2$ (containing informations required by the system to properly register active health-check sender), and then also connects $\mathtt{log}$ with the same message, {\bf or} directly connects $\mathtt{log}$ informing the node is $\mathit{free}$.
 \begin{align*}
 \G_1 = & 
 \mathtt{node} \twoheadrightarrow \mathtt{nodes}{:}\mathit{health{\_}check}(\T_1).\\
@@ -475,11 +479,11 @@ and then also connects $\mathtt{log}$ with the same message,
 \end{align*}
 \myequations{Health-check global protocol.}
 
-Notice that in $\G_1$ we indeed have a choice of $\mathtt{nodes}$ sending either to $\mathtt{state}$ or to $\mathtt{log}$. Such communication pattern could not be directly modeled using standard MPST approaches. 
+Notice that in $\G_1$ we indeed have a choice of $\mathtt{nodes}$ sending either to $\mathtt{state}$ or to $\mathtt{log}$. Such communication patterns are impossible to be modeled using just standard MPST approaches. 
 Also, notice that $\mathtt{state}$ will be introduced into the session only when receiving from $\mathtt{nodes}$. 
 Hence, if the session after the first ping from $\mathtt{node}$ to $\mathtt{nodes}$ proceeds with the second branch (i.e., connecting $\mathtt{nodes}$ with $\mathtt{log}$) then $\mathtt{state}$ is not considered as stuck, as it would be in standard MPST, such as, e.g.,~\cite{HondaYC08}, but rather idle. 
 
-Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, \mathtt{state}$ and $\mathtt{log}$ we obtain local types:
+Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, \mathtt{state}$ and $\mathtt{log}$ we can than get local types as follows:
 \begin{align*}
 \ST_\mathtt{node}  & = 
 \mathtt{nodes}{!!}\mathit{health{\_}check}(\T_1).\tend
@@ -509,16 +513,17 @@ Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, 
 \end{array} \right.
 \end{align*}
 \myequations{Health-check global protocol projection.}
+\noindent
 where, for instance, type $\ST_\mathtt{nodes}$ specifies $\mathtt{nodes}$ can receive the ping message from $\mathtt{node}$, after which it will dynamically introduce either $\mathtt{state}$ or $\mathtt{log}$ into the session, where in the former case it also connects $\mathtt{log}$ (but now with message $\mathit{free}$). 
 %
 %
 \subsection{Cluster formation protocol}\label{sec:cluster_formation_protocol}
 %
-Another communication protocol in our system appears in the cluster formation process. Users are able to dynamically form new clusters. Here, we distinguish two different actions:
+Another communication protocol that the system relies on, appears in the cluster formation process, where users can form new clusters dynamically. Here, we distinguish two different actions:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item The first action is a user-system communication, where the user sends a query to the system in order to obtain a list of available nodes based on the query parameters.
-	\item The second action starts when the user sends a message to the system with a new specification. In this setting, the  system involves participants: User, Queue, Scheduler, State, Nodes, Log, and NodesPool, that cooperate in order to dynamically form new clusters, regions or topologies, adhering to the scenario shown in Figure \ref{fig:fig7}.
+	\item The first action is user-system communication. Here user sends query parameters to the system to obtain a list of available nodes that satisfy specified query parameters.
+	\item The second action is a little bit more complicated than the previous one, and it starts when the user sends a message to the system with a new assembly specification. In this setting, the system involves participants: User, Queue, Scheduler, State, Nodes, Log, and NodesPool. These participants need to cooperate to successfully form new clusters, regions, or topologies dynamically, adhering to the scenario shown in Figure \ref{fig:fig7}.
 \end{enumerate} 
 
 \begin{figure}[H]
@@ -530,26 +535,26 @@ Another communication protocol in our system appears in the cluster formation pr
 	\label{fig:fig7}
 \end{figure}
 
-The participants follow the protocol that we now describe informally:
+\noindent
+These participants included in Figure~\ref{fig:fig7} follow the cluster formation protocol that is informally described below:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \label{cluster_formation_informal_description} \textbf{User} query Nodes service, based on some predefined criteria. User sends a create message to Queue, and, either gets response \textit{ok}, or \textit{error} if the message cannot be accepted due to missing rights or other issues. This operation is called \emph{mutation}; 
-	\item \textbf{Queue} accepts a user message, and passes it to State. Messages are handled in FIFO (First In, First Out) order. The queue prevents system congestion, with received messages;
-	\item \textbf{State} accepts mutation messages from Queue, and tries to store new information about cluster, region, or topology. If Nodes service is able to reserve all desired nodes, the system  will store new user desired information and send a message to Scheduler to physically create clusters of desired nodes;
-	\item \textbf{Nodes} accept messages from State. If possible, it will reserve desired nodes, otherwise it will send an error message to Log service. On a health-check message, if a node is used in some cluster, it will inform that the node is alive;
-	\item \textbf{Scheduler} waits for a message sent from State, and pushes cluster formation messages to desired nodes;
-	\item \textbf{Log} contains records of operations. Users can query this service to see if their tasks are finished or have any problems;
-	\item \textbf{Nodes Pool} represents the set of \emph{n} free nodes that will accept mutation messages. 
-	On message receive, every node will:
+	\item \label{cluster_formation_informal_description} \textbf{User} query Nodes service, based on some predefined query parameters. User sends a new creation message to Queue. User either get response \textit{ok} if the message is accepted or \textit{error} if the message cannot be accepted due to missing rights or other issues. This operation is called \emph{mutation}; 
+	\item \textbf{Queue} accepts a user message, and passes it to State. Messages are handled in FIFO (First In, First Out) order. The queue prevents system congestion, with received messages. the queue will also test if the specified message has been already handled before over idempotency check;
+	\item \textbf{State} accepts mutation messages from Queue, and tries to store new information about the cluster, region, or topology. If Nodes can reserve all desired nodes, the system  will store new user desired specification and send a message to Scheduler to physically carry on the creation of clusters with desired nodes;
+	\item \textbf{Nodes} accept messages from State. It will reserve desired nodes, if possible, otherwise, it will send an error message to Log service. On a health-check message, it will either just store node information or if a node is used in some cluster inform that cluster that the node is alive;
+	\item \textbf{Scheduler} waits for a message sent from State, and physically carry on cluster formation by pushing cluster formation messages to the chosen nodes;
+	\item \textbf{Log} contains records of all operations. Users can query this service to see if their tasks are finished or some problems occurred;
+	\item \textbf{Nodes Pool} represents the set of \emph{n} free nodes that will accept mutation messages. When a node receives the message, he will follow some predefined steps:
+	
 	\begin{enumerate}[start=1,label={(\bfseries \roman*)}] 
-		\item start gossip protocol to inform other nodes from the mutation message about cluster formation;
-		\item send an event to Scheduler and Nodes service that it is alive and can receives messages;
+		\item start gossip protocol to inform other nodes from the mutation message that they should form a cluster;
+		\item when cluster formation is done, send an event to Scheduler and Nodes that node is alive and can receive messages. The cluster formation is done, when all nodes have complete list of nodes that should form the cluster;
 	\end{enumerate}
 \end{enumerate}
 
-If a user wants to get a list of free nodes, he must create a query using \emph{the selector}, which is the set of key-value pairs desired by the user. 
-
-Algorithm \ref{alg:alg2} describes steps required to perform a proper node lookup based on a received selector value.
+\noindent
+If a user wants to get a list of free nodes in the system, he must create a query using \emph{the selector}, which is the set of key-value pairs where he can describe what type of nodes he desires. In algorithm~\ref{alg:alg2}, we describe steps that are required to perform a proper node lookup based on a received selector value.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -575,7 +580,7 @@ We start with the empty selector $Q=\emptyset$, in which we append key-value pai
 \myequations{Query selector formation.} 
 
 \noindent
-Once the query is submitted, for every server in the set $S$, we need to check: 
+Once the user submits query selector to the system with desired attributes, for every server in the set $S$, we need to check two things: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item the cardinality of the $i_\mathit{th}$ server's set of labels and the query selector are identical in size
@@ -588,8 +593,7 @@ Once the query is submitted, for every server in the set $S$, we need to check:
 	\end{equation}
 \end{enumerate} 
 
-The $i_\mathit{th}$ server from the server set $S$ will be present in the result set $R$, % if and only if, 
-iff both rules are satisfied:
+The $i_\mathit{th}$ server from the server set $S$ will be present in the result set $R$, iff both rules are satisfied so we have:
 
 \begin{equation}\label{frm:query_rule}  
 	R=\{ s_i \;|\; \left|s_i[L]\right|=\left|Q\right| \wedge P(Q, s_i),i\in\{1, \ldots, n\}\}
@@ -597,8 +601,7 @@ iff both rules are satisfied:
 \myequations{Server selector.}
 
 \noindent
-If the result set $R$ is not empty, we reserve nodes for configurable time so that other users cannot see (and try to use) them, and, finally, 
-we add reserved nodes with message data $\mathit{md}$ to the task queue set 
+If the result set $R$ is not the empty set, we then reserve nodes for configurable time so that other users cannot see, and try to use them.  Finally, we add reserved nodes with message data $\mathit{md}$ to the task queue set:
 
 \begin{equation}
 	TQ_\mathit{new} =TQ_\mathit{old}\cup \{(R, md)\}.
@@ -606,9 +609,7 @@ we add reserved nodes with message data $\mathit{md}$ to the task queue set
 \myequations{Extending task queue set.}
 
 \noindent 
-When the task comes to execution, the task queue sends messages to every node. 
-
-Algorithm \ref{alg:alg3} describes the process required for cluster formation. 
+When the task comes to execution, the task queue will send messages to every node that is specified. In algorithm~\ref{alg:alg3}, we describe the steps required for cluster formation.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -623,13 +624,12 @@ Algorithm \ref{alg:alg3} describes the process required for cluster formation.
 	\label{alg:alg3}
 \end{algorithm}
 
-Users can choose to override labels with their own or keep existing ones when including nodes in the cluster. If the node is free, or if the user did not change the node labels on cluster formation, the system will use default labels.  
+\noindent
+Users are free to override existing node labels with their labels or keep predefined ones when including nodes in the cluster. If the node is free, or the user did not change the node labels on cluster formation, the system will use default labels like node geo-location, resources, operating system, architecture, etc.   
 
-On message receive, the node will pick and contact a configurable subset of nodes $R_g \subset R$, and start the gossip protocol, propagating informations about nodes in the cluster (e.g, new, alive, suspected, dead, etc.). When every node inside newly formed cluster have complete set of nodes $R$ obtained through gossiping, the cluster formation process is over. 
+When the node receives the cluster formation message, he will automatically pick and contact a configurable subset of nodes $R_g \subset R$, and start the gossip protocol, propagating pieces of information about nodes in the cluster (e.g, new, alive, suspected, dead, etc.). When every node inside the newly formed cluster has a complete set of nodes $R$ obtained through gossiping, the cluster formation process is over. Topology, region, or cluster formation should be done descriptively using YAML, or similar formats. 
 
-Topology, region, or cluster formation should be done descriptively using YAML, or similar formats. 
-
-Algorithm \ref{alg:alg4} describes steps after nodes receive a cluster formation message.
+In the algorithm~\ref{alg:alg4}, we describe the required steps after nodes receive a cluster formation message.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -648,7 +648,8 @@ Algorithm \ref{alg:alg4} describes steps after nodes receive a cluster formation
 	\label{alg:alg4}
 \end{algorithm}
 
-In the following, we formally describe a low-level cluster formation communication protocol (cf. Figure \ref{fig:fig3}), using the same extension of multiparty session types~\cite{HuY17} as for the health-check protocol.
+\noindent
+In the following, we formally describe a low-level cluster formation communication protocol (cf. Figure \ref{fig:fig3}). We are using the same extension of MPSTs~\cite{HuY17} used for the health-check protocol.
 
 Global protocol $\G_2$ (given below) conforms the informal description of the cluster formation protocol given at page~\pageref{cluster_formation_informal_description}. 
 The protocol starts with $\mathtt{user}$ connecting $\mathtt{state}$ by message $\mathit{query}$ and a payload typed with $\T_1$ that contains user query data, and  then $\mathtt{state}$ forwards the message by connecting $\mathtt{nodes}$. 
@@ -659,10 +660,11 @@ At this point, $\mathtt{user}$  sends to $\mathtt{state}$ one of three possible 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item $\mathit{mutate}$, and the mutation process, described with global protocol $\G'$, starts; 
 	\item $\mathit{quit}$, in which case the protocol terminates; or,
-	\item $\mathit{query}$ --- this means the process of querying starts again, the query message is forwarded to $\mathtt{nodes}$ and the protocol loops, returning to the point marked with $\mu\ty$.
+	\item $\mathit{query}$ -- this means the process of querying starts again, the query message is forwarded to $\mathtt{nodes}$ and the protocol loops, returning to the point marked with $\mu\ty$.
 \end{enumerate}
 
-The third branch is the only one in which protocol loops. Also, notice that $\mathtt{user}-\mathtt{state}$ and $\mathtt{state}-\mathtt{nodes}$ are connected before specifying recursion. Hence, even after a number of recursion calls these connections will be unique (thus, there is no need to disconnect them before looping).   
+\noindent
+The third branch is the only one in which protocol loops. Also, we can notice that $\mathtt{user}-\mathtt{state}$ and $\mathtt{state}-\mathtt{nodes}$ are connected before specifying recursion. Hence, even after several recursion calls, these connections will be unique. So it is not required to disconnect them before looping.   
 \begin{align*}
 \G_2 = & 
 \mathtt{user} \twoheadrightarrow \mathtt{state}{:}\mathit{query}(\T_1).
@@ -681,6 +683,7 @@ The third branch is the only one in which protocol loops. Also, notice that $\ma
 \end{align*}
 \myequations{Cluster formation global protocol.}
 
+\noindent
 The mutate protocol $\G'$, activated in the first branch in $\G_1$, starts with $\mathtt{user}$ sending 
 $\mathtt{create}$ message to $\mathtt{state}$, specifying also informations about new user desired state typed with $\T_3$, 
 and $\mathtt{state}$ replies back with $\mathit{ok}$. 
@@ -706,6 +709,7 @@ Then, $\mathtt{state}$ sends $\mathit{ids}$ of the nodes to be reserved (specifi
 \end{array} \right.
 \end{align*}
 
+\noindent
 Finally, in $\G''$ $\mathtt{state}$ connects $\mathtt{sched}$ (Scheduler) with message $\mathit{ids}$ and the payload that contains other data imported for mutation to be completed (typed with $\T_5$). 
 Then, $\mathtt{sched}$ connects $\mathtt{pool}$ (Nodes Pool) with $\mathit{update}$ specified with $\T_6$, after which $\mathtt{pool}$ replies back with $\mathit{ok}$, and connects to $\mathtt{nodes}$ sending new id's $\mathit{nids}$ typed with $\T_4$ ( that contains successfully reserved user desired nodes). Now $\mathtt{nodes}$ notifies $\mathtt{state}$ the action was successful, that in turn connects $\mathtt{log}$ with the same message, and the protocol terminates.
 \begin{align*}
@@ -805,35 +809,40 @@ where
 \end{align*}
 \myequations{Cluster formation global protocol projection.}
 
+\noindent
 For instance, type $\ST_\mathtt{sched}$ specifies that participant $\mathtt{sched}$ gets included in the session only after receiving from $\mathtt{state}$ message $\mathit{ids}$, then $\mathtt{sched}$ connects $\mathtt{pool}$ with $\mathit{update}$ message, after which expects to receive $\mathit{ok}$ message and finally terminates. 
 
-We remark global type $\G_2$ could also be modeled directly using standard MPST models (such as~\cite{HondaYC08}). However, in such models the projection of $G_2$ onto, for instance, participant $\mathtt{sched}$ would be undefined (cf.~\cite{HuY17}).
+We remark that global type $\G_2$ could also be modeled directly by using standard MPST models (such as~\cite{HondaYC08}). However, in such models, the projection of $G_2$ onto, for instance, participant $\mathtt{sched}$ would be undefined (cf.~\cite{HuY17}).
 Since we follow the approach of~\cite{HuY17} with explicit connections, projection of $\G_2$ onto $\mathtt{sched}$ is indeed defined as $\ST_\mathtt{sched}$.
 %
 %
 \subsection{Idempotency check protocol}\label{sec:idempotency_protocol}
 %
-Mutate operation should be atomic, immutable and idempotent. User can specify the same topology details, but in different order. We must ensure that new cluster formation protocol should \textbf{not} be initiated, if user change order of regions, clusters, nodes or labels in one or more node/s. If mutate operation fails, for whatever possible reason but infrastructure is created, or same infrastructure already exists, user can get message that infrastructure is formed. If user change the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start new protocol.
+Mutate operation should be atomic, immutable, and idempotent. The user can specify the same topology details but in a different order, for example. We must ensure that the new cluster formation protocol should \textbf{not} be initiated, if the user change order of regions, clusters, nodes, or labels in one or more node/s. 
 
-But since we have different scenario then standard write to storage, and we do not specify steps how operations should be done, to implement idempotance correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
+If mutate operation fails, for whatever possible reason but the infrastructure is created, or the same infrastructure already exists, the user should get a message that infrastructure is formed. If the user changes the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start a new protocol.
 
-Idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represebted as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in the two ways:
+But since we have a different scenario than standard write to storage, and we do not specify steps on how operations should be done, to implement idempotency correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
+
+The idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represented as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in the two ways:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
-	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is set of clusters, where every cluster is set of nodes etc. We can go deep as long as we want, but restriction is that every structure \textbf{must} be idempotent. So we can use set of sets of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
+	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is a set of clusters, where every cluster is a set of nodes, etc. We can go deep as long as we want, but the restriction is that every structure \textbf{must} be idempotent. So we can use a set of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
 \end{enumerate}
 
-If we have cached idempotency data for user request, and if he tries to send same request we can test idempotency using set operation \textbf{intersection}.
+\noindent
+If we have cached idempotency data for user requests, and if a user tries to send the same request again, we can then test idempotency using set operation \textbf{intersection} because the intersection is an idempotent operation following the next proof.
 
-\begin{definition}\label{def:intersection_idempotent}
+\begin{proof}\label{def:intersection_idempotent}
 	Intersection of two sets $x$ and $y$ $x \cap y$ is an idempotent operation, becasue $x \cap x$ is always equal to $x$. This means that the idempotency law~\ref{form:idempotency_law} $\forall x, x \cap x = x$ is always $true$.
-\end{definition}
+\end{proof}
 
-If we have stored user request on cluster formation protocol, and we receive new request with the same name, \textbf{than} we can take intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise request represents the new action, and new cluster formation protocol. 
+\noindent
+If we have stored user request on cluster formation protocol, and we receive a new request with the same name, \textbf{than} we can take the intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
 
-We can make this test a litle bit faster. If we first test does the same topology name is already present in idempotency store, that lookup will spare us of unnecessary comperiosson on sets.
-We can go little bit further, and use CRDTs and SEC to store and replicate deta on copies of the services that are required for idempotency test.
+We can make this test a little bit faster. If we first test does the same topology name is already present in the idempotency store, that lookup will spare us unnecessary comparison on sets.
+We can go a little bit further and use CRDTs and SEC to store and replicate data on copies of the services that are required for the idempotency test.
 
 Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
 
@@ -846,19 +855,22 @@ Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\
 	\label{fig:fig13}
 \end{figure}
 
+\noindent
 The participants follow the communication that we now describe informally: \label{informal_description_idempotency}
+
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{User} sends a list request to State service (same as~\ref{sec:cluster_formation_protocol});
 	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service (same as~\ref{sec:cluster_formation_protocol});
 	\item \textbf{State service} service that is wrapper aroud system main storage. Interacts with main storage in oreder to create new topologies, regions or clusters, or to get data from main storages about same entities.
 	\item \textbf{Idempotency storage} contains idempotent set for all \textbf{already} formed topologies, regions and clusters.
-	\item \textbf{Main storage} contains records about desired state for all formed topologies, regions and clusters.
+	\item \textbf{Main storage} contains records about the desired state for all formed topologies, regions, and clusters.
 	\item \textbf{Log} contains records of operations. Users can query this service to see if their tasks are finished or have any problems (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Nodes} accept messages from State. If possible, it will reserve desired nodes, otherwise it will send an error message to Log service. On a health-check message, if a node is used in some cluster, it will inform that the node is alive (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Scheduler} waits for a message sent from State, and pushes clus- ter formation messages to desired nodes (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Nodes} accept messages from State. If possible, it will reserve desired nodes, otherwise, it will send an error message to Log service. On a health-check message, if a node is used in some cluster, it will inform that the node is alive (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Scheduler} waits for a message sent from State, and pushes cluster formation messages to desired nodes (same as~\ref{sec:cluster_formation_protocol});
 \end{enumerate}
 
-When testing is request idempotent we must have in mind that stored structure could be $(1)$ \textbf{flat keyspace} and \textbf{$(2)$ hierarhical keyspace} both options are valid as log as \textbf{structure is idempotent} and we can do \textbf{idempotent operation} over that structure. For example $set$ as a data structure and $intersection$ are good candidates. Algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps requred to test if operation is done before.
+\noindent
+When testing is request idempotent we must have in mind that stored structure could be $(1)$ \textbf{flat keyspace} and \textbf{$(2)$ hierarchical keyspace} both options are valid as long as \textbf{structure is idempotent} and we can do \textbf{idempotent operation} over that structure. For example, $set$ as a data structure and $intersection$ are good candidates. The algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps required to test if the operation is done before.
 
 \begin{algorithm}[H]
 	\SetKwFunction{idempotent}{idempotent}
@@ -890,13 +902,13 @@ When testing is request idempotent we must have in mind that stored structure co
 	\label{alg:alg6}
 \end{algorithm}
 
+\noindent
 Next we present a formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17}. The global protocol $\G_3$ (given bellow) conforms the informal description given at page~\pageref{informal_description_idempotency}. At this point, the $\mathtt{user}$ can choose one of two possible messages: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 \item $\mathit{quit}$, in which case the protocol terminates; or, 
 \item $\mathit{mutate}$, and the mutation process, described with global protocol $\G'$, starts;
 \end{enumerate}
-
 \begin{align*}
 \G_3 & = 
 \left\{
@@ -913,12 +925,12 @@ $\mathtt{create}$ message to $\mathtt{state}$, specifying also informations abou
 and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same as cluster formation protocol (cf. section~\ref{cluster_formation_informal_description}). Now we start specific communication protocol for idempotency check so $\mathtt{service}$ sends payload $T_3$ to $\mathtt{istorage}$ to test is this request $seen$ before. The $\mathtt{istorage}$ responds with payload $T_6$ to $\mathtt{service}$, and based on $Boolean$ response $\mathtt{service}$ can do one of two things:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-\item $\mathtt{service}$ sends message to $\mathtt{log}$ and this process terminates; or,
-\item $\mathtt{service}$ sends $\mathit{ids}$ of the nodes to be reserved (specified in the payload typed with $\T_4$) to $\mathtt{nodes}$;
+	\item $\mathtt{service}$ sends message to $\mathtt{log}$ and this process terminates; or,
+	\item $\mathtt{service}$ sends $\mathit{ids}$ of the nodes to be reserved (specified in the payload typed with $\T_4$) to $\mathtt{nodes}$;
 \end{enumerate}
 
 \noindent
-same as cluster formatoin protocol (cf. section~\ref{cluster_formation_informal_description}). For simplification, we can assume that all nodes are reserved, and now idempotency data store global protocol $\G''$, starts;
+same as cluster formation protocol (cf. section~\ref{cluster_formation_informal_description}). For simplification, we can assume that all nodes are reserved, and now idempotency data store global protocol $\G''$, starts;
 \begin{align*}
 G' & = 
 \mathtt{service} \twoheadrightarrow \mathtt{istorage}{:}\mathit{try}(\T_3). \\
@@ -933,6 +945,7 @@ G' & =
 \end{array} \right.
 \end{align*}
 
+\noindent
 The idempotency store protocol $\G''$, starts with $\mathtt{service}$ sending mutation payload $T_3$ to $\mathtt{mstorage}$. Then $\mathtt{mstorage}$ sends same payload to $\mathtt{istorage}$. When data is saved for future testing, $\mathtt{istorage}$ respond back to $\mathtt{mstorage}$, and finally $\mathtt{mstorage}$ respond back to $\mathtt{service}$. At this poing user payload $T_3$ is stored in both main storage and idempotency storage for future testing. Protocol continue with $\mathtt{state}$ connects $\mathtt{sched}$ (Scheduler) with message $\mathit{ids}$ and the payload that contains other data imported for mutation to be completed (typed with $\T_5$), and the rest of cluster formation protocol may continue.
 
 \begin{align*}
@@ -946,6 +959,7 @@ The idempotency store protocol $\G''$, starts with $\mathtt{service}$ sending mu
 \mathtt{service} \twoheadrightarrow \mathtt{sched}{:}\mathit{ids}(\T_5).\tend
 \end{align*}
 
+\noindent
 We may now obtain the projections of global type $\G_3$ onto the participants $\mathtt{user}, \mathtt{service}, \mathtt{istorage}$, $\mathtt{mstorage}$, $\mathtt{log}$, $\mathtt{nodes}$: and $\mathtt{sched}$:
 
 \begin{align*}
@@ -1005,23 +1019,24 @@ where
 	\mathtt{service}{??}\mathit{ids}(\T_4).\mathtt{service}{!}\mathit{rsrvd}().\tend
 \end{align*}
 \myequations{Idempotency check global protocol projection.}
-Similarly as for $\G_2$ we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
+
+\noindent
+Similarly, as for $G_2$, we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
 %
 %
 \subsection{List detail protocol}\label{sec:list_detail_protocol}
 %
-The last communication protocol in our system appears in the information retrieval process. Namely, on formed topologies, using labels, the user can specify what part of the system he wants to retrieve, for example to visualise on some dashboard. Two options are available: 
+The final communication protocol in our system appears in the information retrieval process. Using labels, the user can specify what part of the system he wants to retrieve, namely, on formed topologies. This protocol could be useful, for example, if the user wants to visualize his topologies, regions, or clusters on some dashboard and monitor for some changes, alerts, etc. This protocol comes with two available options: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{global view} of the system --- all topologies the user manages
-	\item \textbf{specific clusters} details --- complete details about specified clusters like resources utilization over time (using stored metrics information), node information, and running or stopped services.
+	\item \textbf{global view} of the system -- all topologies the user manages. This will return just basic information about regions and clusters and their utilization.
+	\item \textbf{specific clusters} details -- in-depth details for specified clusters like resources utilization over time (using stored metrics information), node information, configuration data, and running or stopped services.
 \end{enumerate}
 
-It is important to note, that similar to the query operation, both rules $(\ref{eq:eq1})$ and $(\ref{eq:eq2})$ must be satisfied in order for information to be present in the response. 
+\noindent
+It is important to note, that similarly to the query operation (defined previously), both rules $(\ref{eq:eq1})$ and $(\ref{eq:eq2})$ \textbf{must} be satisfied for information to be presented in the response. The user can specify one additional information in the list request, and that is whether or not the user wants a detailed view or not. If such information is presented in the request, the user will get a detaild view back. 
 
-One additional information may be specified is whether the user wants a detailed view or not. If detail view information is presented in a request, the user will get a detailed view. 
-
-Figure \ref{fig:fig8}. shows a low-level view of the list operation protocol, where users can get details about the formed system. In this setting, the system involves participants: User, State, Nodes, and Log. 
+In the figure~\ref{fig:fig8}, we show a low-level view of the list operation protocol, where users can get details about the formed system. This setting involves the next participants: User, State, Nodes, and Log. 
 
 \begin{figure}[!htbp]
 	\begin{center}
@@ -1032,16 +1047,18 @@ Figure \ref{fig:fig8}. shows a low-level view of the list operation protocol, wh
 	\label{fig:fig8}
 \end{figure}
 
-We now informally describe the participants roles in the protocol:\label{list_protocol_informal_description}
+\noindent
+Now we can informally describe the roles of the participants in the protocol:\label{list_protocol_informal_description}, shown in figure~\ref{fig:fig8}
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{User} sends a list request to State service;
-	\item \textbf{State} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service;
+	\item \textbf{User} sends a list request to State;
+	\item \textbf{State} accepts the list request and the query local state based on the user selector. If a detail view is requested, the state gets metrics data from Nodes, and return details back to user;
 	\item \textbf{Nodes} contain node metrics data, and if required, it may send this data to State;
 	\item \textbf{Log} contains records of all operations. Users can query this service.
 \end{enumerate}
 
-Algorithm \ref{alg:alg5} describes steps after the state receives a list message.
+\noindent
+In algorithm~\ref{alg:alg5}, we describe steps that are required after the state receives a list message.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -1060,6 +1077,7 @@ Algorithm \ref{alg:alg5} describes steps after the state receives a list message
 	\label{alg:alg5}
 \end{algorithm}
 
+\noindent
 Next we present a formal description of the list communication protocol (cf. Figure \ref{fig:fig4}) by using~\cite{HuY17}.
 Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
 $(1)$ $\mathit{list}$, specifying a request for a detailed view, where sort $\T_1$ identifies which parts of the system user wants to view in details, after which $\mathtt{state}$ connects $\mathtt{nodes}$ with $\mathit{query}$ message, with a payload of sort $\T_2$  containing specification of which nodes need to show their metrics data, and then protocol proceeds as prescribed with $\G'$; 
@@ -1088,6 +1106,7 @@ In $\G''$, $\mathtt{state}$ also connects $\mathtt{log}$ with $\mathit{brief}$ a
 	\mathtt{state}\twoheadrightarrow \mathtt{log}{:}\mathit{brief}(\T_5).\mathtt{state}\to\mathtt{user}{:}\mathit{result}(\T_5).\tend
 \end{align*}
 
+\noindent
 Same as for the health-check and the cluster formation protocols, here we also present the projections of global type $\G_4$, modeling the list protocol, onto participants $\mathtt{user}$, $\mathtt{state}$, $\mathtt{nodes}$, and $\mathtt{log}$:
 \begin{align*}
 	\ST_\mathtt{user} =& 
@@ -1126,6 +1145,8 @@ where
 	\end{array} \right.
 \end{align*}
 \myequations{List detail global protocol projection.}
+
+\noindent
 For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in the session only after receiving from $\mathtt{state}$, either message $\mathit{detail}$, or message $\mathit{brief}$, and then terminates. 
 
 Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
@@ -1157,7 +1178,7 @@ The model presented in this chapter, have three possible execution repercussions
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be a viable option in the CC.
 	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because -- the communication should be implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an organization tool.
-	\item \textbf{Combination}, this approach can be done over multi-cloud principles.
+	\item \textbf{Combination}, this approach can be done over multi-cloud principles. Some cloud tasks could be offloaded to the nearest micro-cloud.
 \end{enumerate} 
 %
 %
