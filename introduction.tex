@@ -15,7 +15,7 @@ In this section, we are going to give an overview of the topics, that are of sig
 %
 \section{Problem area}\label{sec:problem_area}
 %
-To lower the administration cost, cloud providers create an effective economy of scale~\cite{BariBEGPRZZ13} by housing data-centers (DCs) with huge capacities. However, such a model does not come with the cost. When such a  system grows to its physical limits, a centralized model brings more harm than good~\cite{GunawiHSLSAE16, LopezMEDHIBFR15}. Despite all the benefits that centralization can provide, it is inevitable for the CC services to suffer from serious problems~\cite{KarimIWGSYO16}. Over time, and due to the high bandwidth and latency, these services face degradation that we cannot overlook. This serious services degradation can have an enormous consequence on the human business and potentially lives as well. To avoid large investments~\cite{MonsalveCC18}, like creating and maintaining their own DCs, organizations use cloud services created by others~\cite{Satyanarayanan17}. They consume resources and pay for their usage time. This model is known as -- pay as you go model.
+To lower the administration cost, cloud providers create an effective economy of scale~\cite{BariBEGPRZZ13} by housing data-centers (DCs) with huge capacities. However, such a model does not come with the cost. When such a  system grows to its physical limits, a centralized model brings more harm than good~\cite{GunawiHSLSAE16, LopezMEDHIBFR15}. Despite all the benefits that centralization can provide, it is inevitable for the CC services to suffer from serious problems~\cite{KarimIWGSYO16}. Over time, and due to the high bandwidth and latency, these services face degradation that we cannot overlook. This serious services degradation can have an enormous consequence on the human business and potentially lives as well~\cite{El-SayedSPPGML18}. To avoid large investments~\cite{MonsalveCC18}, like creating and maintaining their own DCs, organizations use cloud services created by others~\cite{Satyanarayanan17}. They consume resources and pay for their usage time. This model is known as -- pay as you go model.
 
 CC requires data transfer to the DCs from data sources. This operation is problematic because it creates a high latency in the system~\cite{HossainRH18}. We can observe few examples like data collection from planes and autonomous cars. Boeing 787s per single flight generates half a terabyte of data, while a self-driving car generates two petabytes of data per single drive. On the other hand, bandwidth is not large enough to support such requirements~\cite{CaoZS18}. Data transfer is not the only problem CC is facing. Some applications require real-time processing for proper decision-making \cite{CaoZS18}. For example, self-driving cars, delivery drones, or power balancing in electric grids. Such applications might face serious issues if a cloud service becomes unavailable due to whatever reson~\cite{GunawiHSLSAE16}.
 
@@ -25,9 +25,7 @@ Over the years, research led to new computing areas and model in which computing
 %
 \section{Distributed systems}\label{sec:distributed_systems}
 %
-There are various definitions of DS, but we can think of DS as a system where multiple entities can communicate to one another in some way, but at the same time, they can perform some operations. 
-
-In~\cite{SteenT16, 0019513} Tanenbaum et al. give two interesting assumptions about DS:
+There are various definitions of DS, but we can think of DS as a system where multiple entities can communicate to one another in some way, but at the same time, they can perform some operations. In~\cite{SteenT16, 0019513} Tanenbaum et al. give two interesting assumptions about DS:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item  \say{A computing element, which we will generally refer to as a node, can be either a hardware device or a software process}.
@@ -45,6 +43,7 @@ Three significant characteristics of distributed systems are~\cite{0019513}:
 	\item \textbf{lack of a global clock}, this is a consequence of dealing with independent nodes. Each node has its notion of time, and as such we cannot assume that there is something like a global clock.
 \end{enumerate} 
 
+\noindent
 In~\cite{SteenT16} authors give formal definition \say{distributed system is a collection of autonomous computing elements that appears to its users as a single coherent system}.
 
 When talking about DS, we usually think about computing systems that are connected via network or over the internet. But DS is not exclusive to the domain of computer science. They existed before computers started to enrich almost every aspect of human life. DS have been used in various different domains such as: \textbf{telecommunication networks}, \textbf{aircraft control systems}, \textbf{industrial control systems} etc. DS are used anywhere where the number of users is growing rapidly so that a single entity cannot respond to the demands in (near) real-time.
@@ -64,6 +63,7 @@ DS is hard to implement because of its nature. James Gosling and Peter Deutsch b
 	\item \textbf{The network is homogeneous}; today, a homogeneous network is the exception, rather than a rule. We have different servers, systems, clients that interact. The implication of this is that we have to assume interoperability between these systems sooner or later but we must be aware of it. We might also have some proprietary protocols that might also take time to send on and they may stay without support, so we should avoid them.
 \end{enumerate}
 
+\noindent
 These fallacies are introduced over a decade ago, and more than four decades since we started building DS, but the characteristics and underlying problems remain pretty the same. It is interesting fact that designers, architects still assume that technology solves everything. This is not the case in DS, and these fallacies should not be forgotten. Because of these problems, DS is hard to implement correctly and they are hard to test and maintain.
 %
 %
@@ -76,6 +76,7 @@ Scalability is the property of a system to handle a growing amount of work by ad
 	\item \textbf{Scaling horizontally} means that we scale our system by keep adding more and more computers, rather than upgrading the hardware of a single one. With this approach, we are (almost) limitless on how much we can scale. Whenever performance degrades we can simply add more computers (or nodes). These nodes are not required to be some high-end machines.
 \end{itemize}
 
+\noindent
 Table~\ref{tab:table1} summarize differences between horizontall and verticall scaling.
 
 \begin{table}[h!]
@@ -93,6 +94,7 @@ Table~\ref{tab:table1} summarize differences between horizontall and verticall s
 	\label{tab:table1}
 \end{table}
 
+\noindent
 Scaling horizontally is a preferable way for scaling DS. Not because we can scale easier, or because it is significantly cheaper than vertical scaling (after a certain threshold)~\cite{Bondi00}, but because this approach comes with few more benefits that are especially important when talking about large-scale DS. Adding more nodes gives us two important properties: 
 
 \begin{itemize}
@@ -100,6 +102,7 @@ Scaling horizontally is a preferable way for scaling DS. Not because we can scal
 	\item \textbf{Low latency} refers to the idea that the world is limited by the speed of light. If a node running application is too far away, the user will wait too long for the response to get back. If the same application is running in multiple places, the user request will hit the node that is closest to the user.
 \end{itemize}
 
+\noindent
 But despite all the obvious benefits, for a DS to work properly, we need the writing software in such a way that is able to run on multiple nodes, as well as that accept \textbf{failure} and deal with it. This turns out to be not an easy task.
 
 For example, users need to be aware when using DS, which is related to distributed data storage systems. Storage implementations that rely on vertical scaling to ensure scalability and fault tolerance, have one nasty feature. 
@@ -144,6 +147,7 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 		\label{tab:table7}
 	\end{table}
 	
+	\noindent
 	We can calculate availability class if we have system availability $A$, the system's availability class is defined as~\cite{GrayS91}: 
 	
 	\begin{equation} 
@@ -154,6 +158,7 @@ This nasty feature is represented in theorem called \textbf{CAP theorem} present
 	\item \textbf{P}artition tolerance, which means that the cluster must continue to work despite any number of communication breakdowns between nodes in the system. It is important to state that in a distributed system, partitions cannot be avoided.
 \end{enumerate}
 
+\noindent
 Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems, but only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be: \label{crdts}
 
 \begin{itemize}
@@ -168,9 +173,7 @@ where $*$ is a binary operation, for example: $max$, $union$, $or$ we can rely o
 %
 \subsection{Cloud computing}\label{sec:cloud_computing}
 %
-Vogels et al. describe CC as an \say{aggregation of computing resources as a utility, and software as a service}~\cite{Vogels}.  Big DCs provide hardware and software services for their users over the internet~\cite{AboveTheCloud}. Cloud providers offer various resources like CPU, GPU, storage, and network as utilities that can be used and released on-demand~\cite{ZhangCB10}. The key strength of the CC is reflected in the offered services~\cite{Vogels}.  
-
-To support the various application needs, the traditional CC model provides enormous computing and storage resources elastically. This property refers to the cloud ability to allow services to allocate additional resources or release unused ones to match the application workloads on-demand~\cite{AssuncaoVB18}. Services usually fall in one of three main categories: 
+Vogels et al. describe CC as an \say{aggregation of computing resources as a utility, and software as a service}~\cite{Vogels}.  Big DCs provide hardware and software services for their users over the internet~\cite{AboveTheCloud}. Cloud providers offer various resources like CPU, GPU, storage, and network as utilities that can be used and released on-demand~\cite{ZhangCB10}. The key strength of the CC is reflected in the offered services~\cite{Vogels}. To support the various application needs, the traditional CC model provides enormous computing and storage resources elastically. This property refers to the cloud ability to allow services to allocate additional resources or release unused ones to match the application workloads on-demand~\cite{AssuncaoVB18}. Services usually fall in one of three main categories: 
 
 \begin{itemize}
 	\item \textbf{Infrastructure as a service (IaaS)} allows businesses to purchase resources on-demand and as-needed instead of buying and managing hardware themself;
@@ -178,6 +181,7 @@ To support the various application needs, the traditional CC model provides enor
 	\item \textbf{Software as a service (SaaS)} deliver applications over the internet to its users. These applications are managed by a third-party vendor;
 \end{itemize}
 
+\noindent
 Figure~\ref{fig:fig1} show the difference in control and management of resources between different cloud options and on-premises solutions.
 
 \begin{figure}[H]
@@ -200,6 +204,7 @@ By the ownership, CC can be categorized into three categories:
 	\item \textbf{Hybrid cloud} in such an environment that uses both public and private clouds. Examples include IBM, HP, VMWare vCloud, etc.
 \end{itemize}
 
+\noindent
 Table~\ref{tab:table4} show comparison of public, private and hybrid cloud capabilities.\label{sec_types}
 
 \begin{table}[h!]
@@ -221,6 +226,7 @@ Table~\ref{tab:table4} show comparison of public, private and hybrid cloud capab
 	\label{tab:table4}
 \end{table}
 
+\noindent
 In the rest of the thesis, if not stated differently when CC term is used it denotes public cloud.
 
 CC has been the dominating tool in the past decade in various applications~\cite{Satyanarayanan17}. It is changing, evolving, and offering new types of services. Resources such as container as a service (CaaS), database as a service (DBaaS)~\cite{Peter} are newly introduced. The CC model gives us a few benefits. Centralization relies on the economy of scale to lower the cost of administration of big DCs. Organizations using cloud services avoid huge investments. Like creating and maintaining their own DCs. They consume resources usually created by others~\cite{Satyanarayanan17} and pay for usage time -- pay as you go model. 
@@ -248,11 +254,10 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 	\label{tab:table2}
 \end{table}
 
+\noindent
 In recent years there is one extension of CC from a series standpoint called \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15}. 
 
-A multi-cloud environment is a such environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers, that each delivers a specific application or service. A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}.
-
-This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
+A multi-cloud environment is a such environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers, that each delivers a specific application or service. A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
 
 CC is giving a user an illusion that he is using a single machine, while the background implementation is fairly complicated and consists of various elements that are composed of countless machines. CC is a typical example of a horizontally scalable system presented in~\ref{sec:scalability}.
 %
@@ -276,6 +281,7 @@ Every membership protocol has some properties that will ensure efficiency and sc
 	\item \textbf{Scale}, with this property we must ensure that the network load that is generated should be distributed equally between all processes in the group.
 \end{enumerate}
 
+\noindent
 The easiest idea to implement this protocol would be \textbf{heartbeating} technique where process $P_i$ will send a heartbeat message to all his peers in the group or \textbf{multicast}. After some time if process $P_j$ did not receive a heartbeat message from $P_i$, it will mark him as failed. This idea is easy to understand, and implement but the downsides are that his process is not that \textbf{scalable}, especially for large groups, and this will introduce huge network traffic.
 
 To resolve this problem, Das et al.~\cite{DasGM02} introduced \textbf{S}calable \textbf{W}eakly-consistent \textbf{I}nfection-style Process Group \textbf{M}embership protocol, or \textbf{SWIM} for short\label{swim}. This protocol divides the membership problem into two parts:
@@ -294,6 +300,7 @@ To resolve this problem, Das et al.~\cite{DasGM02} introduced \textbf{S}calable 
 	\label{fig:fig15}
 \end{figure}
 
+\noindent
 Over the years, researchers found ways to improve the protocol for example Dadgar et al. present Lifeguard protocol~\cite{DadgarPC18} for more accurate failure detection, and there are other implementations to fine-tune the SWIM, but the base idea is still there. Today SWIM or SWIM-like protocols are standard membership protocols whenever we are doing some node clustering.
 %
 %
@@ -333,6 +340,7 @@ On contrary to relational databases that mostly deal with structured data, big d
 	\item \textbf{Semi-structured} data is the kind of data that can contain both previously mentioned types of data. An example of this type of data is XML files.
 \end{itemize}
 
+\noindent
 Along with the share size, big data have other instantly recognizable features called \textbf{V's} of big data~\cite{PatgiriA16}. Name is derived from starting letters from the other features that are describing big data. Image~\ref{fig:fig3} show 6 V's commonly used to represent the big data.
 
 \begin{figure}[H]
@@ -344,6 +352,7 @@ Along with the share size, big data have other instantly recognizable features c
 	\label{fig:fig3}
 \end{figure}
 
+\noindent
 Processing in big data systems can be represented as~\cite{phdthesis, KiranMMDB15}:
 
 \begin{itemize}
@@ -352,6 +361,7 @@ Processing in big data systems can be represented as~\cite{phdthesis, KiranMMDB1
 	\item \textbf{Lambda architectures} represents a processing technique where stream processing and handling of massive data volumes in a batch are combined in a uniform manner, reducing costs in the process~\cite{KiranMMDB15}.
 \end{itemize}
 
+\noindent
 Big data systems, are not processing and value extracting systems. Big data systems can be separated into few categories: $(1)$ data storage, $(2)$, data ingestion $(3)$, data processing, and analytics. All these systems aids to properly analyze ever-growing requirements~\cite{RaoMBG19},
 
 Despite a promise that big data offers to derive value out of the collected data, this task is not easy to do and requires properly set up system filtering and removing data that contains no value. To aid this idea, data could be filtered and a little bit preprocessed on close to the source~\cite{inproceedingsSimic1}, and as such sent to data lakses~\cite{MarynowskiSP15}.
@@ -369,6 +379,7 @@ There is no single comprehensive definition of what a microservice is. Different
 	\item they are implemented and maintained by a small team.
 \end{enumerate}
 
+'\noindent
 The industry is migrating much of their applications to the cloud because CC offers to scale their computing resources as per their usage~\cite{LiZJLZLGGS19}. Microservices are small loosely coupled services that follow UNIX philosophy~\say{do one thing and do it well}~\cite{krause2015microservices}, and they communicate over well defined API~\cite{DragoniGLMMMS16}.
 
 This architecture pattern is well aligned to the CC paradigm~\cite{LiZJLZLGGS19}, contrary to previous models like monolith whose modules cannot be executed independently~\cite{DragoniGLMMMS16, abs-1905-07997}, and are not well aligned with the CC paradigm~\cite{abs-1905-07997}. Table~\ref{tab:table3} summarize differences between the monolith and microservices architecture.
@@ -389,6 +400,7 @@ This architecture pattern is well aligned to the CC paradigm~\cite{LiZJLZLGGS19}
 	\label{tab:table3}
 \end{table}
 
+\noindent
 Since its inception, microservices architecture is gone through some adaptations. And modern-day microservices are extended with two new models each with its unique abilities and problems:
 
 \begin{itemize}
@@ -408,7 +420,7 @@ Microservices communicate over a network to fulfill some goal using message pass
 	\item Event-driven services are services where communication between services is done using events. Events are sent on some channel and other read messages that are received on another channel. These channels could be implemented either like message queues or message topics. Services connect to message queue or subscribe to the specific topic, and when messages arrive, they can act according to the message type.
 \end{itemize}
  
- \noindent
+\noindent
 They are well aligned with text-based protocols like HTTP/1 using $JSON$ for example, or binary protocols such as HTTP/2 using $protobuf$ and $gRPC$ for example, and even new faster version like HTTP/3 over new $QUIC$ protocol, designed by Google. HTTP 3 is the latest version of the conventional and trusted HTTP protocol. It is very similar to HTTP 2, but it also offers a few important new features. Table~\ref{tab:table9} show important difference between versions of HTTP protocol.
  
  \begin{table}[h!]
@@ -429,6 +441,7 @@ They are well aligned with text-based protocols like HTTP/1 using $JSON$ for exa
  	\label{tab:table9}
  \end{table}
  
+\noindent
 To ensure a wider range of devices that can communicate with the rest of the systems, developers usually have a gateway into the system that is REST service, and other services could be implemented differently.
 
 It is important to point out, that all flavors of microservices applications rely on continuous delivery and deployment~\cite{7436659}. This is enabled by lightweight containers, instead of virtual machines~\cite{FelterFRR15}, and orchestration tools such Kubernetes~\cite{BurnsGOBW16}. These concepts will be described in more detail in Section~\ref{sec:virtualization_techniques}.
@@ -442,6 +455,7 @@ One particular thing that users need to be aware of is \textbf{idempotency}. In 
 \end{equation}
 \myequations{Idempotency law formula}
 
+\noindent
 Not all Create, Read, Update, Delete (CRUD) operations are idempotent by default. But developers need to make effort to make all of them idempotent, to prevent bad outcomes and inconsistent states. Table~\ref{tab:table8} show list of idempotent and non-idempotent for standard CRUD operations:
 
 \begin{table}[h!]
@@ -460,6 +474,7 @@ Not all Create, Read, Update, Delete (CRUD) operations are idempotent by default
 	\label{tab:table8}
 \end{table}
 
+\noindent
 Crate operation is not idempotent by default, but to make it idempotent there are multiple strategies for how to do so. The most common way is to create \textbf{idempotency key} that will be sent in the request, and based on that request server can decide if this operation is already invoked or not. If a server is already \say{seen} specified idempotency key than operation is already done and we can return just response that operation is done but no operation will be done over the state of the service or application. If the server sees the idempotency key for the first time, that is the signal that this request is a new one, and it should be done.
 
 Idempotency key could be stored in any kind of storage, it is not uncommon that these keys are stored in cache storage with some time to live (TTL) policy that will automatically remove the key after a specified time.
@@ -504,6 +519,7 @@ Figure~\ref{fig:fig2} show difference in network topology between P2P networks $
 	\label{fig:fig2}
 \end{figure}
 
+\noindent
 Peers are creating a sense of virtual community. This community of peers can resolve greater tasks, beyond those that individual peers can do. Yet, these tasks are beneficial to all the peers in the system~\cite{BandaraJ13}. When a request comes to such a network, a node that accepted request is usually called \textbf{coordinator}, because he then is trying to found the right peer to send a request to.
 
 Based on how the nodes are linked to each other within the overlay network, and how resources are indexed and located, we can classify networks as~\cite{KamelSE07}:
@@ -514,6 +530,7 @@ Based on how the nodes are linked to each other within the overlay network, and 
 	\item \textbf{Hybrid} combine the previous two models in various ways.
 \end{itemize}
 
+\noindent
 P2P networks are a great tool in many arsenals, but because of their unique ability to act as a server and as a client at the same time, we must be aware and pay more attention to security because they are more vulnerable to exploits~\cite{0024003}.
 %
 %
@@ -536,6 +553,7 @@ Figure~\ref{fig:fig16} show difference between mater-slave $(left)$ and peer-to-
 	\label{fig:fig16}
 \end{figure}
 
+\noindent
 Using the right distribution model usually depends on the business requirements. High availability requires a P2P network because no single point of failure. If we could manage data using batch jobs that run in off-hours, then the simpler master-slave model might be the solution.
 %
 %
@@ -561,6 +579,7 @@ These models are similar, but they are not identical, and the kinds of problems 
 	\label{fig:fig4}
 \end{figure}
 
+\noindent
 Parallel computing has often used the strategy with problems, that due to their nature or constraints must be done on multi-core machines simultaneously~\cite{0072397}. It is often, that some big problems are divided into smaller ones, which can then be solved at the same time. 
 
 Several tasks require parallel computing like simulations, computer graphics rendering, or different scenarios in scientific computing.
@@ -589,9 +608,8 @@ Modern virtualization differentiates few different tools. Some of them are used 
 	\item \textbf{Unikernels} is the newest addition to the virtualization space. In~\cite{pavlicek2016unikernels} Pavlicek define unikernels as small, fast, secure virtual machines that lack operating systems. Unikernels are comprised of source code, along with only the required system calls and drivers. Because of their specific design, they have a single process and they contain and execute what it absolutely needs to nothing more and nothing less~\cite{GoethalsSAVT18}. They are advertised that new technology that will save resources and that they are \textit{green}~\cite{208735} meaning they save both power and money. When put to the test and compared to containers they give interesting results~\cite{GoethalsSAVT18, PlauthFP17}. Unikernels are still a new technology and they are not widely adopted yet. But they give promising features for the future, especially \textbf{if} properly ported to ARM architectures, and various development languages. Unikernels will probably be used as a user applications and functions virtualization tool, because of their specific architecture, especially for serverless applications presented in~\ref{sec:microservices}.
 \end{itemize}
 
-Figure~\ref{fig:fig5} represent architectural differences between VMs, containers, and unikernels.
-
-With every virtualization technique, the ultimate goal is to pack as many applications on existing hardware as possible, so that there are no resources that are left not used -- we are trying to achieve high resource utilization.
+\noindent
+With every virtualization technique, the ultimate goal is to pack as many applications on existing hardware as possible, so that there are no resources that are left not used -- we are trying to achieve high resource utilization. Figure~\ref{fig:fig5} represent architectural differences between VMs, containers, and unikernels.
 
 \begin{figure}[H]
 	\begin{center}
@@ -616,6 +634,7 @@ Deployments in such complex environment can be separated how they handle changes
 	\item \textbf{Immutable model}, is a model where we do not do any in-place changes on existing infrastructure or application whatsoever. In this model, we replace it completely with a new version that is updated or changed compared to the previous version. The previous version gets discarded in favor of the new version. Compared to the previous model, immutable deployment has: $(1)$ less risk, since we do not change existing infrastructure or the application but we start a new one with and shut down the previous one. This is important especially in DS where everything can fail at any time, $(2)$ previous property reduces the complexity of the mutable deployment model. This is a direct implication of the previous feature, since we shut down and fully replace the previous version with the new one we get \textbf{descrete} version change and atomic deployment with deferring deployments with fast rollback and recovery processes. On the other hand, this process requires more resources~\ref{Helland16}, since both versions must be present on the node for this process is done. The second problem is data that is used by the application, we should not lose the data that the application is generated. If we externalize data then this problem is resolved. We should not rely on local storage but store that data elsewhere, especially when the parts of the system are volatile and changed often. The key advantage of this approach is avoiding downtime experienced by the end-user when new features are released.
 \end{itemize}
 
+\noindent
 Figure~\ref{fig:fig12} summarize difference bewteen prevous infrastructure deplyment models.
 
 \begin{figure}[H]
@@ -635,6 +654,7 @@ Immutability is a simple concept to understand and simplify a lot especially in 
 	\item \textbf{Rolling update} strategy update large environments a few nodes at a time. The setup is similar to blue-green deployment, but here we have a single environment. With this strategy, the new version gradually replaces the old one. But this is not the only benefit. If for whatever reason, the new version is not working properly on the larger amount of nodes, we can always do rolling back to the previous version.
 \end{itemize}
 
+\noindent
 With mutable infrastructure, these strategies would be hard to implement, and maybe it is not possible at all. Besides infrastructure deployment, there is another side that we must consider, and that is how to describe these deployments. Here we can consider two different strategies:
 
 \begin{itemize}
@@ -642,6 +662,7 @@ With mutable infrastructure, these strategies would be hard to implement, and ma
 	\item \textbf{Declarative}, with this option user, has to describe the end state or what is his desired state, and the tool needs to figure out the way how to do this. Here we have \textit{smart} system that will found a way how to achieve the desired state, and we have user who\textit{do not care} in what order actions need to be done --- that is what the system needs to do. Users do not need to worry about timing, this simplifies the whole process and the code always represents the latest state. With this type of deployment, we can offer users two different models: $(1)$ use existing formats that are user familiar with like JSON, YAML, XML, etc., or $(2)$ create a new domain-specific language that users need to learn, but we might be able to optimize description.
 \end{itemize}
 
+\noindent
 With the introduction of \textit{LinuxKit}, we can create Linux subsystems based around very secure containers. With linuxkit, every part of the Linux subsystem is running inside the container, so we can assemble a Linux subsystem with services that are needed. As a result, systems created with LinuxKit have a smaller attack surface~\cite{abs-1802-10375} than general-purpose systems. This is important from the security point of view, but also infrastructure deployment because we can compose specific OS based around containers that we need for a different purpose. And we can update, change and adopt these OS for every machine or purpose we need.
 
 Deployment is based around changing parts of the OS, and his services that are running inside containers. As a result, everything can be removed or replaced. It's highly portable and can work on desktops, servers, IoT, mainframes, bare metal, and virtualized systems.
@@ -656,6 +677,7 @@ People usually confuse these two concepts. Even they look similar, they are a di
 	\item \textbf{Parallelism} is the simultaneous execution of multiple things. Parallelism is about doing a lot of things at once. 
 \end{itemize}
 
+\noindent
 These things are important, especially when building applications and systems that should achieve very high throughput. We must build them with a good structure and a good concurrency model. These features enable possible parallelism, but with communication~\cite{Pike}. These ideas are based on Tony Hoare work of Communicating Sequential Processes (CSP)~\cite{Hoare78}.
 
 \subsection{Actor model}\label{sec:actor_model}
@@ -694,7 +716,7 @@ One size rarely suits all needs, so the CC should not be our final computing shi
 
 A zonally-based organization of servers combined with MDCs shows a great possibility for building micro-clouds and EC as a service. To achieve such a behavior, we need a few more abstractions and layers, to make the whole system more available, resilient, and with less latency. By their nature, EC originates from P2P systems~\cite{LopezMEDHIBFR15} as suggested by L{\'{o}}pez et al., but expands it into new directions and blends it with the CC. This very interesting, because we already have much research and knowledge available for P2P systems that we could use for inspiration. But one extension of the P2P system leads to geo-distributed deployments, and going from node to node is a time-consuming process. Satyanarayanan et al. stated that infrastructure deployment will not happen until the whole process is relatively easy~\cite{SatyanarayananBCD09}. 
 
-If we assume that we have a well-defined system and the previous task is solved so that we can easily deploy infrastructure and operate with it, we will have a system that could be offered like any other resource in the CC -- as a service. Such a system or service could be offered to various types of users, from researchers to developers to create new types of applications. A well-defined system that is easy to operate with, will be able to move resources from one place to another with no problem. We also must be aware, that some cloud providers might choose to integrate the system into their existing CC platform to hide complexity and offer a commiunication interface or proposed application models.
+If we assume that we have a well-defined system and the previous task is solved so that we can easily deploy infrastructure and operate with it, we will have a system that could be offered like any other resource in the CC -- as a service. Such a system or service could be offered to various types of users, from researchers to developers to create new types of applications. A well-defined system that is easy to operate with, will be able to move resources from one place to another with no problem. We also must be aware, that some cloud providers might choose to integrate the system into their existing CC platform to reduce the load or avoid bottlenecks and single points of failure~\cite{JararwehDAAAB16}.
 
 The idea of small-scale servers introduced by EC, with heterogeneous, compute, storage, and network resources, raise interesting research ideas and it is the main motivation for this thesis. Taking advantage of resources organized locally as micro clouds, community clouds, or edge clouds~\cite{RydenOCW14} suggested by Ryden et al., to help power-hungry servers reduce traffic~\cite{HirschMZ18}. Contact the cloud only when needed~\cite{inproceedingsSimic1}. Send to the cloud only information that is crucial for other services or applications. Not ingest everything as the standard CC model proposes.
 
@@ -710,9 +732,8 @@ This cloud extension strengthens our understanding of not just DS but also CC as
 	\item \textit{Can we make model in such a way that is formaly correct, easy to extend, understand and reason about?}
 \end{enumerate}
 
-This micro-cloud model makes both system and applications more available and reliable, while resources are extended further beyond the single node or even MDCs. IN his work~\cite{SatyanarayananK19} Satyanarayanan et al. show that MDCs can serve as firewalls, while users get a unique ability to dynamically and selectively control their information that will be uploaded to the cloud.  Simi\' c et al., in~\cite{inproceedingsSimic1} use a similar idea as a pre-processing tier for the cloud. 
-
-Years after its inception, EC is no longer just an idea~\cite{SatyanarayananK19} but a must-have tool for novel applications to come. 
+\noindent
+This micro-cloud model makes both system and applications more available and reliable, while resources are extended further beyond the single node or even MDCs. IN his work~\cite{SatyanarayananK19} Satyanarayanan et al. show that MDCs can serve as firewalls, while users get a unique ability to dynamically and selectively control their information that will be uploaded to the cloud.  Simi\' c et al., in~\cite{inproceedingsSimic1} use a similar idea as a pre-processing tier for the cloud. Years after its inception, EC is no longer just an idea~\cite{SatyanarayananK19} but a must-have tool for novel applications to come. 
 %
 %
 \section{Research Hypotheses, and Goals}\label{sec:research_hyphotesis_and_golas}
