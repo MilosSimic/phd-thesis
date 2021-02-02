@@ -716,7 +716,7 @@ One size rarely suits all needs, so the CC should not be our final computing shi
 
 A zonally-based organization of servers combined with MDCs shows a great possibility for building micro-clouds and EC as a service. To achieve such a behavior, we need a few more abstractions and layers, to make the whole system more available, resilient, and with less latency. By their nature, EC originates from P2P systems~\cite{LopezMEDHIBFR15} as suggested by L{\'{o}}pez et al., but expands it into new directions and blends it with the CC. This very interesting, because we already have much research and knowledge available for P2P systems that we could use for inspiration. But one extension of the P2P system leads to geo-distributed deployments, and going from node to node is a time-consuming process. Satyanarayanan et al. stated that infrastructure deployment will not happen until the whole process is relatively easy~\cite{SatyanarayananBCD09}. 
 
-If we assume that we have a well-defined system and the previous task is solved so that we can easily deploy infrastructure and operate with it, we will have a system that could be offered like any other resource in the CC -- as a service. Such a system or service could be offered to various types of users, from researchers to developers to create new types of applications. A well-defined system that is easy to operate with, will be able to move resources from one place to another with no problem. We also must be aware, that some cloud providers might choose to integrate the system into their existing CC platform to reduce the load or avoid bottlenecks and single points of failure~\cite{JararwehDAAAB16}.
+If we assume that we have a well-defined system and the previous task is solved so that we can easily deploy infrastructure and operate with it, we will have a system that could be offered like any other resource in the CC -- \emph{as a service}. Such a system or service could be offered to various types of users, from researchers to developers to create new types of applications. A well-defined system that is easy to operate with, will be able to move resources from one place to another with no problem. We also must be aware, that some cloud providers might choose to integrate the system into their existing CC platform to reduce the load or avoid bottlenecks and single points of failure~\cite{JararwehDAAAB16}.
 
 The idea of small-scale servers introduced by EC, with heterogeneous, compute, storage, and network resources, raise interesting research ideas and it is the main motivation for this thesis. Taking advantage of resources organized locally as micro clouds, community clouds, or edge clouds~\cite{RydenOCW14} suggested by Ryden et al., to help power-hungry servers reduce traffic~\cite{HirschMZ18}. Contact the cloud only when needed~\cite{inproceedingsSimic1}. Send to the cloud only information that is crucial for other services or applications. Not ingest everything as the standard CC model proposes.
 
@@ -760,7 +760,7 @@ From the previously defined hypotheses, we can derive the primary goals of this 
 %
 \section{Structure of the thesis}\label{sec:structure_of_thesis}
 %
-Throughout this introductory Chapter, we defined the motivation for our work with problems that this thesis addresses and presented the necessary background information and areas to support our work. Here we outline the rest of the thesis.
+Throughout this introductory Chapter~\ref{chapter:Intro}, we defined the motivation for our work, with problems that this thesis addresses. Furthermore, we presented the necessary background details, information, and areas required for understanding and support the rest of the thesis. Here we outline the rest of the thesis.
 
 Chapter~\ref{chapter:Review} presents the literature review, where we examine different aspects of existing systems and methods important for the thesis. We analyze existing organizational abilities for nodes in both industry and academia frameworks and solutions to address our first research question. We further examine platform models from industry and academia tools and frameworks to address our second research question. And last but not least, we examine current strategies to offload tasks from the cloud. All three parts address our third research question.
 
@@ -768,6 +768,6 @@ Chapter~\ref{chapter:Micro_clouds} details our model, how it is related to other
 
 Chapter~\ref{chapter:Implementation} presents implementation details of a framework developed to test hypotheses defined earlier in this chapter, but also a model and formally defined protocols defined in~\ref{chapter:Micro_clouds}. This chapter also shows results after conducting experiments, current limitations of the implemented system, and possible applications that could benefit from such a system.
 
-Chapter~\ref{chapter:Conclusion} concludes our work and presents opportunities for further research and development.
+Chapter~\ref{chapter:Conclusion} is the final chapter, and it concludes the work of this thesis, outlines the opportunities and directions for further research and development in this area.
 %
 %
