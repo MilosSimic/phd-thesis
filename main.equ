@@ -1,22 +1,23 @@
 \contentsline {myequations}{\numberline {1.1}Availability percentage formula}{9}{equation.1.2.1}% 
 \contentsline {myequations}{\numberline {1.2}Availability class formula.}{9}{equation.1.2.2}% 
-\contentsline {myequations}{\numberline {1.2}Commutative formula.}{10}{Item.44}% 
-\contentsline {myequations}{\numberline {1.2}Associative formula.}{10}{Item.44}% 
-\contentsline {myequations}{\numberline {1.2}Idempotent formula.}{10}{Item.44}% 
+\contentsline {myequations}{\numberline {1.2}Commutative formula.}{10}{Item.45}% 
+\contentsline {myequations}{\numberline {1.2}Associative formula.}{10}{Item.45}% 
+\contentsline {myequations}{\numberline {1.2}Idempotent formula.}{10}{Item.45}% 
 \contentsline {myequations}{\numberline {1.3}Idempotency law formula}{25}{equation.1.3.3}% 
-\contentsline {myequations}{\numberline {3.1}Cluster size limits}{61}{equation.3.1.1}% 
-\contentsline {myequations}{\numberline {3.2}Global type construction}{75}{equation.3.6.2}% 
-\contentsline {myequations}{\numberline {3.3}Local type representation syntax.}{76}{equation.3.6.3}% 
-\contentsline {myequations}{\numberline {3.4}Extending free servers set.}{79}{equation.3.6.4}% 
-\contentsline {myequations}{\numberline {3.5}Extending label set.}{80}{equation.3.6.5}% 
-\contentsline {myequations}{\numberline {3.5}Health-check global protocol.}{81}{definition.3.6.4}% 
-\contentsline {myequations}{\numberline {3.5}Health-check global protocol projection.}{82}{definition.3.6.4}% 
-\contentsline {myequations}{\numberline {3.6}Query selector formation.}{85}{equation.3.6.6}% 
-\contentsline {myequations}{\numberline {3.9}Server selector.}{86}{equation.3.6.9}% 
-\contentsline {myequations}{\numberline {3.10}Extending task queue set.}{86}{equation.3.6.10}% 
-\contentsline {myequations}{\numberline {3.10}Cluster formation global protocol.}{88}{Item.113}% 
-\contentsline {myequations}{\numberline {3.10}Cluster formation global protocol projection.}{90}{Item.115}% 
-\contentsline {myequations}{\numberline {3.10}Idempotency check global protocol.}{95}{Item.127}% 
-\contentsline {myequations}{\numberline {3.10}Idempotency check global protocol projection.}{98}{Item.129}% 
-\contentsline {myequations}{\numberline {3.10}List detail global protocol.}{100}{algocf.6}% 
-\contentsline {myequations}{\numberline {3.10}List detail global protocol projection.}{101}{algocf.6}% 
+\contentsline {myequations}{\numberline {3.1}Cluster size limits}{63}{equation.3.1.1}% 
+\contentsline {myequations}{\numberline {3.2}Position od micro clouds.}{64}{equation.3.1.2}% 
+\contentsline {myequations}{\numberline {3.3}Global type construction}{77}{equation.3.6.3}% 
+\contentsline {myequations}{\numberline {3.4}Local type representation syntax.}{78}{equation.3.6.4}% 
+\contentsline {myequations}{\numberline {3.5}Extending free servers set.}{81}{equation.3.6.5}% 
+\contentsline {myequations}{\numberline {3.6}Extending label set.}{82}{equation.3.6.6}% 
+\contentsline {myequations}{\numberline {3.6}Health-check global protocol.}{83}{definition.3.6.4}% 
+\contentsline {myequations}{\numberline {3.6}Health-check global protocol projection.}{84}{definition.3.6.4}% 
+\contentsline {myequations}{\numberline {3.7}Query selector formation.}{87}{equation.3.6.7}% 
+\contentsline {myequations}{\numberline {3.10}Server selector.}{88}{equation.3.6.10}% 
+\contentsline {myequations}{\numberline {3.11}Extending task queue set.}{88}{equation.3.6.11}% 
+\contentsline {myequations}{\numberline {3.11}Cluster formation global protocol.}{90}{Item.114}% 
+\contentsline {myequations}{\numberline {3.11}Cluster formation global protocol projection.}{92}{Item.116}% 
+\contentsline {myequations}{\numberline {3.11}Idempotency check global protocol.}{98}{Item.128}% 
+\contentsline {myequations}{\numberline {3.11}Idempotency check global protocol projection.}{100}{Item.130}% 
+\contentsline {myequations}{\numberline {3.11}List detail global protocol.}{102}{algocf.6}% 
+\contentsline {myequations}{\numberline {3.11}List detail global protocol projection.}{103}{algocf.6}% 

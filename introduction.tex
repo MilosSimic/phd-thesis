@@ -54,12 +54,12 @@ DS is hard to implement because of its nature. James Gosling and Peter Deutsch b
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]\label{ds:8_fallacies}
 	\item \textbf{The network is reliable}; there will always be something that goes wrong with the network --- power failure, a cut cable, environmental disasters, etc.
-	\item \textbf{Latency is zero}; locally latency is not an issue, but it deteriorates very quickly when you move to the internet and CC scenarios.
+	\item \textbf{Latency is zero}; locally latency is not an issue, but it deteriorates very quickly when you move to the internet and CC scenarios;
 	\item \textbf{Bandwidth is infinite}; even though bandwidth is constantly getting better and better, the amount of data we try to push through it rise as well.
-	\item \textbf{The network is secure};  Internet attack trends are showing growth, and this becomes a problem even more in public CC.
-	\item \textbf{Topology doesn't change}; network topology is usually out of user control, and network topology changes constantly for numerous reasons --- added or removed new devices, servers, breaks, outages, etc.
-	\item \textbf{There is one administrator}; nowadays there are numerous administrators for web servers, databases, cache and so one, but also company collaborates with other companies or CC provider.
-	\item \textbf{Transport cost is zero}; we have to serialize information and send data over the wire, which takes resources and adds to the total latency. The problem here is not just latency, but that information serialization takes time and resources.
+	\item \textbf{The network is secure};  Internet attack trends are showing growth, and this becomes a problem even more in public CC;
+	\item \textbf{Topology doesn't change}; network topology is usually out of user control, and network topology changes constantly for numerous reasons --- added or removed new devices, servers, breaks, outages, etc;
+	\item \textbf{There is one administrator}; nowadays there are numerous administrators for web servers, databases, cache and so one, but also company collaborates with other companies or CC provider;
+	\item \textbf{Transport cost is zero}; we have to serialize information and send data over the wire, which takes resources and adds to the total latency. The problem here is not just latency, but that information serialization takes time and resources;
 	\item \textbf{The network is homogeneous}; today, a homogeneous network is the exception, rather than a rule. We have different servers, systems, clients that interact. The implication of this is that we have to assume interoperability between these systems sooner or later but we must be aware of it. We might also have some proprietary protocols that might also take time to send on and they may stay without support, so we should avoid them.
 \end{enumerate}
 
@@ -407,8 +407,8 @@ Since its inception, microservices architecture is gone through some adaptations
 
 \begin{itemize}
 	\item \textbf{Cloud-native applications} are specially designed applications for CC. They are distributed, elastic, and horizontally scalable systems by their nature, and composed of (micro)services that isolate state in a minimum of stateful components~\cite{KratzkeQ17}. These type of applications are self-contained, could be deployed independently, and they are composed of loosely coupled microservices that are packaged in lightweight containers. They have Improved resource utilization, and they are centered around APIs.
-	\item \textbf{Serversles applications} is a computing model, where the developers need to worry only about the logic for processing client requests~\cite{AdzicC17}. Logic is represented as an event handler that only runs when a client request is received, and billing is done only when these functions are executing~\cite{AdzicC17}. \textbf{Cold start} is one of the features of serverless computing, and we can define it as user requests need to wait until a new container instance is up and running before can do any processing at all. Most providers have 1–3 second cold starts, and this is important for certain types of applications where latency is a concern. Cold start is only happening when there are no \textit{warm} containers available for the request, meaning there is no single instance to server request. Other features include: $(1)$ simplified services development, $(2)$ faster time to market, $(3)$ and lower costs.
-	\item \textbf{Service Mesh} is designed to standardize the runtime operations of applications~\cite{LiLGZH19}. As part of the microservices ecosystem, this dedicated communication layer can provide several benefits, such as: $(1)$ observability, $(2)$ providing secure connections, or $(3)$ automating retries and backoff for failed requests. With these features, developers only focus on the implementation of business logic, while operators gain out-of-the-box traffic policies, observability, and insights from the services. Advocates of the microservice movement, nowadays recommend using service mesh architecture when running microservices in production environments.
+	\item \textbf{Serversles applications} is a computing model, where the developers need to worry only about the logic for processing client requests~\cite{AdzicC17}. Logic is represented as an event handler that only runs when a client request is received, and billing is done only when these functions are executing~\cite{AdzicC17}. \textbf{Cold start} is one of the features of serverless computing, and we can define it as user requests need to wait until a new container instance is up and running before can do any processing at all. Most providers have 1–3 second cold starts, and this is important for certain types of applications where latency is a concern. Cold start is only happening when there are no \textit{warm} containers available for the request, meaning there is no single instance to server request. Other features include: \textbf{(1)} simplified services development, \textbf{(2)} faster time to market, \textbf{(3)} and lower costs.
+	\item \textbf{Service Mesh} is designed to standardize the runtime operations of applications~\cite{LiLGZH19}. As part of the microservices ecosystem, this dedicated communication layer can provide several benefits, such as: \textbf{(1)} observability, \textbf{(2)} providing secure connections, or \textbf{(3)} automating retries and backoff for failed requests. With these features, developers only focus on the implementation of business logic, while operators gain out-of-the-box traffic policies, observability, and insights from the services. Advocates of the microservice movement, nowadays recommend using service mesh architecture when running microservices in production environments.
 \end{itemize}
 
 \noindent
@@ -494,14 +494,24 @@ With this operation, developers can store various information, that will provide
 
 In monolithic applications logging is a little bit easier to implement, because we have the whole application state in one place. When we come to the field of DS and microservices, our state is scattered across multiple elements or services. The solution for this problem is to use a centralized logging service that aggregates logs from each service~\cite{BeschastnikhWBE16}. This is beneficial because the users can search and analyze the logs as a whole state of the system. To do this properly the log must be stored very reliably~\cite{DanielsST87}. The users can than configure log server for some alerts that are triggered when certain messages appear in the logs. The log of DS usually does not contain enough information to regenerate the timeline of execution, and this is one reason that logs in DS are so hard to interpret~\cite{BeschastnikhWBE16}.
 
-To resolve this problem of DS execution timeline, Google develops a new technique called \textbf{tracing}~\cite{36356}. The trace represents a single execution timeline or execution of one request. Trace will create a tree, and the tree is used to establish order. Every node in the tree represents a unit of work and it is called span. A tree unites all the elements needed to carry out an originating request. In every span or unit of work, we can attach more details about that particular execution element.
+To resolve this problem of DS execution timeline, Google develops a new technique called \textbf{tracing}~\cite{36356}. The trace represents a single execution timeline or execution of one request. Trace will create a tree, and the tree is used to establish order. Every node in the tree represents a unit of work and it is called span. A tree unites all the elements needed to carry out an originating request. In every span or unit of work, we can attach more details about that particular execution element. Figure~\ref{fig:fig18} show simple example of \textit{RequestX} path through the processes in a distributed system.
 
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=1]{images/Figure18}
+	\end{center}
+	\vspace{-0.9cm}
+	\caption{\textit{RequestX} path through the processes in a distributed system.}
+	\label{fig:fig18}
+\end{figure}
+
+\noindent
 DS logging and tracing, represent the important role of any system, and as such, it should not be neglected especially in the DS environment. Every user request should be traced and logged from an infrastructure perspective, but we should allow users to store logs from their applications.
 %
 %
 \section{Distribution Models}\label{sec:distribution_models}
 %
-The role of distribution models is to determine the responsibility for the request, or to answer the fundamental question \say{who is in charge} for a specific request. There are two ways to answer this question: $(1)$ all nodes in the system, or $(1)$ single node in the system.
+The role of distribution models is to determine the responsibility for the request, or to answer the fundamental question \say{who is in charge} for a specific request. There are two ways to answer this question: \textbf{(1)} all nodes in the system, or \textbf{(2)} single node in the system.
 %
 %
 \subsection{Peer-to-peer}\label{sec:p2p_networks}
@@ -668,6 +678,48 @@ With mutable infrastructure, these strategies would be hard to implement, and ma
 With the introduction of \textit{LinuxKit}, we can create Linux subsystems based around very secure containers. With linuxkit, every part of the Linux subsystem is running inside the container, so we can assemble a Linux subsystem with services that are needed. As a result, systems created with LinuxKit have a smaller attack surface~\cite{abs-1802-10375} than general-purpose systems. This is important from the security point of view, but also infrastructure deployment because we can compose specific OS based around containers that we need for a different purpose. And we can update, change and adopt these OS for every machine or purpose we need.
 
 Deployment is based around changing parts of the OS, and his services that are running inside containers. As a result, everything can be removed or replaced. It's highly portable and can work on desktops, servers, IoT, mainframes, bare metal, and virtualized systems.
+%
+%
+\section{Development roles}\label{sec:dev_roles}
+%
+\new{
+In our modern internet-connected world of applications, we have few distinctive development roles. Each of them plays the important role in order that modern software runs smooth, and with less downtime. These development roles could be separated in few categories (focuse is on the technical roles):
+
+\begin{itemize}
+	\item \textbf{Developer} is usually a person responsabile for developing software for the user. Developer is responsible for maintainnig existing, and/or developing new features. There could be different subroles, dealing with specific part of the complex software systems.
+	\item \textbf{DevOps} role represents a multidisciplinary organizational effort to automate application deployments trough continuous delivery of new software updates~\cite{LeiteRKMM20}. It combines software development with technology operations to shorten the development life cycle.
+	\item \textbf{Site Reliability Engineer (SRE)} role is responsible for availability, latency, performance, efficiency, change management, monitoring, emergency response, and capacity planning~\cite{beyer2016site}. It is a software engineering role aplied to the infrastructure and operations problems.
+\end{itemize}
+
+\noindent
+DevOps and SREs are kinda similar roles, they both are trying to bridge the gap between development and operations. As such they have a very large conceptual overlap in how they operate~\cite{46939}, but also have some differences. 
+
+Table~\ref{tab:table10} sum the differences between the DevOps and SREs.
+
+\begin{table}[H]
+	\begin{center}
+		\begin{tabular}{l|l|l}
+			\textbf{Feature} & \textbf{DevOps} & \textbf{SREs}\\
+			\hline
+			\textbf{Essence} & Practices and metrics &  Mindset and culture \\
+			\textbf{Team structure} & \multirow{3}{10em}{Wide range of roles: QA, developers, SREs etc.} &  \multirow{3}{10em}{SREs with operations and development skils} \\
+			&  &  \\
+			&  &  \\
+			\textbf{Focuse} & \multirow{2}{10em}{System availability and reliability} & \multirow{2}{10em}{Development and delivery continuity} \\
+			 &  &  \\
+			 \hline
+			\textbf{Goal} & \multicolumn{2}{c}{\multirow{2}{15em}{Bridge the gap between developement and operations}} \\
+			&  &  \\
+		\end{tabular}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption{Ddifferences between DevOps and SREs.}
+	\label{tab:table10}
+\end{table}
+
+\noindent
+In modern complex software development, SREs should keep things running smoothly, while DevOps principles should be used to improve processes. So it is not either/or, but it seems that combination of approaches may provide best results. However, in some smaller organizations these roles can overlaps.
+}
 %
 %
 \section{Concurrency and parallelism}\label{sec:concurency_parallelism}

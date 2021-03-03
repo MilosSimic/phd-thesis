@@ -65,7 +65,7 @@ With these simple abstractions, we can easily cover any geographic region with t
 The organization of these concepts should be fully optional. So for example, we could fit clusters in an interval of nano-DCs~\cite{inbookKurniawan} and MDCs~\cite{GreenbergHMP09} or as wide as the whole city or small as all devices in a single household and everything in between. Formaly, we can represent the size of some cluster $c$ like:
 
 \begin{equation}
-	c \in \left[ nano DCs, MDCs \right]
+	c \in \left[ nano DCs,\ MDCs \right]
 \end{equation}
 \myequations{Cluster size limits}
 
@@ -78,7 +78,15 @@ Replication could be used not only in nodes inside the cluster, but we can also 
 
 Single $topology$ reflects one CC provider, so multiple topologies are forming micro-clouds that can help CC with huge latency issues, pre-processing in huge volumes of data, and relax and decentralize strict centralized CC model.
 
-These micro-clouds have much fewer resources, compared to standard clouds but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later.
+\new{These micro-clouds have much fewer resources compared to standard clouds, but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later. Formaly, we can represent position od micro-clouds $mc$ in between CC and EC like:
+
+\begin{equation}
+mc \in \left( Cloud\ computing,\ Edge\ computing \right)
+\end{equation}
+\myequations{Position od micro clouds.}
+
+\noindent
+Exclusiveness in previous formula, means that position of micro-clouds is moveable in between CC and EC depending do we want our model to be more CC like or more EC like, but it should not become one of them. But, it could be integral part for both of these models (even at the same time).}
 
 Three-tier architecture with numerous clients in the bottom, micro clouds in the middle, and cloud on the top kinda resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
 
@@ -98,7 +106,7 @@ In everything as a service model~\cite{DuanFZSNH15}, ECC as a service fits in be
 %
 \section{Separation of concers}\label{sec:separation_of_concerns}
 %
-In his work, Jin et al.~\cite{JinCJL14} introduces three core concepts to fully describe physical services, and specifies their relationships. Concepts that authors propose are: $(1)$ Devices, $(2)$ Resources, and $(3)$ Services. This separation is interesting because we can rely on it in a geo-distributed environment, to describe SoC for micro-clouds.
+In his work, Jin et al.~\cite{JinCJL14} introduces three core concepts to fully describe physical services, and specifies their relationships. Concepts that authors propose are: \textbf{(1)} Devices, \textbf{(2)} Resources, and \textbf{(3)} Services. This separation is interesting because we can rely on it in a geo-distributed environment, to describe SoC for micro-clouds.
 
 One of the most important of every system is the SoC model. This is especially important if we are going to create a platform to offer as a service. With some adaptations, we can base our SoC model on concepts proposed by Jin et al. in three layers as depicted in Figure~\ref{fig:fig10}. 
 
@@ -230,7 +238,7 @@ It is important to notice, that both deployments should be closely followed, for
 Separation like this, simplify deployment and usage for both application development spectrums: 
 
 \begin{enumerate}[start=1,label={(\bfseries \roman*)}]
-	\item operation people like \textbf{devops} who should be dealing with infrastructure deployment, tooling set up, applications deployment, monitoring, and in the general health of applications and infrastructure.
+	\item operation people like \textbf{devops} and \textbf{SREs} who should be dealing with infrastructure deployment, tooling set up, applications deployment, monitoring, and in the general health of applications and infrastructure.
 	\item \textbf{developers} who should be dealing with the development of the services, their interactions, and cloud to micro-cloud and vice-versa synchronization.
 \end{enumerate}
 
@@ -870,7 +878,7 @@ The participants follow the communication that we now describe informally: \labe
 \end{enumerate}
 
 \noindent
-When testing is request idempotent we must have in mind that stored structure could be $(1)$ \textbf{flat keyspace} and \textbf{$(2)$ hierarchical keyspace} both options are valid as long as \textbf{structure is idempotent} and we can do \textbf{idempotent operation} over that structure. For example, $set$ as a data structure and $intersection$ are good candidates. The algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps required to test if the operation is done before.
+When testing is request idempotent we must have in mind that stored structure could be: \textbf{(1)} flat keyspace, and \textbf{(2)} hierarchical keyspace. The both options are valid, as long as the \textbf{structure is idempotent}, and we can do \textbf{idempotent operations} over that structure. For example, $set$ as a data structure and $intersection$ are good candidates. The algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps required to test if the operation is done before.
 
 \begin{algorithm}[H]
 	\SetKwFunction{idempotent}{idempotent}
@@ -1080,8 +1088,8 @@ In algorithm~\ref{alg:alg5}, we describe steps that are required after the state
 \noindent
 Next we present a formal description of the list communication protocol (cf. Figure \ref{fig:fig4}) by using~\cite{HuY17}.
 Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
-$(1)$ $\mathit{list}$, specifying a request for a detailed view, where sort $\T_1$ identifies which parts of the system user wants to view in details, after which $\mathtt{state}$ connects $\mathtt{nodes}$ with $\mathit{query}$ message, with a payload of sort $\T_2$  containing specification of which nodes need to show their metrics data, and then protocol proceeds as prescribed with $\G'$; 
-$(2)$ $\mathit{list^*}$, specifies no need for a detailed view is specified, where a payload of sort $\T_4$ denotes user specified parts of the system the user wants to view, but without greater details. In the latter case protocol follows global type $\G''$.
+\textbf{(1)} $\mathit{list}$, specifying a request for a detailed view, where sort $\T_1$ identifies which parts of the system user wants to view in details, after which $\mathtt{state}$ connects $\mathtt{nodes}$ with $\mathit{query}$ message, with a payload of sort $\T_2$  containing specification of which nodes need to show their metrics data, and then protocol proceeds as prescribed with $\G'$; 
+\textbf{(2)} $\mathit{list^*}$, specifies no need for a detailed view is specified, where a payload of sort $\T_4$ denotes user specified parts of the system the user wants to view, but without greater details. In the latter case protocol follows global type $\G''$.
 \begin{align*}
 \G_4 &= 
 \left\{
