@@ -1,26 +1,26 @@
 %!TEX root =  main.tex
 \chapter{Micro clouds}\label{chapter:Micro_clouds}
 %
-In this section, we are going to present a core idea of this thesis from point of view how such a model can be formed and described, and what is important so that such a system operates properly. We will describe a micro-service model, based on the CC organizational model.  The presented model will be able to support EC as a service, amongst other applications and use-cases. 
+In this section, the core idea of this thesis will be presented, from the point of view how such a model can be formed and described, and what is important so that such a system operates properly. A \textbf{micro-cloud} model will be described, based on the CC organizational model.  The presented model will be able to support EC as a service, amongst other applications and use-cases. 
 
-Throughout this section, we are going to rely on research presented in chapter~\ref{chapter:Intro} and chapter~\ref{chapter:Review} and make a connection with the existing CC model.
+Throughout this section, we are going to rely on the research presented in chapters~\ref{chapter:Intro} and~\ref{chapter:Review}, and make a connection with the existing CC model.
 
-In Section~\ref{sec:configurable_model_structure} we present a high overview of the system. We present an architecture that is influenced by the standard CC model but adopted for a different environment. In Section~\ref{sec:separation_of_concerns} we introduce the separation of concerns model, for previously defined system architecture. In Section~\ref{sec:application_model} we present a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. In Section~\ref{sec:as_a_service_model} we discuss how this system could be offered as a service, and what options can be offered to the potential users for developing their applications. Section~\ref{sec:immutable_infrastructure} presents desired option for infrastructure and application deployment, and why immutability is important in a micro-cloud geo=distributed environment. In Section~\ref{sec:formal_model} we present why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation. Section~\ref{sec:access_pattern} show access patterns that could be used in micro-clouds and geo=distributed environments. Section~\ref{sec:repercussion} gives repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems. Finally, we conclude this chapter wi section~\ref{sec:limitations} present limitations of our model.
+In Section~\ref{sec:configurable_model_structure} we presents a high overview of the system -- an architecture that is influenced by the standard CC model but adapted for a different environment. Section~\ref{sec:separation_of_concerns}introduces the separation of concerns model for previously defined system architecture. Section~\ref{sec:application_model} presents a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. How this system could be offered as a service, and which options can be offered to the potential users for developing their applications is discussed in Section~\ref{sec:as_a_service_model}. Section~\ref{sec:immutable_infrastructure} presents the desired option for infrastructure and application deployment, and why immutability is important in a micro-cloud geo=distributed environment. Section~\ref{sec:formal_model}presents why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation. Section~\ref{sec:access_pattern} show access patterns that could be used in micro-clouds and geo=distributed environments. Section~\ref{sec:repercussion} gives repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems. This chapter is concluded with Section~\ref{sec:limitations}, which presents limitations of our model.
 %
 %
 \section{Configurable Model Structure}\label{sec:configurable_model_structure}
 %
-In his work~\cite{SatyanarayananK19} Satyanarayanan et al. propose a new architecture pattern and separation into the three tiers, where every tier or layer has a distinct role. This idea is a very powerful one because we can now split and optimize applications into parts for a specific role in the global picture. On the other hand, too many moving parts meaning more problems, and the whole system is potentially more prone to errors and failures.
+In his work~\cite{SatyanarayananK19} Satyanarayanan et al. propose a new architecture pattern and separation into the three tiers, where every tier or layer has a distinct role. This idea is a very powerful one because applications can now be split into parts and optimized for the specific role in the global picture. On the other hand, too many moving parts mean more problems, and the whole system is potentially more prone to errors and failures.
 
-If we take the previous model and combine it with MDCs and a zonally-based server organization we get a good starting point for building micro-cloud infrastructure, and EC as a service. This extension is an interesting move because we can then extend the computing power and storage capacity that is serving the nearby population. This base model is just a starting point that is promising but to make a fully functional model, we need to make it more available and resilient with less latency. To achieve such behavior, we need to extend these concepts and adapt them for different usage scenarios but never losing a geo-distributed idea from our vision.
+If the previous model is taken and combined with MDCs and a zonally based server organization, a good starting point for building micro-cloud infrastructure, and EC as a service is achieved. This extension is an interesting move because the computing power and storage capacity that serves the nearby population can then be extended. This base model is just a starting point that is promising, but to make a fully functional model, it needs to be made more available and resilient with less latency. To achieve such behavior, these concepts have to be extended and adapted for different usage scenarios, but a geo-distributed idea from our vision should not be lost.
 
-To extend the system in a new direction, we can look for some inspiration in existing systems that are proven and working. This is especially important in DS, so we want to lower down the complexity and avoid known problems by sticking to existing models and algorithms. When we observer the CC design, we can see that every single part in that system, contributes to a more resilient and scalable system. On the high level, the CC architecture is separated into few building blocks that make the whole system lot easier to understand, maintain and operate.
+To extend the system in a new direction, we can look for some inspiration in existing systems that are proven and working. This is especially important in DS, so we want to lower down the complexity and avoid known problems by sticking to existing models and algorithms. When the CC design is observed, it can be seen that every single part in that system contributes to a more resilient and scalable system. On the high level, the CC architecture is separated into few building blocks that make the whole system lot easier to understand, maintain and operate.
 
-The first building block of CC architecture is a cluster, and a cluster can be defined as a set of nodes or servers that operate as a single unit to achieve some goal. This is where resources are, and this is where user applications are running on. The next building block that consists of multiple clusters is called Regions (or DCs). Regions are isolated and independent from each other, and they contain resource application needs. These resources come in form of clusters. Regions are usually composed of a few availability zones~\cite{SouzaMFAK19}. These zones are the defense against the fail. If for whatever reason, one zone fails or goes offline, there are still more of them to serve user requests, we have better availability, scalability, and resilience.
+The first building block of CC architecture is a cluster, and a cluster can be defined as a set of nodes or servers that operate as a single unit to achieve some goal. This is where resources are, and this is where user applications are running on. The next building block that consists of multiple clusters is called Regions (or DCs). Regions are isolated and independent from each other, and they contain resource application needs. These resources come in form of clusters. Regions are usually composed of a few availability zones~\cite{SouzaMFAK19}. These zones are the defense against the fail. If for whatever reason, one zone fails or goes offline, there are still more of them to serve user requests, there is a better availability, scalability, and resilience.
 
 If we now observer micro-clouds as geo-distributed systems, we can use a similar model, with some adaptations. Rely on a similar proven strategy, do not reinvent the wheel, but adopt for the different use-case.
 
-Table~\ref{tab:table5} present similar concepts between CC and edge-centric computing (ECC) concepts. Here we want to put an accent on the difference between the physical logical concepts in the two models.
+Table~\ref{tab:table5} presents similar concepts between CC and edge-centric computing (ECC) concepts. The accent is here put on the difference between the physical logical concepts in the two models.
 
 \begin{table}[h!]
 	\begin{center}
@@ -38,43 +38,43 @@ Table~\ref{tab:table5} present similar concepts between CC and edge-centric comp
 \end{table}
 
 \noindent
-Since we are talking about geo-distributed systems, our scenario is a little bit different than one used in the standard CC model. We can still combine multiple EC nodes into clusters, that is what MDCs already propose. If we want to go a little bit further, we can then combine multiple node clusters into a next bigger logical concept of $region$. A region will increase the availability and reliability of both the system and applications. 
+Since we are talking about geo-distributed systems, our scenario is a little bit different than the one used in the standard CC model. We can still combine multiple EC nodes into clusters, that is what MDCs already propose. If we want to go a little bit further, we can then combine multiple node clusters into the next bigger logical concept of $region$. A region will increase the availability and reliability of both the system and applications. 
 
-But the region in CC and ECC is not fully the same thing. In the standard CC model, the region is a physical thing or element of the existing infrastructure~\cite{SouzaMFAK19}, while in the ECC a region could be view differently, not as a physical element but rather as a logical element. We can now give a formal definition of a $region$ in ECC as:
+But the region in CC and ECC is not fully the same thing. In the standard CC model, the region is a physical thing or element of the existing infrastructure~\cite{SouzaMFAK19}, while in the ECC a region could be viewed differently, not as a physical element but rather as a logical element.A formal definition of a $region$ in ECC can now be given as:
 
 \begin{definition}
 	In a geo-distributed environment like ECC and micro-clouds, a concept of region is used to describe a set of clusters (that could be) scattered over an arbitrary geographic region. Regions are fully capable to accept or release clusters in the same way that clusters can accept or release nodes.
 \end{definition}
 
-In MDCs, a cluster is as big as the population nearby that is using it~\cite{GreenbergHMP09}. If we combine this with the previous definition than we can formally define the minimum size of an ECC region as:
+In MDCs, a cluster is as big as the population nearby that is using it~\cite{GreenbergHMP09}. If this is combined with the previous definition, then the minimum size of an ECC region can formally be defined as:
 
 \begin{definition}
 	Geo-distributed regions are composed of at least one cluster but can be composed of much more to achieve a more resilient, scalable, and available system.
 \end{definition}
 
-With the previous definition, we have to be careful to not introduce huge latency in the system. To lower the region latency, the vast distances between clusters should be strongly avoided in normal circumstances. To extend the CC region, we need to bring new nodes and connect them physically to the rest of the infrastructure~\cite{Hamilton07}, while in the ECC we should extend the region just by changing the definition to whom specific cluster belongs.
+With the previous definition, we have to be careful not to introduce huge latency in the system. To lower the region latency, the vast distances between clusters should be strongly avoided in normal circumstances. new nodes have to be brought and connected physically to the rest of the infrastructure~\cite{Hamilton07}, while in the ECC the region should be extended just by changing the definition to whom the specific cluster belongs.
 
-Multiple regions should be able to form a second logical layer -- $topology$. In the geo-distributed systems such as ECC or micro-clouds, we can formally define a $topology$ as:
+Multiple regions should be able to form a second logical layer -- $topology$. In the geo-distributed systems such as ECC or micro-clouds, topology can formally be described as:
 
 \begin{definition}
 In geo-distributed systems, topology represents the highest logical concept that is composed of a minimum of one region and could span over multiple regions. Topology is fully capable to accept new or release the existing regions. 
 \end{definition}
 
-With these simple abstractions, we can easily cover any geographic region with the ability to shrink or expand clusters, regions, and topologies. Size and formation of $clusters$, $regions$, and $topologies$ should be a matter of need, agreement, and usages of nearby population similar to the size of MDCs~\cite{GreenbergHMP09}, and modeling in Big Data systems~\cite{SonbolOAA20, WangCAL14}. This separation and organization give us one interesting feature. We can follow a more natural administrative division of some region, and organize resources by population usages.
+With these simple abstractions, any geographical region can be easily covered with the ability to shrink or expand clusters, regions, and topologies. Size and formation of $clusters$, $regions$, and $topologies$ should be a matter of need, agreement, and usages of nearby population similar to the size of MDCs~\cite{GreenbergHMP09}, and modeling in Big Data systems~\cite{SonbolOAA20, WangCAL14}. This separation and organization gives one interesting feature. A more natural administrative division of some region can be followed, and resources can be organized by population usages.
 
-The organization of these concepts should be fully optional. So for example, we could fit clusters in an interval of nano-DCs~\cite{inbookKurniawan} and MDCs~\cite{GreenbergHMP09} or as wide as the whole city or small as all devices in a single household and everything in between. Formaly, we can represent the size of some cluster $c$ like:
+The organization of these concepts should be fully optional. So for example, we could fit clusters in an interval of nano-DCs~\cite{inbookKurniawan} and MDCs~\cite{GreenbergHMP09} or as wide as the whole city or as small as all devices in a single household and everything in between. Formally, the size of some cluster $c$ can be represented like:
 
 \begin{equation}
-	c \in \left[ nano DCs,\ MDCs \right]
+	c \in \left[ nano\ DCs,\ MDCs \right]
 \end{equation}
 \myequations{Cluster size limits}
 
 \noindent
-If we go a little bit further, we can represent the city as one region, where parts of the city are organized into clusters. We can even form a city topology by splitting the city into multiple regions containing multiple clusters, and ultimately or we can form a country topology by splitting the country into regions, with cities being clusters.\\ 
+If we go a little bit further, we can represent the city as one region, where parts of the city are organized into clusters. A city topology can even be formed by splitting the city into multiple regions containing multiple clusters, and ultimately a country topology can be formed by splitting the country into regions, with cities being clusters.\\ 
 
 Nodes that belong to the same cluster should run some form of membership protocol presented in~\ref{sec:memership_protocol}. Gossip style protocols, like SWIM~\cite{DasGM02} (cf. page~\pageref{swim}), are standard in the cloud environment. The same strategy could be applied here, used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16, CRDTS_Nuno} making the whole system more resilient. 
 
-Replication could be used not only in nodes inside the cluster, but we can also replicate data in clusters inside the region and even in regions inside topology. This property should exist, but it should be controlled by users depending on how resilient and available the system he wants and needs. In~\cite{inproceedingsSimic2} Simi\' c et al. take a look from a theoretical point of view on CRDTs usage, to achieve SEC in EC. the authors conclude that CRDTs could be a natural fit to EC as long as we are aware of the potential pitfalls of CRDTs.
+Replication could be used not only in nodes inside the cluster, but data can also be replicated in clusters inside the region and even in regions inside topology. This property should exist, but it should be controlled by users depending on how resilient and available the system he/she wants and needs. In~\cite{inproceedingsSimic2} Simi\' c et al. take a look from a theoretical point of view on CRDTs usage, to achieve SEC in EC. The authors conclude that CRDTs could be a natural fit to EC as long as we are aware of the potential pitfalls of CRDTs.
 
 Single $topology$ reflects one CC provider, so multiple topologies are forming micro-clouds that can help CC with huge latency issues, pre-processing in huge volumes of data, and relax and decentralize strict centralized CC model.
 
@@ -88,19 +88,20 @@ mc \in \left( Cloud\ computing,\ Edge\ computing \right)
 \noindent
 Exclusiveness in previous formula, means that position of micro-clouds is moveable in between CC and EC depending do we want our model to be more CC like or more EC like, but it should not become one of them. But, it could be integral part for both of these models (even at the same time).}
 
-Three-tier architecture with numerous clients in the bottom, micro clouds in the middle, and cloud on the top kinda resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
+Three-tier architecture with numerous clients at the bottom, micro clouds in the middle, and cloud on the top, seem to resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
 
-On lower levels, we have the fastest response time, since data is on the device. But at the same time, we have very limited storage capacity and processing power. As we go on the upper tiers, we have more and more storage capacity and processing power, but contrary the response time is higher and higher.  Especially when we consider distance, and huge volumes of data that need to be moved to the cloud.
+On lower levels, response time is the fastest, since data is on the device. At the same time, there is very limited storage capacity and processing power. As we go on the upper tiers, there is more and more storage capacity and processing power, but the response time is higher and higher, especially when distance and huge volumes of data that need to be moved to the cloud is considered.
 
 Figure~\ref{fig:fig9}. shows the three-tier architecture, with the response time and resource avelability.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{images/Figure9}
 	\vspace{-0.7cm}
-	\caption{3 tier architecture, with the response time and resource avelability}
+	\caption{3 tier architecture, with the response time and resource availability}
 	\label{fig:fig9}
 \end{figure}
 
+\noindent
 In everything as a service model~\cite{DuanFZSNH15}, ECC as a service fits in between CaaS and PaaS, depending on the user needs. 
 %
 %
@@ -108,27 +109,27 @@ In everything as a service model~\cite{DuanFZSNH15}, ECC as a service fits in be
 %
 In his work, Jin et al.~\cite{JinCJL14} introduces three core concepts to fully describe physical services, and specifies their relationships. Concepts that authors propose are: \textbf{(1)} Devices, \textbf{(2)} Resources, and \textbf{(3)} Services. This separation is interesting because we can rely on it in a geo-distributed environment, to describe SoC for micro-clouds.
 
-One of the most important of every system is the SoC model. This is especially important if we are going to create a platform to offer as a service. With some adaptations, we can base our SoC model on concepts proposed by Jin et al. in three layers as depicted in Figure~\ref{fig:fig10}. 
+One of the most important part of every system, is the SoC model. This is especially important if a platform to be offered as a service is going to be created. With some adaptations, our SoC model can be based on concepts proposed by Jin et al.~\cite{JinCJL14} in three layers, as depicted in Figure~\ref{fig:fig10}. 
 
 The layer on the very bottom of the three-tier architecture (cf.~Figure~\ref{fig:fig10}) consists of various devices. These devices are important because they represent main \textit{data creators} but at the same time, they are main \textit{services consumers}. 
 
-The layer in the middle (cf.~Figure~\ref{fig:fig10}) represents resources or EC nodes. These resources have a very important spatial feature, and as such, they indicate the range of their hosting devices~\cite{JinCJL14}. This means that the developers at any given time must know the topology of the system, the resource spread, and utilization across clusters. Besides that main information, users must know the state and health of every application.~\label{soc:resources}. If some EC node desire to be part of the system, a node must obey four simple rules:
+The layer in the middle (cf.~Figure~\ref{fig:fig10}) represents resources or EC nodes. These resources have a very important spatial feature, and as such, they indicate the range of their hosting devices~\cite{JinCJL14}. This means that the developers at any given time must know the topology of the system, the resource spread, and utilization across clusters. Besides that main information, users must know the state and health of every application.~\label{soc:resources}. If some EC node desires to be a part of the system, a node must obey four simple rules:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 \item a node must run an operating system with a usable file system;
 \item a node must be able to run some isolation engine for applications, for example, containers or unikernels;
-\item a node must have available resources for utilization so that we can run  applications or store data;
+\item a node must have available resources for utilization so that applications can be run or data stored;
 \item a node must have a stable internet connection;
 \end{enumerate}
 
 \noindent
 One thing that is important to notice, is that all nodes in clusters, regions, and topologies are \textbf{equal} and there are \textbf{no special nodes}. Every node that joins the system must be able to store and process information.
 
-Last but certainly not least layer represent services. These services expose resources through some interface and make them available over the internet~\cite{JinCJL14}. These services respond to the client requests immediately, if possible, or cache information~\cite{SatyanarayananBCD09,YaoXWYZP20} for future use. Unlike the previous two layers, services have one specific feature and span over two tiers of the system (cf.~Figure~\ref{fig:fig10}):
+Last but certainly not least layer represents services. These services expose resources through some interface and make them available over the internet~\cite{JinCJL14}. These services respond to the client requests immediately, if possible, or cache information~\cite{SatyanarayananBCD09,YaoXWYZP20} for future use. Unlike the previous two layers, services have one specific feature and span over two tiers of the system (cf.~Figure~\ref{fig:fig10}):
 
 \begin{enumerate}[start=1,label={(\bfseries \roman*)}]\label{services}
-	\item Services that exist in the micro-cloud, and they are responsible for filtering and data pre-processing before send it to the cloud. Or cache information that was not available on a previous user request for some future use.
-	\item Services in the standard cloud that should be able to accept pre-processed data, and they are responsible for computation and storage that is beyond the capabilities of ECC nodes. Services in the cloud should be able to take direct requests from the clients in a case when something catastrophic happened to the micro-cloud that is close to the user, and he is not able anymore to accept user requests.
+	\item Services that exist in the micro-cloud, and they are responsible for filtering and data pre-processing before sending it to the cloud. Or cache information that was not available on a previous user request for some future use.
+	\item Services in the standard cloud that should be able to accept pre-processed data, and they are responsible for computation and storage that is beyond the capabilities of ECC nodes. Services in the cloud should be able to take direct requests from the clients in a case when something catastrophic happens to the micro-cloud that is close to the user, and it is not able anymore to accept user requests.
 \end{enumerate}
 
 \noindent
@@ -152,11 +153,11 @@ Satyanarayanan et al. present the edge-native applications model~\cite{Satyanara
 
 When we introduced SoC for the micro-cloud model (cf. page~\pageref{services}), we described services that have one specific feature, and that is that these services span over two tiers of the system. This information is crucial for application development because we want to use the full potential of formed infrastructure, and keep good features of their cloud counterparts.
 
-To satisfy the previously defined SoC model (cf. page~\pageref{services}), we can split existing applications into the \textbf{front} and \textbf{back} processing services. The front processing service is an edge-native application running inside some previously formed cluster to minimize latency, while the back service runs in the traditional cloud as a cloud-native application to leverage greater resources.
+To satisfy the previously defined SoC model (cf. page~\pageref{services}), existing applications can be split into the \textbf{front} and \textbf{back} processing services. The front processing service is an edge-native application running inside some previously formed cluster to minimize latency, while the back service runs in the traditional cloud as a cloud-native application to leverage greater resources.
 
 The front processing service will handle user requests coming to the nearby cluster, and communicate with the back processing services when needed to synchronize the pieces of information, cache data, or pass filtered or pre-processed data. Separation like that gives developers better flexibility and large design space when creating and optimizing their workloads.
 
-With this model, we venture even deeper into understanding and applying the concept of \textbf{data locality} (cf. page~\pageref{ds:data_locality}). Since we have front and back processing services, we are committed to doing processing data closer to their source, instead of moving data to the cloud. We reduced latency and save some users money on storing and processing unnecessary data.
+With this model, we venture even deeper into understanding and applying the concept of \textbf{data locality} (cf. page~\pageref{ds:data_locality}). Since we have front and back processing services, we are committed to doing processing data closer to their source, instead of moving data to the cloud. This reduces latency and saves some users money on storing and processing unnecessary data.
 %
 %
 \subsection{Execution models}\label{sec:execution_models}
@@ -171,7 +172,7 @@ If a service is subscribed to some stream using a topic, for example, it is natu
 \end{enumerate}
 
 \noindent 
-to implement those ideas without complicated synchronization, CRDTs could be used~\ref{crdts}. Companies like Soundcloud and Bet365 are already using them for the same or similar tasks.
+To implement those ideas without complicated synchronization, CRDTs could be used~\ref{crdts}. Companies like Soundcloud and Bet365 are already using them for the same or similar tasks.
 
 Some examples of applications may include:
 
@@ -179,73 +180,76 @@ Some examples of applications may include:
 	\item \textbf{events} that notify users if some value is above or below some defined threshold; 
 	\item \textbf{stream} or processing data as it comes to the system;
 	\item \textbf{batch} does processing in predefined times over some bigger collection of data ;
-	\item \textbf{daemons} or processing that are doing some tasks or executions in the background without explicit user intervention, usually their execution could be time defined but it is not mandatory;
+	\item \textbf{daemons} or processing that are that do some tasks or executions in the background without explicit user intervention, usually their execution could be time defined but it is not mandatory;
 	\item \textbf{services} or applications that would operate over standard request-response model or some variation of that protocol. For example, the NATS messaging system has a request-reply form implemented over topics;
 	\item \textbf{other}, something that falls outside these models, or it is a composition of multiple operations at once. This type should get events from some topic as they arrive, and a user can define his strategy what needs to be done and how it needs to be processed. Users can contact other existing services, and the user is responsible for optimization;
 \end{enumerate}
 
+\noindent
 These types of applications could be implemented in many ways like those discussed in section~\ref{sec:microservices}, or some adapted variant of those models, and should have a clear communication interface offered to users or applications and other services. 
 
-Users should be given the option to develop their applications in various available languages, not forcing them to use a strict one. But we must advise users about outcomes of their choice. For example, some languages might be slower or use more resources than others due to virtual machine execution, or some other tooling that is required to be started as well. The second important thing would be that users can do proper logging and tracing of their services. If something fails, the user must be able to go over the logs and traces to found problems.
+Users should be given the option to develop their applications in various available languages, not forcing them to use a strict one. Users must also be advised about outcomes of their choice. 
+
+For example, some languages might be slower or use more resources than others due to virtual machine execution, or some other tooling that is required to be started as well. The second important thing would be that users can do proper logging and tracing of their services. If something fails, the user must be able to go over the logs and traces to find problems.
 %
 \subsection{Packaging options}\label{sec:packaging}
 %
-Because of their nature, micro-clouds could be most likely be composed of ARM devices. These devices in many cases are not able to run full VMs because of their hardware restrictions. In recent years there are advances in VMs technology and its ability to run VMs on ARM devices. In~\cite{Ding12armvisor} Ding et al. show such possibility to run VMs on ARM devices.
+Because of their nature, micro-clouds could be most likely composed of ARM devices. These devices in many cases are not able to run full VMs because of their hardware restrictions. In recent years there have been advances in VMs technology and its ability to run VMs on ARM devices. In~\cite{Ding12armvisor} Ding et al. show such possibility to run VMs on ARM devices.
 
 But even if VMs are fully compatible with ARM devices, we still inherit VMs large footprint, already discussed in section~\ref{sec:virtualization_techniques} if we try to use them $as is$.
 
-On the contrary, containers, and unikernels give us $more for less$ same functionality but using fewer resources, meaning we can run more services in containers and even more in unikernels. But until unikernels are fully ready to be used they will fall in nice to have a category, and we should stick to containers. But even with containers we need to be aware of their limitations and pitfalls and know that there is no $silver bullit$ and there is no one solution for all scenarios.
+On the contrary, containers, and unikernels give us \textbf{more or less} the same functionality, but use fewer resources, which means that more services can be run in containers and even more in unikernels. Until unikernels are fully ready to be used, though, they will fall in nice to have a category, and we should stick to containers. But even with containers we need to be aware of their limitations and pitfalls and know that there is no \textbf{silver bullit} and there is not just one solution for all scenarios.
 
 At the moment, containers are a more mature solution than unikernels and require fewer resources than VMs. On top of that, there are numerous tools already existing using containers that could be utilized. Knowing all this, at the first stages of micro-clouds, containers should be an option to go. 
 
 In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containers in large scale edge computing systems from the theoretical point of view, by looking into architecture difference. Authors focus on differences between VMs and containers in cases where services need to run on ARM devices with limited resources.
 
-In the future and when unikernels are more matured and tested, they could be used for particular use-cases and applications, especially like events or serverless implementations. The containers will probably not be fully replaced, but they can co-exist with unikernels in some cases where we need more control over running a single function.
+In the future and when unikernels are more matured and tested, they could be used for particular use-cases and applications, especially like events or serverless implementations. The containers will probably not be fully replaced, but they can co-exist with unikernels in some cases where more control over running a single function is needed.
 
-Like any other system, users can create variants of the systems and different flavors optimized for certain solutions. In that cases, they may favor one solution over the other one. But in general case containers and unikernels should be the preferred way to package, run, and distributed user applications in a micro-clouds environment.
+Like any other system, users can create variants of the systems and different flavors optimized for certain solutions. In that cases, they may favor one solution over the other one. In general, containers and unikernels should be the preferred way to package, run, and distribute user applications in a micro-clouds environment.
 %
 %
 \section{As a service model}\label{sec:as_a_service_model}
 %
-Depends on their needs, users should be able to develop their applications using familiar models. Depending on how much control user require over the process of service scheduling, resource selection, etc. we can distinguish two models:
+Users should be able to develop their applications using familiar models, depending on their needs. Depending on how much control a user requires over the process of service scheduling, resource selection, etc. three models can be distinguished:
  
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{microPaaS or mPaaS}, where the platform is doing all the management and offers a simple interface for developers to deploy their applications. This model is similar to PaaS, and the only difference is that this is running in micro-cloud and should synchronize with CC.
-	\item \textbf{microCaaS or mCaaS}, if users require more control over resource requirements, deployment, and orchestration decisions. This model is similar to CaaS (or even IaaS), and the only difference is that this is running in micro-cloud and should synchronize with CC.
-	\item \textbf{microSaaS or mSaaS}, with this option, we do not synchronize data with the CC, but all processing and storage is done in the micro-cloud. As such, this option should be used vigilantly, or not used \textbf{at all}.
+	\item \textbf{microPaaS or mPaaS}, where the platform does all the management and offers a simple interface for developers to deploy their applications. This model is similar to PaaS, and the only difference is that this runs in micro-cloud and should synchronize with CC.
+	\item \textbf{microCaaS or mCaaS}, if users require more control over resource requirements, deployment, and orchestration decisions. This model is similar to CaaS (or even IaaS), and the only difference is that this runs in micro-cloud and should synchronize with CC.
+	\item \textbf{microSaaS or mSaaS}, with this option, data is not synchronized with the CC, but all processing and storage is done in the micro-cloud. As such, this option should be used vigilantly.
 \end{enumerate}
 
 \noindent
-It is important to note, that both variants \textbf{mCaaS} and \textbf{mPaaS} should \textbf{not} stand alone, at least not for now. We do not advise using \textbf{mSaaS} option for now, since that would require that the whole application is running \textbf{only} in the micro-clouds. In the future, when EC nodes gain more power and storage, this might change. 
+It is important to note, that both variants, \textbf{mCaaS} and \textbf{mPaaS}, should \textbf{not} stand alone, at least not for now. Using \textbf{mSaaS} is not being advised for now, since that would require that the whole application be running \textbf{only} in the micro-clouds. In the future, when EC nodes gain more power and storage, this might change. \textbf{mSaaS} as an option should more investigated in the future.
 
-Both options \textbf{mCaaS} and \textbf{mPaaS} could be included, and part of any cloud model (cf. section~\ref{sec:cloud_computing}) or offered separately.
+Both options, \textbf{mCaaS} and \textbf{mPaaS}, could be included, and a part of any cloud model (cf. section~\ref{sec:cloud_computing}), multi-cloud or offered separately.
 %
 %
 \section{Immutable infrastructure}\label{sec:immutable_infrastructure}
 %
-As described in section~\ref{sec:deployment}, we have few options when it comes to setup and deploys infrastructure and/or applications. This thesis proposes a DS model that is built with a three-tier architecture that should operate in the geo-distributed environment we believe that \textbf{immutable deployment} model would be a good fit. It will simplify the deployment process since we want to rely on atomic operations and do not want to left the misconfigured system at any level. If something like that happens, we will end up in a problem, that would be hard to properly address and resolve.
+As described in section~\ref{sec:deployment}, there are a few options when it comes to setup and deployment of infrastructure and/or applications. This thesis proposes a DS model that is built with a three-tier architecture that should operate in the geo-distributed environment. We believe that \textbf{immutable deployment} model would be a good fit. It will simplify the deployment process since we want to rely on atomic operations and do not want to leave the misconfigured system at any level. If something like that happens, there will be a problem that would be hard to properly address and resolve.
 
 Geo-distributed micro-clouds model that is described in this chapter should operate in two levels of deployment that are built one on top of the other:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Infrastructure deployement}, update and change should be atomic and immutable. Users should do changes declaratively -- mutations of the system, by telling the system what new state should be, and let the system figure out the best way how to do user-specified changes. In this category, we can account for any change that is doing on the cluster, region, or topology that user/s operate on. For example create the new cluster, region, topology, or doing configurations of the setup system. The only change that could be done by imperative strategy updates on the nodes themselves. But even for this strategy, it would be beneficial if we could use declarative way \textbf{if possible}. It is important to notice that \textbf{mutation} does not mean in place change, but just the name of the operation. This deployment strategy is reserved for operations people, but if the company or team is small any developer could do this. Developers should not be dealing with this part of the deployment.
-	\item \textbf{Services deployment}, make sense only if the previous action is taken. We must have infrastructure setup already, to put any sort of services (applications) into the system. Like the previous model, this should be done declaratively as well, and all changes should be done immutably without an in-place change. The user should specify his new state or \say{view of the word} declaratively and let the system do all the changes he wants. All user services should be packed as described in section~\ref{sec:packaging} because this simplifies the way services are put to the nodes. When done properly, this allows operations people to do faster changes with almost zero downtime deployments with all strategies already discussed in section~\ref{sec:deployment}. this part of the deployment should be done by developers since they did implementation and testing. They know how many resources they need for their service, what type of service they had developed. This deployment could be done in collaboration between operations and developers if a company is big or time is properly separated.
+	\item \textbf{Infrastructure deployement}, update and change should be atomic and immutable. Users should do changes declaratively -- mutations of the system, by telling the system what the new state should be, and let the system figure out the best way how to do user-specified changes. In this category, we can account for any change that is doing on the cluster, region, or topology that user/s operate on. For example create the new cluster, region, topology, or doing configurations of the setup system. The only change that could be done by imperative strategy updates on the nodes themselves. But even for this strategy, it would be beneficial if we could use declarative way \textbf{if possible}. It is important to notice that \textbf{mutation} does not mean in place change, but just the name of the operation. This deployment strategy is reserved for operations people or (eg. DevOps or SREs), but if the company or team is small any developer could do this. Developers should not be dealing with this part of the deployment.
+	\item \textbf{Services deployment}, makes sense only if the previous action is taken. We must have infrastructure already set up, to put any sort of services (applications) into the system. Like the previous model, this should be done declaratively as well, and all changes should be done immutably without an in-place change. The user should specify his new state or \say{view of the word} declaratively and let the system do all the changes he wants. All user services should be packed as described in section~\ref{sec:packaging} because this simplifies the way services are put to the nodes. When done properly, this allows operations people to do faster changes with almost zero downtime deployments with all strategies already discussed in section~\ref{sec:deployment}. This part of the deployment should be done by developers since they did implementation and testing. They know how many resources they need for their service, what type of service they had developed. This deployment could be done in collaboration between operations and developers if a company is big or time is properly separated.
 \end{enumerate}
 
 \noindent
 It is important to notice, that both deployments should be closely followed, for possible errors and problems so that users can act accordingly. These deployment messages, logs, and traces~\cite{36356} should be stored in a centralized log system, for convenient lookup, alerting, and reporting.
 
-Separation like this, simplify deployment and usage for both application development spectrums: 
+Separation like this simplifies deployment and usage for both application development spectrums: 
 
 \begin{enumerate}[start=1,label={(\bfseries \roman*)}]
-	\item operation people like \textbf{devops} and \textbf{SREs} who should be dealing with infrastructure deployment, tooling set up, applications deployment, monitoring, and in the general health of applications and infrastructure.
+	\item operations people (eg. DevOps and SREs) who should be dealing with infrastructure deployment, tooling set up, applications deployment, monitoring, and in the general health of applications and infrastructure.
 	\item \textbf{developers} who should be dealing with the development of the services, their interactions, and cloud to micro-cloud and vice-versa synchronization.
 \end{enumerate}
 
 \noindent
 Only with tight collaboration with those two development roles, such a complex system like one presented in this chapter can be alive, well, and serving user requests without collapse.
 
-It is important to note that every action in the system should be logged and traced properly. Since we are dealing with multi-tier architecture chance that something will fail is increased. Logs and traces should be available to operations people who are responsible for the infrastructure maintenance. At the same time, actions should be traced by the company that offers these micro-clouds. For security reason, any of these logs and traces should not be visible to others \textbf{but} responsible individuals, and the level of details and personal pieces of information should be different.
+It is important to note that every action in the system should be logged and traced properly. Since we are dealing with multi-tier architecture, a chance that something will fail is increased. Logs and traces should be available to operations people who are responsible for the infrastructure maintenance. At the same time, actions should be traced by the company that offers these micro-clouds. For security reason, any of these logs and traces should not be visible to others \textbf{but} responsible individuals, and the level of details and personal pieces of information should be different.
 %
 %
 \section{Formal model}\label{sec:formal_model}
@@ -254,7 +258,7 @@ Ensuring the reliability and correctness of any D is very difficult, and should 
 
 Unfortunately, because of their nature DS cannot always be formally described by any of the existing techniques. There are a lot of variables that could influence this. But if the nature of the DS that is developing is such that can be formally described, it is recommended and beneficial. A formally described and correct model can save hours, days, and even months of hard debugging, testing to reveal all bugs and problems in the system that may only happen in some specific circumstances that are hard to initiate.
 
-Infrastructure deployment will not happen overnight, and it might take years. It might not be started at all until the whole process is trivial \cite{SatyanarayananBCD09}, and this is complicated task~\cite{JararwehDAAAB16}. Because of those properties, the key problem that needs to be resolved is how to simplify ECC or micro-cloud management. The naive approach would require going to every node and do it manually. This process is super tedious and time-consuming, especially if we consider a geo-distributed environment. 
+Infrastructure deployment will not happen overnight, and it might take years. It might not be started at all until the whole process is trivial \cite{SatyanarayananBCD09}, and this is a complicated task~\cite{JararwehDAAAB16}. Because of those properties, the key problem that needs to be resolved is how to simplify ECC or micro-cloud management. The naive approach would require going to every node and do it manually. This process is super tedious and time-consuming, especially if we consider a geo-distributed environment. 
 
 In such a complex environment, formal models are of great help if we can model and prove that protocols that the system relies on are correct. The system we propose tackles this issue using remote configuration and it relies on four formally modeled protocols:
 
@@ -266,14 +270,14 @@ In such a complex environment, formal models are of great help if we can model a
 \end{enumerate}
 
 \noindent
-These three protocols are base on the geo-distributed Infrastructure deployment.
+These three protocols are based on the geo-distributed Infrastructure deployment.
 %
 %
 \subsection{Multiparty asynchronous session types}\label{sec:multiparty}
 %
 Communication protocols that operate from node to the system can be modeled using~\cite{HuY17}, an extension of \emph{MPST}~\cite{HondaYC08} -- a class of behavioral types specifically designed for describing distributed protocols that rely on asynchronous communications. 
 
-The type specifications give us one additional benefit. They are not only useful to formally describe protocols, but we can also rely on them for a modeling-based approach developed in~\cite{HuY17} to validate our protocols are they satisfy multiparty session types safety (there is no reachable error state) and progress (an action is eventually executed, assuming fairness).
+The type specifications give us one additional benefit. They are not only useful to formally describe protocols, but also reliable for a modeling-based approach developed in~\cite{HuY17} to validate our protocols are they satisfy multiparty session types safety (there is no reachable error state) and progress (an action is eventually executed, assuming fairness).
 
 The modeling process is done in two steps.
 
@@ -330,14 +334,14 @@ The modeling process is done in two steps.
 \end{enumerate}
 
 \noindent
-For simplicity reasons, we will consider that all participants are communicating in a single private session. All sent messages, but not yet received, are buffered in a single queue that preserves their order. The order is preserved only for pairs of messages having the same sender and receiver, while other pairs of massages can be swapped since these are asynchronously independent.
+For simplicity reasons, we will consider that all participants are communicating in a single private session. All sent messages, but not yet received, are buffered in a single queue that preserves their order. The order is preserved only for pairs of messages having the same sender and receiver, while other pairs of messages can be swapped since these are asynchronously independent.
 %
 %
 \subsection{Health-check protocol}\label{sec:health_check_protocol}
 %
 Nodes that exist in the clustered environment usually have a channel where they can send metrics and other data in a form of a health-check mechanism. This channel could be used this channel to reach nodes to send some actions to them, for example, a cluster formation message. 
 
-In figure~\ref{fig:fig6}. we can see a low-level health-check protocol between a single node and the rest of the system. This process involves the following participants: Node, Nodes, State, and Log.
+In figure~\ref{fig:fig6}. a low-level health-check protocol between a single node and the rest of the system can be seen. This process involves the following participants: Node, Nodes, State, and Log.
 
 \begin{figure}[H]
 	\begin{center}
@@ -361,7 +365,7 @@ These participants included in Figure~\ref{fig:fig6} follow the health-check pro
 \noindent
 Nodes service will be informed about node existence on his health-check ping. However, the system state will not be updated, changed, or even informed about this ping if the node is not used in some cluster.
 
-In the following algorithm~\ref{alg:alg1} we describe steps required by the system to determine if the node is free or used and how node information is stored.
+In the following algorithm~\ref{alg:alg1} steps required by the system to determine if the node is free or used, and how node information is stored, are described.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -388,18 +392,18 @@ In the following algorithm~\ref{alg:alg1} we describe steps required by the syst
 \end{algorithm}
 
 \noindent
-To formally describe servers or nodes (terms are used interchangeably) properties in the system, we could use set theory. In the beginning, the system will have an empty server set $S$ denoted with $S=\emptyset$. To determine node state, we could use existing node properties. One approach may be that we use a node-id structure, for example. 
+To formally describe servers or nodes (terms are used interchangeably) properties in the system, set theory could be used. At the beginning, the system will have an empty server set $S$ denoted with $S=\emptyset$. To determine node state, we could use existing node properties. One approach may be that we use a node-id structure, for example. 
 
-Whatever approach we use, formally we can define free nodes as follows:
+Whatever approach is used, free nodes can be formally described as follows:
 
 \begin{definition}
 	Nodes are free if and only if (henceforth iff) they do not belong to any cluster.
 \end{definition}
 
 \noindent 
-If we take node-id, for example, when the new health-check message from the particular node is received node-id structure will determine the node state. When the node is free, he will home some random or user-defined id, while when he is used in some cluster, the node-id structure will reflect this.\\
+If \textbf{node-id} is taken, for example, when the new health-check message from the particular node is received, \textbf{node-id} structure will determine the node state. When the node is free, it will home some random or user-defined id, while when it is used in some cluster, the node-id structure will reflect this.\\
 
-If we, for example, have $n$ free nodes in the wild, this can be denoted with $s_i$, where $i\in\{1, \ldots, n\},$. If all of them send the health-check ping to the system, we need to determine their state. If a node $s_i$ is free, we should add it to the server set, and thus we have:
+If, for example, there are $n$ free nodes in the wild, this can be denoted with $s_i$, where $i\in\{1, \ldots, n\},$. If all of them send the health-check ping to the system, we need to determine their state. If a node $s_i$ is free, we should add it to the server set, and thus we have:
 
 \begin{equation}
 	S_{\mathit{new}} = S_{\mathit{old}} \cup \bigcup%\limits
@@ -408,14 +412,14 @@ If we, for example, have $n$ free nodes in the wild, this can be denoted with $s
 \myequations{Extending free servers set.}
  
 \noindent 
-IIt is important to notice, that the order in which messages arrive is not important. The only thing that is important is that every message eventually comes into the system. We can now formally define node roles in the system like:
+It is important to notice, that the order in which messages arrive is not important. The only thing that is important is that every message eventually comes into the system. Node roles in the system can now formally be defined like:
 
 \begin{definition}
-	All nodes in the system are equal, no matter are they part of some cluster or are not. One node can be used in one cluster only.
+	All nodes in the system are equal, no matter if they are a part of some cluster or if they are not.
 \end{definition}
 
 \noindent
-The previous definition gives us a strong background in the further formal definition of the system because the only thing that we should care about is that node is alive and well and that he is ready to accept some jobs.\\
+The previous definition gives us a strong background in the further formal definition of the system because the only thing that should be cared about is that node is alive and well, and that it is ready to accept some jobs.\\
 
 We described in algorithm~\ref{alg:alg1} how the system stores the node data, but also how to determine if the node is free or used using the node-id structure. Every node $s_i$ in the system that is part of the server set $S$ could be described as a tuple $s_i = (L, R, A, I)$, where:
 
@@ -423,7 +427,7 @@ We described in algorithm~\ref{alg:alg1} how the system stores the node data, bu
 	%
 	%
 	\item $L$ is a set of ordered key-value pairs, i.e., $L = \{(k_1,v_1),\ldots ,(k_m,v_m)\}$ where $k_i \not= k_j$, for each $i,j\in \{1, \ldots , m\}$ such that $i\not= j$. $L$ represents node labels or server-specific features.  
-	We based labels on Kubernetes  \cite{RossiCPN20} labels concept, which is used as an elegant binding mechanism for its components.
+	Labels were based on Kubernetes~\cite{RossiCPN20} labels concept, which is used as an elegant binding mechanism for its components.
 	%
 	%
 	\item $R$ is a set of tuples $R = \{(f_1,u_1,t_1),\ldots ,(f_m,u_m,t_m)\}$ representing node resources, where $f_i,u_i,t_i$, for $i\in\{1,\ldots,m\}$ are as follows:
@@ -436,14 +440,14 @@ We described in algorithm~\ref{alg:alg1} how the system stores the node data, bu
 	%
 	\item $A$ is a set of tuples $A = \{(l_1,r_1,c_1,i_1), \ldots ,(l_m,r_m,c_m,i_m)\}$, representing running applications, where $l_j,r_j,c_j,i_j$, for $j\in\{1,\ldots,m\}$, are as follows: 
 	\begin{itemize}
-		\item  $l_j$ represents labels, same way we used for node labels, 
+		\item  $l_j$ represents labels, the same way we used for node labels, 
 		\item $r_j$ is the resource set application requires, 
 		\item $c_j$ is the configuration set application requires, and 
 		\item $i_j$ is the general information like name, port, developer. 
 	\end{itemize}
 	%
 	%
-	\item $I$ represent a set of general node information like: name, location, IP address, id, cluster id, region id, topology id, etc.
+	\item $I$ represents a set of general node information like: name, location, IP address, id, cluster id, region id, topology id, etc.
 \end{itemize}
 
 \noindent
@@ -463,7 +467,7 @@ We can now formally define the number of labels per single server $s_i$ in the s
 \end{definition}
 
 \noindent
-Since labels are an important part of the system (more in future sections), they should be picked carefully and agreed on upfront. It should be possible also to change them if such a thing is required. 
+Since labels are an important part of the system (more in future sections), they should be picked carefully and agreed on upfront. It should also be possible to change them if such a thing is required. 
 
 Labels should stick out some distinctive features of the node, that might be valuable for developers or administrators to target. For example, server resources, server features (e.g., SSD drive), geolocation, etc. They can be created as follows:
 
@@ -474,7 +478,7 @@ Labels should stick out some distinctive features of the node, that might be val
 \noindent
 Following all things presented above, we can now give a formal description for the low-level health-check communication protocol (cf. Figure~\ref{fig:fig6}). The global protocol $\G_1$ (given bellow) conforms the informal description given at page~\pageref{informal_description_health-check}: $\mathtt{node}$ connects $\mathtt{nodes}$ with $\mathit{health{\_}check}$ message and a payload of type $\T_1$ required by the system to properly register node into the system. 
 
-Based on the received information, $\mathtt{nodes}$ {\bf either} connects $\mathtt{state}$ with $\mathit{active}$ message, informing the node status alongside payload typed with $\T_2$ (containing informations required by the system to properly register active health-check sender), and then also connects $\mathtt{log}$ with the same message, {\bf or} directly connects $\mathtt{log}$ informing the node is $\mathit{free}$.
+Based on the received information, $\mathtt{nodes}$ {\bf either} connect $\mathtt{state}$ with $\mathit{active}$ message, informing the node status alongside payload typed with $\T_2$ (containing informations required by the system to properly register active health-check sender), and then also connect $\mathtt{log}$ with the same message, {\bf or} directly connect $\mathtt{log}$ informing the node is $\mathit{free}$.
 \begin{align*}
 \G_1 = & 
 \mathtt{node} \twoheadrightarrow \mathtt{nodes}{:}\mathit{health{\_}check}(\T_1).\\
@@ -491,7 +495,7 @@ Notice that in $\G_1$ we indeed have a choice of $\mathtt{nodes}$ sending either
 Also, notice that $\mathtt{state}$ will be introduced into the session only when receiving from $\mathtt{nodes}$. 
 Hence, if the session after the first ping from $\mathtt{node}$ to $\mathtt{nodes}$ proceeds with the second branch (i.e., connecting $\mathtt{nodes}$ with $\mathtt{log}$) then $\mathtt{state}$ is not considered as stuck, as it would be in standard MPST, such as, e.g.,~\cite{HondaYC08}, but rather idle. 
 
-Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, \mathtt{state}$ and $\mathtt{log}$ we can than get local types as follows:
+Projecting global type $\G_1$ onto participants $\mathtt{node}, \mathtt{nodes}, \mathtt{state}$ and $\mathtt{log}$ we can then get local types as follows:
 \begin{align*}
 \ST_\mathtt{node}  & = 
 \mathtt{nodes}{!!}\mathit{health{\_}check}(\T_1).\tend
@@ -527,7 +531,7 @@ where, for instance, type $\ST_\mathtt{nodes}$ specifies $\mathtt{nodes}$ can re
 %
 \subsection{Cluster formation protocol}\label{sec:cluster_formation_protocol}
 %
-Another communication protocol that the system relies on, appears in the cluster formation process, where users can form new clusters dynamically. Here, we distinguish two different actions:
+Another communication protocol that the system relies on, appears in the cluster formation process, where users can form new clusters dynamically. Two different actions are distinguished:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item The first action is user-system communication. Here user sends query parameters to the system to obtain a list of available nodes that satisfy specified query parameters.
@@ -547,13 +551,13 @@ Another communication protocol that the system relies on, appears in the cluster
 These participants included in Figure~\ref{fig:fig7} follow the cluster formation protocol that is informally described below:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \label{cluster_formation_informal_description} \textbf{User} query Nodes service, based on some predefined query parameters. User sends a new creation message to Queue. User either get response \textit{ok} if the message is accepted or \textit{error} if the message cannot be accepted due to missing rights or other issues. This operation is called \emph{mutation}; 
-	\item \textbf{Queue} accepts a user message, and passes it to State. Messages are handled in FIFO (First In, First Out) order. The queue prevents system congestion, with received messages. the queue will also test if the specified message has been already handled before over idempotency check;
+	\item \label{cluster_formation_informal_description} \textbf{User} query Nodes service, based on some predefined query parameters. User sends a new creation message to Queue. User either gets response \textit{ok} if the message is accepted or \textit{error} if the message cannot be accepted due to missing rights or other issues. This operation is called \emph{mutation}; 
+	\item \textbf{Queue} accepts a user message, and passes it to State. Messages are handled in FIFO (First In, First Out) order. The queue prevents system congestion, with received messages. The queue will also test if the specified message has already been handled before over idempotency check;
 	\item \textbf{State} accepts mutation messages from Queue, and tries to store new information about the cluster, region, or topology. If Nodes can reserve all desired nodes, the system  will store new user desired specification and send a message to Scheduler to physically carry on the creation of clusters with desired nodes;
-	\item \textbf{Nodes} accept messages from State. It will reserve desired nodes, if possible, otherwise, it will send an error message to Log service. On a health-check message, it will either just store node information or if a node is used in some cluster inform that cluster that the node is alive;
+	\item \textbf{Nodes} accept messages from State. It will reserve desired nodes, if possible, otherwise, it will send an error message to Log service. On a health-check message, it will either just store node information or if a node is used in some cluster, inform that cluster that the node is alive;
 	\item \textbf{Scheduler} waits for a message sent from State, and physically carry on cluster formation by pushing cluster formation messages to the chosen nodes;
 	\item \textbf{Log} contains records of all operations. Users can query this service to see if their tasks are finished or some problems occurred;
-	\item \textbf{Nodes Pool} represents the set of \emph{n} free nodes that will accept mutation messages. When a node receives the message, he will follow some predefined steps:
+	\item \textbf{Nodes Pool} represents the set of \emph{n} free nodes that will accept mutation messages. When a node receives the message, it will follow some predefined steps:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \roman*)}] 
 		\item start gossip protocol to inform other nodes from the mutation message that they should form a cluster;
@@ -562,7 +566,7 @@ These participants included in Figure~\ref{fig:fig7} follow the cluster formatio
 \end{enumerate}
 
 \noindent
-If a user wants to get a list of free nodes in the system, he must create a query using \emph{the selector}, which is the set of key-value pairs where he can describe what type of nodes he desires. In algorithm~\ref{alg:alg2}, we describe steps that are required to perform a proper node lookup based on a received selector value.
+If a user wants to get a list of free nodes in the system, he must create a query using \emph{the selector}, which is the set of key-value pairs where he can describe what type of nodes he desires. Algorithm~\ref{alg:alg2} describes steps that are required to perform a proper node lookup based on a received selector value.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -588,7 +592,7 @@ We start with the empty selector $Q=\emptyset$, in which we append key-value pai
 \myequations{Query selector formation.} 
 
 \noindent
-Once the user submits query selector to the system with desired attributes, for every server in the set $S$, we need to check two things: 
+Once the user submits query selector to the system with desired attributes, for every server in the set $S$, two things need to be checked:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item the cardinality of the $i_\mathit{th}$ server's set of labels and the query selector are identical in size
@@ -609,7 +613,7 @@ The $i_\mathit{th}$ server from the server set $S$ will be present in the result
 \myequations{Server selector.}
 
 \noindent
-If the result set $R$ is not the empty set, we then reserve nodes for configurable time so that other users cannot see, and try to use them.  Finally, we add reserved nodes with message data $\mathit{md}$ to the task queue set:
+If the result set $R$ is not the empty set, we then reserve nodes for configurable time so that other users cannot see, and try to use them.  Finally, reserved nodes with message data $\mathit{md}$ are added to the task queue set:
 
 \begin{equation}
 	TQ_\mathit{new} =TQ_\mathit{old}\cup \{(R, md)\}.
@@ -617,7 +621,7 @@ If the result set $R$ is not the empty set, we then reserve nodes for configurab
 \myequations{Extending task queue set.}
 
 \noindent 
-When the task comes to execution, the task queue will send messages to every node that is specified. In algorithm~\ref{alg:alg3}, we describe the steps required for cluster formation.
+When the task comes to execution, the task queue will send messages to every node that is specified. Algorithm~\ref{alg:alg3} describes the steps required for cluster formation.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -637,7 +641,7 @@ Users are free to override existing node labels with their labels or keep predef
 
 When the node receives the cluster formation message, he will automatically pick and contact a configurable subset of nodes $R_g \subset R$, and start the gossip protocol, propagating pieces of information about nodes in the cluster (e.g, new, alive, suspected, dead, etc.). When every node inside the newly formed cluster has a complete set of nodes $R$ obtained through gossiping, the cluster formation process is over. Topology, region, or cluster formation should be done descriptively using YAML, or similar formats. 
 
-In the algorithm~\ref{alg:alg4}, we describe the required steps after nodes receive a cluster formation message.
+In the Algorithm~\ref{alg:alg4} describes the required steps after nodes receive a cluster formation message.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -657,9 +661,9 @@ In the algorithm~\ref{alg:alg4}, we describe the required steps after nodes rece
 \end{algorithm}
 
 \noindent
-In the following, we formally describe a low-level cluster formation communication protocol (cf. Figure \ref{fig:fig3}). We are using the same extension of MPSTs~\cite{HuY17} used for the health-check protocol.
+In the following, a low-level cluster formation communication protocol (cf. Figure \ref{fig:fig3}) is described. We are using the same extension of MPSTs~\cite{HuY17} used for the health-check protocol.
 
-Global protocol $\G_2$ (given below) conforms the informal description of the cluster formation protocol given at page~\pageref{cluster_formation_informal_description}. 
+Global protocol $\G_2$ (given below) conforms the informal description of the cluster formation protocol given on page~\pageref{cluster_formation_informal_description}. 
 The protocol starts with $\mathtt{user}$ connecting $\mathtt{state}$ by message $\mathit{query}$ and a payload typed with $\T_1$ that contains user query data, and  then $\mathtt{state}$ forwards the message by connecting $\mathtt{nodes}$. 
 Then, the protocol possibly enters into a loop, specified with $\mu\ty$, depending on the later choices. 
 Further, $\mathtt{nodes}$ replies a response $\mathit{resp}$ to $\mathtt{state}$, that, in turn, forwards the message to $\mathtt{user}$. The payload of the message is typed with $\T_2$ that has response data, based on a given query. 
@@ -693,7 +697,7 @@ The third branch is the only one in which protocol loops. Also, we can notice th
 
 \noindent
 The mutate protocol $\G'$, activated in the first branch in $\G_1$, starts with $\mathtt{user}$ sending 
-$\mathtt{create}$ message to $\mathtt{state}$, specifying also informations about new user desired state typed with $\T_3$, 
+$\mathtt{create}$ message to $\mathtt{state}$, specifying also information about new user desired state typed with $\T_3$, 
 and $\mathtt{state}$ replies back with $\mathit{ok}$. 
 Then, $\mathtt{state}$ sends $\mathit{ids}$ of the nodes to be reserved (specified in the payload typed with $\T_4$) to $\mathtt{nodes}$, that, in turn sends one of the two possible messages to $\mathtt{state}$: 
 
@@ -818,7 +822,7 @@ where
 \myequations{Cluster formation global protocol projection.}
 
 \noindent
-For instance, type $\ST_\mathtt{sched}$ specifies that participant $\mathtt{sched}$ gets included in the session only after receiving from $\mathtt{state}$ message $\mathit{ids}$, then $\mathtt{sched}$ connects $\mathtt{pool}$ with $\mathit{update}$ message, after which expects to receive $\mathit{ok}$ message and finally terminates. 
+For instance, type $\ST_\mathtt{sched}$ specifies that participant $\mathtt{sched}$ gets included in the session only after receiving from $\mathtt{state}$ message $\mathit{ids}$, then $\mathtt{sched}$ connects $\mathtt{pool}$ with $\mathit{update}$ message, after which it expects to receive $\mathit{ok}$ message and finally terminates. 
 
 We remark that global type $\G_2$ could also be modeled directly by using standard MPST models (such as~\cite{HondaYC08}). However, in such models, the projection of $G_2$ onto, for instance, participant $\mathtt{sched}$ would be undefined (cf.~\cite{HuY17}).
 Since we follow the approach of~\cite{HuY17} with explicit connections, projection of $\G_2$ onto $\mathtt{sched}$ is indeed defined as $\ST_\mathtt{sched}$.
@@ -826,17 +830,17 @@ Since we follow the approach of~\cite{HuY17} with explicit connections, projecti
 %
 \subsection{Idempotency check protocol}\label{sec:idempotency_protocol}
 %
-Mutate operation should be atomic, immutable, and idempotent. The user can specify the same topology details but in a different order, for example. We must ensure that the new cluster formation protocol should \textbf{not} be initiated, if the user change order of regions, clusters, nodes, or labels in one or more node/s. 
+Mutate operation should be atomic, immutable, and idempotent. The user can specify the same topology details but in a different order, for example. We must ensure that the new cluster formation protocol should \textbf{not} be initiated, if the user changes order of regions, clusters, nodes, or labels in one or more node/s. 
 
-If mutate operation fails, for whatever possible reason but the infrastructure is created, or the same infrastructure already exists, the user should get a message that infrastructure is formed. If the user changes the number of labels per node, nodes per cluster, clusters per region \textbf{only} at that case we should start a new protocol.
+If mutate operation fails, for whatever possible reason, but the infrastructure is created, or the same infrastructure already exists, the user should get a message that infrastructure is formed. If the user changes the number of labels per node, nodes per cluster, clusters per region \textbf{only} in that case a new protocol should be started.
 
 But since we have a different scenario than standard write to storage, and we do not specify steps on how operations should be done, to implement idempotency correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
 
-The idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represented as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in the two ways:
+The idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represented as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in two ways:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{flat keyspace}, with this opetion all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
-	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements for example set of regions, where every region is a set of clusters, where every cluster is a set of nodes, etc. We can go deep as long as we want, but the restriction is that every structure \textbf{must} be idempotent. So we can use a set of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
+	\item \textbf{flat keyspace}, with this option all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity, for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
+	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements, for example set of regions, where every region is a set of clusters, where every cluster is a set of nodes, etc. We can go deep as long as we want, but the restriction is that every structure \textbf{must} be idempotent. So we can use a set of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
 \end{enumerate}
 
 \noindent
@@ -847,12 +851,12 @@ If we have cached idempotency data for user requests, and if a user tries to sen
 \end{proof}
 
 \noindent
-If we have stored user request on cluster formation protocol, and we receive a new request with the same name, \textbf{than} we can take the intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
+If we have stored user request on cluster formation protocol, and we receive a new request with the same name, \textbf{then} we can take the intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
 
-We can make this test a little bit faster, by choosing the proper storage structure. If we first test does the same topology name is already present in the idempotency store, that lookup will spare us unnecessary comparison on sets. For example, data structures like $Hash tables$ store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}. 
+This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like $Hash tables$ store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}. 
 We can go even a little bit further and use CRDTs and SEC to store and replicate data on copies of the services that are required for the idempotency test.
 
-Figure~\ref{fig:fig13} show zoomed view in the $State$ participent from figure~\ref{fig:fig7}, and idempotency check communication.
+Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
 
 \begin{figure}[H]
 	\begin{center}
@@ -868,8 +872,8 @@ The participants follow the communication that we now describe informally: \labe
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{User} sends a list request to State service (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detail view is required, the state gets metrics data from Nodes service (same as~\ref{sec:cluster_formation_protocol});
-	\item \textbf{State service} service that is wrapper aroud system main storage. Interacts with main storage in oreder to create new topologies, regions or clusters, or to get data from main storages about same entities.
+	\item \textbf{Queue} accepts the list request and the query local state based on the user selector. If a detailed view is required, the state gets metrics data from Nodes service (same as~\ref{sec:cluster_formation_protocol});
+	\item \textbf{State service} is a wrapper aroud system main storage. Interacts with main storage in order to create new topologies, regions or clusters, or to get data from the main storages about the same entities. 
 	\item \textbf{Idempotency storage} contains idempotent set for all \textbf{already} formed topologies, regions and clusters.
 	\item \textbf{Main storage} contains records about the desired state for all formed topologies, regions, and clusters.
 	\item \textbf{Log} contains records of operations. Users can query this service to see if their tasks are finished or have any problems (same as~\ref{sec:cluster_formation_protocol});
@@ -878,7 +882,9 @@ The participants follow the communication that we now describe informally: \labe
 \end{enumerate}
 
 \noindent
-When testing is request idempotent we must have in mind that stored structure could be: \textbf{(1)} flat keyspace, and \textbf{(2)} hierarchical keyspace. The both options are valid, as long as the \textbf{structure is idempotent}, and we can do \textbf{idempotent operations} over that structure. For example, $set$ as a data structure and $intersection$ are good candidates. The algorithm that will test structure idempotency must be able to test both options. Algorithm~\ref{alg:alg6} describe steps required to test if the operation is done before.
+When testing idempotency, we must have in mind that stored structure could be: \textbf{(1)} flat keyspace, and \textbf{(2)} hierarchical keyspace. The both options are valid, as long as the \textbf{structure is idempotent}, and we can do \textbf{idempotent operations} over that structure. For example, $set$ as a data structure and $intersection$ are good candidates. The algorithm that will test structure idempotency must be able to test both options. 
+
+Algorithm~\ref{alg:alg6} describes steps required to test if the operation is done before.
 
 \begin{algorithm}[H]
 	\SetKwFunction{idempotent}{idempotent}
@@ -911,7 +917,7 @@ When testing is request idempotent we must have in mind that stored structure co
 \end{algorithm}
 
 \noindent
-Next we present a formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17}. The global protocol $\G_3$ (given bellow) conforms the informal description given at page~\pageref{informal_description_idempotency}. At this point, the $\mathtt{user}$ can choose one of two possible messages: 
+A formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17} is presented next. The global protocol $\G_3$ (given below) conforms the informal description given at page~\pageref{informal_description_idempotency}. At this point, the $\mathtt{user}$ can choose one of two possible messages: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 \item $\mathit{quit}$, in which case the protocol terminates; or, 
@@ -929,8 +935,8 @@ Next we present a formal description of the idempotency check protocol (cf. Figu
 \myequations{Idempotency check global protocol.}
 
 The mutate protocol $\G'$, activated in the first branch in $\G_3$, starts with $\mathtt{user}$ sending 
-$\mathtt{create}$ message to $\mathtt{state}$, specifying also informations about new user desired state typed with $\T_3$, 
-and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same as cluster formation protocol (cf. section~\ref{cluster_formation_informal_description}). Now we start specific communication protocol for idempotency check so $\mathtt{service}$ sends payload $T_3$ to $\mathtt{istorage}$ to test is this request $seen$ before. The $\mathtt{istorage}$ responds with payload $T_6$ to $\mathtt{service}$, and based on $Boolean$ response $\mathtt{service}$ can do one of two things:
+$\mathtt{create}$ message to $\mathtt{state}$, specifying also information about the new user desired state typed with $\T_3$, 
+and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same as cluster formation protocol (cf. section~\ref{cluster_formation_informal_description}). Now we start specific communication protocol for idempotency check so $\mathtt{service}$ sends payload $T_3$ to $\mathtt{istorage}$ to test if this request is $seen$ before. The $\mathtt{istorage}$ responds with payload $T_6$ to $\mathtt{service}$, and based on $Boolean$ response $\mathtt{service}$ can do one of two things:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item $\mathtt{service}$ sends message to $\mathtt{log}$ and this process terminates; or,
@@ -954,7 +960,7 @@ G' & =
 \end{align*}
 
 \noindent
-The idempotency store protocol $\G''$, starts with $\mathtt{service}$ sending mutation payload $T_3$ to $\mathtt{mstorage}$. Then $\mathtt{mstorage}$ sends same payload to $\mathtt{istorage}$. When data is saved for future testing, $\mathtt{istorage}$ respond back to $\mathtt{mstorage}$, and finally $\mathtt{mstorage}$ respond back to $\mathtt{service}$. At this poing user payload $T_3$ is stored in both main storage and idempotency storage for future testing. Protocol continue with $\mathtt{state}$ connects $\mathtt{sched}$ (Scheduler) with message $\mathit{ids}$ and the payload that contains other data imported for mutation to be completed (typed with $\T_5$), and the rest of cluster formation protocol may continue.
+The idempotency store protocol $\G''$, starts with $\mathtt{service}$ sending mutation payload $T_3$ to $\mathtt{mstorage}$. Then $\mathtt{mstorage}$ sends the same payload to $\mathtt{istorage}$. When data is saved for future testing, $\mathtt{istorage}$ responds back to $\mathtt{mstorage}$, and finally $\mathtt{mstorage}$ responds back to $\mathtt{service}$. At this point user payload $T_3$ is stored in both main storage and idempotency storage for future testing. Protocol continues with $\mathtt{state}$ connects $\mathtt{sched}$ (Scheduler) with message $\mathit{ids}$ and the payload that contains other data imported for mutation to be completed (typed with $\T_5$), and the rest of cluster formation protocol may continue.
 
 \begin{align*}
 \G'' = & 
@@ -1029,7 +1035,7 @@ where
 \myequations{Idempotency check global protocol projection.}
 
 \noindent
-Similarly, as for $G_2$, we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
+Similarly, as for $G_2$, we remark $\G_3$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined while following the approach of ~\cite{HuY17} with explicit connections, all valid projections have been obtained.
 %
 %
 \subsection{List detail protocol}\label{sec:list_detail_protocol}
@@ -1044,7 +1050,7 @@ The final communication protocol in our system appears in the information retrie
 \noindent
 It is important to note, that similarly to the query operation (defined previously), both rules $(\ref{eq:eq1})$ and $(\ref{eq:eq2})$ \textbf{must} be satisfied for information to be presented in the response. The user can specify one additional information in the list request, and that is whether or not the user wants a detailed view or not. If such information is presented in the request, the user will get a detaild view back. 
 
-In the figure~\ref{fig:fig8}, we show a low-level view of the list operation protocol, where users can get details about the formed system. This setting involves the next participants: User, State, Nodes, and Log. 
+Figure~\ref{fig:fig8} shows a low-level view of the list operation protocol, where users can get details about the formed system. This setting involves the next participants: User, State, Nodes, and Log. 
 
 \begin{figure}[!htbp]
 	\begin{center}
@@ -1060,13 +1066,13 @@ Now we can informally describe the roles of the participants in the protocol:\la
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{User} sends a list request to State;
-	\item \textbf{State} accepts the list request and the query local state based on the user selector. If a detail view is requested, the state gets metrics data from Nodes, and return details back to user;
+	\item \textbf{State} accepts the list request and the query local state based on the user selector. If a detailed view is requested, the state gets metrics data from Nodes, and return details back to user;
 	\item \textbf{Nodes} contain node metrics data, and if required, it may send this data to State;
 	\item \textbf{Log} contains records of all operations. Users can query this service.
 \end{enumerate}
 
 \noindent
-In algorithm~\ref{alg:alg5}, we describe steps that are required after the state receives a list message.
+Algorithm~\ref{alg:alg5} describes steps that are required after the state receives a list message.
 
 \begin{algorithm}[H]
 	\SetAlgoLined
@@ -1086,9 +1092,8 @@ In algorithm~\ref{alg:alg5}, we describe steps that are required after the state
 \end{algorithm}
 
 \noindent
-Next we present a formal description of the list communication protocol (cf. Figure \ref{fig:fig4}) by using~\cite{HuY17}.
-Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
-\textbf{(1)} $\mathit{list}$, specifying a request for a detailed view, where sort $\T_1$ identifies which parts of the system user wants to view in details, after which $\mathtt{state}$ connects $\mathtt{nodes}$ with $\mathit{query}$ message, with a payload of sort $\T_2$  containing specification of which nodes need to show their metrics data, and then protocol proceeds as prescribed with $\G'$; 
+A formal description of the list communication protocol (cf. Figure \ref{fig:fig4}) by using~\cite{HuY17} is presented next. Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
+\textbf{(1)} $\mathit{list}$, specifying a request for a detailed view, where sort $\T_1$ identifies which parts of the system the user wants to view in details, after which $\mathtt{state}$ connects $\mathtt{nodes}$ with $\mathit{query}$ message, with a payload of sort $\T_2$  containing specification of which nodes need to show their metrics data, and then protocol proceeds as prescribed with $\G'$; 
 \textbf{(2)} $\mathit{list^*}$, specifies no need for a detailed view is specified, where a payload of sort $\T_4$ denotes user specified parts of the system the user wants to view, but without greater details. In the latter case protocol follows global type $\G''$.
 \begin{align*}
 \G_4 &= 
@@ -1100,7 +1105,7 @@ Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt
 \end{align*}
 \myequations{List detail global protocol.}
 Global type $\G'$ starts with $\mathtt{nodes}$ replying to $\mathtt{state}$ $\mathit{result}$ message and a payload identifying parts of the system user wants to see in greater detail typed with $\T_3$. Then, $\mathtt{state}$ connects $\mathtt{log}$ with $\mathtt{details}$ and also sends $\mathtt{result}$ to $\mathtt{user}$, and finally terminates. 
-In $\G''$, $\mathtt{state}$ also connects $\mathtt{log}$ with $\mathit{brief}$ and a payload typed with $\T_5$ identifying parts of the system user wants to see without greater detail. Then, $\mathtt{state}$ replies to $\mathtt{user}$ with $\mathtt{result}$ message, and the protocol terminates.
+In $\G''$, $\mathtt{state}$ also connects $\mathtt{log}$ with $\mathit{brief}$ and a payload typed with $\T_5$ identifying parts of the system the user wants to see without greater detail. Then, $\mathtt{state}$ replies to $\mathtt{user}$ with $\mathtt{result}$ message, and the protocol terminates.
 \begin{align*}
 \begin{split}
 	\G' =  & 
@@ -1157,31 +1162,31 @@ where
 \noindent
 For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in the session only after receiving from $\mathtt{state}$, either message $\mathit{detail}$, or message $\mathit{brief}$, and then terminates. 
 
-Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, we have obtained all valid projections.
+Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, all valid projections have been obtained.
 %
 %
 \section{Access pattern}\label{sec:access_pattern}
 %
-n section~\ref{sec:application_model}, we already discuss system access patterns from the applications point of view, using streams and topics. In this section, we are going to venture into the dashboard and system access described in~\ref{sec:distribution_models}. 
+In section~\ref{sec:application_model}, we already discussed system access patterns from the applications point of view, using streams and topics. In this section, we are going to venture into the dashboard and system access described in~\ref{sec:distribution_models}. 
 
 To access the system, requests are going over some \textit{master process}. This process is not responsible for any sort of synchronization, agreement, or something like that, but just to show dashboards and various system details since the cloud is available anywhere in the world, while micro-cloud should serve the local population. 
 
-One question that could come to mind is, what if some cloud provider offering micro-cloud functionality, or running our master process goes down, should the rest of the micro-clouds go to \textit{read-only} mode and only accept \textbf{read} requests?
+One question that could come to mind is, what if some cloud provider offering micro-cloud functionality, or running our master process, goes down, should the rest of the micro-clouds go to \textit{read-only} mode and only accept \textbf{read} requests?
 
-All communication is not exclusive to go over that master process, but if the user is nearby to micro-cloud should be able to initiate commands directly to clusters, regions, and topologies. But for dashboards and full pieces of information about his micro-clouds cloud would be a better solution, just because of more available resources.
+All communication is not exclusive to go over that master process, but if the user is nearby to micro-cloud he/she should be able to initiate commands directly to clusters, regions, and topologies. But for dashboards and full pieces of information about his micro-clouds, cloud would be a better solution, just because of more available resources.
 
-If some cloud provider goes down for whatever reason, we should foresee this and to resolve it we could use multiple cloud providers using \textit{Multi-Cloud Computing}~\cite{HongDSH19, Ardagna15} so that one cloud provider is a master process and many others are backup in case the whole cloud provider goes down.
+If some cloud provider goes down for whatever reason, we should foresee this, and to resolve it, we could use multiple cloud providers using \textit{Multi-Cloud Computing}~\cite{HongDSH19, Ardagna15} so that one cloud provider is a master process and many others are backup in case the whole cloud provider goes down.
 
-Here inevitably we have some state synchronization, and here we could rely on SEC and CRDTs to do synchronization without some expensive coordination between providers.
+We inevitably have some state synchronization here, and we could rely on SEC and CRDTs to do synchronization without some expensive coordination between providers.
 
-This is not generally a problem if applications that are running in micro-clouds are not dependent on some process, location, sensors of services, etc. If we this is the case then we can connect micro-clouds in sort of P2P network and give them some logic to just route request to the proper location on the globe. 
+This is not generally a problem if applications that are running in micro-clouds are not dependent on some process, location, sensors of services, etc. If this is the case, then we can connect micro-clouds in sort of P2P network and give them some logic to just route request to the proper location on the globe. 
 
 This might not be that fast, since even light is affected by the distance, but we would be able to issue requests to cluster in a different part of the world.
 %
 %
 \section{Repercussion}\label{sec:repercussion}
 %
-The model presented in this chapter, have three possible execution repercussions:
+The model presented in this chapter, has three possible execution repercussions:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be a viable option in the CC.
@@ -1192,15 +1197,15 @@ The model presented in this chapter, have three possible execution repercussions
 %
 \section{Limitations}\label{sec:limitations}
 %
-Since the perfect model never existed, the model that is proposed in this thesis has some limitations, that we must be aware of. Either to work on improvements or use the model as is. When talking about small-scale servers and micro-clouds, we must be aware of a few things.
+Since the perfect model never existed, the model that is proposed in this thesis has some llimitations that we must be aware of, either to work on improvements or use the model as is. When talking about small-scale servers and micro-clouds, we must be aware of a few things.
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item We must be aware that not all organizations will be able to deploy micro-clouds, due to the high initial investments required~\cite{MonsalveCC18}. We can rely on government authorities, large cloud providers, or other big companies to build the initial infrastructure for their own needs, and lease it to others similar to the cloud. The general public can use them, similarly to the cloud -- pay as you go, model.
-	\item There is no guarantee that existing public cloud providers will allow nodes that are not built, resigned, or deployed by them. If we are building a private cloud, that we can make a different decision. One way to resolve this issue is that the whole platform becomes open-source so that public cloud providers can engage in the development, and eventually use them as a solution.
+	\item There is no guarantee that existing public cloud providers will allow nodes that are not built, resigned, or deployed by them. If we are building a private cloud, then  we can make a different decision. One way to resolve this issue is that the whole platform becomes open-source so that public cloud providers can engage in the development, and eventually use them as a solution.
 	\item These small-scale servers must be out of reach of people and protected in some way so that not everyone has access to them. Some degree of physical security must be implemented.
 	\item The places where these small scale servers will be deployed must have a stable internet connection, and the ability to integrate SDN or other similar technologies, so that complex network topologies could be implemented properly.
-	\item these servers can have some open architecture or could be custom built by other providers. In both cases, they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
-	\item Splitting the processing into two parts and the possibility that users can be responsible for micro-clouds may raise some legal concerns. Either to develop interesting applications, use them as a firewall or simply use them as a privacy level for data there must be a legal agreement that might not be that easy to achieve.
+	\item These servers can have some open architecture or could be custom built by other providers. In both cases, they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
+	\item Splitting the processing into two parts and the possibility that users can be responsible for micro-clouds may raise some legal concerns. Either to develop interesting applications, use them as a firewall or simply use them as a privacy level for data, there must be a legal agreement that might not be that easy to achieve.
 \end{enumerate}
 %
 %
