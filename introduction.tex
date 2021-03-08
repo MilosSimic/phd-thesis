@@ -502,7 +502,9 @@ In case of errors, fails or misbehavior of the system, some insight can be gaine
 
 The logging operation, gives developers ability to store various arbitrary informations, that will provide more details for those who are investigating the failure. One thing we must be aware of is not to store any sensitive pieces of information in the log because this can cause a bunch of problems. Another thing we must be aware of is that we do not log too much and too often to slow down the business logic and execution of the function.
 
-In monolithic applications logging is a little bit easier to implement, because we have the whole application state in one place. When we come to the field of DS and microservices, our state is scattered across multiple elements or services. The solution to this problem is to use a centralized logging service -- \textbf{logs aggregation}, that collects logs from each service~\cite{BeschastnikhWBE16}. This is beneficial because users can search and analyze the logs as a whole state of the system. To do this properly the log must be stored very reliably~\cite{DanielsST87}. Users can then configure the log server for some alerts that are triggered when certain messages appear in the logs. The log of DS usually does not contain enough information to regenerate the timeline of execution, and this is one reason that logs in DS are so hard to interpret~\cite{BeschastnikhWBE16}.
+In monolithic applications logging and monitoring is a little bit easier to implement, because we have the whole application state in one place. When we come to the field of DS and microservices, our state is scattered across multiple elements or services. In DS, the monitoring involves interactions among concurrently executing processes~\cite{JoyceLSU87}.
+
+The solution to this problem is to use a centralized logging service -- \textbf{logs aggregation}, that collects logs from each service~\cite{BeschastnikhWBE16}. This is beneficial because users can search and analyze the logs as a whole state of the system. To do this properly the log must be stored very reliably~\cite{DanielsST87}. Users can then configure the log server for some alerts that are triggered when certain messages appear in the logs. The log of DS usually does not contain enough information to regenerate the timeline of execution, and this is one reason that logs in DS are so hard to interpret~\cite{BeschastnikhWBE16}.
 
 To resolve this problem of DS execution timeline, Google develops a new technique called \textbf{tracing}~\cite{36356}. The trace represents a single execution timeline or execution of one request. Trace will create a tree, and the tree is used to establish order. Every node in the tree represents a unit of work and it is called span. A tree unites all the elements needed to carry out an originating request. In every span or unit of work, we can attach more details about that particular execution element. 
 
@@ -518,7 +520,7 @@ To resolve this problem of DS execution timeline, Google develops a new techniqu
 \end{figure}
 
 \noindent
-And last, but not the least option is \textbf{alerting}. Alerting of a monitored system can be represented as a set of rules that performs actions based on changes in specific metric. Alerting enables a system to notify users when something important happens or (probably) is going to happen.
+\new{And last, but not the least option is \textbf{alerting}. Alerting of a monitored system can be represented as a set of rules that performs actions based on changes in specific metric. Alerting enables a system to notify users when something important happens or (probably) is going to happen.}
 
 DS logging, tracing and alerting represents the important role of any system, and as such, it should not be neglected especially in the DS environment. Every user request should be traced and logged from an infrastructure perspective, but we should allow users to store logs from their applications.
 %
