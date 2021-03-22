@@ -5,7 +5,7 @@ In this section, the core idea of this thesis will be presented, from the point 
 
 Throughout this section, we are going to rely on the research presented in chapters~\ref{chapter:Intro} and~\ref{chapter:Review}, and make a connection with the existing CC model.
 
-In Section~\ref{sec:configurable_model_structure} we presents a high overview of the system -- an architecture that is influenced by the standard CC model but adapted for a different environment. Section~\ref{sec:separation_of_concerns}introduces the separation of concerns model for previously defined system architecture. Section~\ref{sec:application_model} presents a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. How this system could be offered as a service, and which options can be offered to the potential users for developing their applications is discussed in Section~\ref{sec:as_a_service_model}. Section~\ref{sec:immutable_infrastructure} presents the desired option for infrastructure and application deployment, and why immutability is important in a micro-cloud geo=distributed environment. Section~\ref{sec:formal_model}presents why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation. Section~\ref{sec:access_pattern} show access patterns that could be used in micro-clouds and geo=distributed environments. Section~\ref{sec:repercussion} gives repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems. This chapter is concluded with Section~\ref{sec:limitations}, which presents limitations of our model.
+In Section~\ref{sec:configurable_model_structure} we present a high overview of the system -- an architecture that is influenced by the standard CC model but adapted for a different environment. Section~\ref{sec:separation_of_concerns}introduces the separation of concerns model for previously defined system architecture. Section~\ref{sec:application_model} presents a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. How this system could be offered as a service, and which options can be offered to the potential users for developing their applications is discussed in Section~\ref{sec:as_a_service_model}. Section~\ref{sec:immutable_infrastructure} presents the desired option for infrastructure and application deployment, and why immutability is important in a micro-cloud geo=distributed environment. Section~\ref{sec:formal_model}presents why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation. Section~\ref{sec:access_pattern} shows access patterns that could be used in micro-clouds and geo-distributed environments. Section~\ref{sec:repercussion} gives repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems. This chapter is concluded with Section~\ref{sec:limitations}, which presents limitations of our model.
 %
 %
 \section{Configurable Model Structure}\label{sec:configurable_model_structure}
@@ -78,7 +78,7 @@ Replication could be used not only in nodes inside the cluster, but data can als
 
 Single $topology$ reflects one CC provider, so multiple topologies are forming micro-clouds that can help CC with huge latency issues, pre-processing in huge volumes of data, and relax and decentralize strict centralized CC model.
 
-\new{These micro-clouds have much fewer resources compared to standard clouds, but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later. Formaly, we can represent position od micro-clouds $mc$ in between CC and EC like:
+These micro-clouds have much fewer resources compared to standard clouds, but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later. Formaly, the position of micro-clouds $mc$ in between CC and EC like:
 
 \begin{equation}
 mc \in \left( Cloud\ computing,\ Edge\ computing \right)
@@ -86,7 +86,7 @@ mc \in \left( Cloud\ computing,\ Edge\ computing \right)
 \myequations{Position od micro clouds.}
 
 \noindent
-Exclusiveness in previous formula, means that position of micro-clouds is moveable in between CC and EC depending do we want our model to be more CC like or more EC like, but it should not become one of them. But, it could be integral part for both of these models (even at the same time).}
+Exclusiveness in the previous formula, means that position of micro-clouds is moveable in between CC and EC depending do we want our model to be more CC like or more EC like, but it should not become one of them. It could be integral part for both of these models (even at the same time).
 
 Three-tier architecture with numerous clients at the bottom, micro clouds in the middle, and cloud on the top, seem to resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
 
@@ -853,7 +853,8 @@ If we have cached idempotency data for user requests, and if a user tries to sen
 \noindent
 If we have stored user request on cluster formation protocol, and we receive a new request with the same name, \textbf{then} we can take the intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
 
-This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like $Hash tables$ store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}. 
+This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}. 
+
 We can go even a little bit further and use CRDTs and SEC to store and replicate data on copies of the services that are required for the idempotency test.
 
 Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
@@ -1163,6 +1164,15 @@ where
 For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in the session only after receiving from $\mathtt{state}$, either message $\mathit{detail}$, or message $\mathit{brief}$, and then terminates. 
 
 Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, all valid projections have been obtained.
+%
+%
+\section{System observability}\label{sec:system_observability}
+%
+Every service will log details about its usage and calls, as well as traces how requests are going. Log data is stored outside the service and container, and pieces of information will be sent to centralized log storage on every t seconds specified by the user. Sending intervals could be changed and adapted using the configuration file for every service independently.
+Log data will be stored in the two levels:
+(1) system level, this data is generated by the system and could be viewed by administrators of the system only. Operations people in the team (eg. DevOps or SREs), and developers cannot see it, but providers can.
+(2) user level that stores information about user requests that only users can see. This type of data will not be visible to the developers of the system, and only users that created these logs will be able to see them.
+Log storage could be searched to see the general state of the system, and pieces of information about user requests and the state of their requests.
 %
 %
 \section{Access pattern}\label{sec:access_pattern}

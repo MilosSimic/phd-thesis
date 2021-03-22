@@ -9,7 +9,7 @@ Various software systems have changed the way people communicate, share informat
 
 This thesis aims to provide formal models based on which we can model and implement distributed systems (DS) for organizing cloud-like geo-distributed environments for users or CC providers. We can look at the whole system as a micro-cloud or pre-processing layer. The responsibility of such a system is sending only necessary and data to the cloud. This strategy reduces cost for users and ensures the availability of CC services. Such a system could lead to lowering the downtime of critical services.
 
-An overview of the topics that are of significant importance for the rest of the thesis is going to be given in this section, since the thesis is heavily based on these topics. It starts by describing the general problem area that our work addresses in Section~\ref{sec:problem_area}. Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patterns, and organizational structure. Section~\ref{sec:similar_models} describes similar models that might be a source of confusion, and how they are different than DS or DC, and how some concepts can fit in the bigger picture. Section~\ref{sec:virtualization_techniques} describes different virtualization methods that are used in CC for systems and/or applications. Section~\ref{sec:deployment} describes different architecture and application model and how deployment can be done in large DS. \new{Section~\ref{sec:dev_roles} describes different development roles in the modern complex software environment, with focuse on technical roles}, while Section~\ref{sec:concurency_parallelism} describes the difference between concurrency and parallelism and introduces an actor system, that will be used later on in the thesis. Section~\ref{sec:problem_statement}, specifies the exact problem that our work addresses, and Section~\ref{sec:research_hyphotesis_and_golas} describes our hypothesis and research goals. Section~\ref{sec:structure_of_thesis} presents the structure of the thesis.
+An overview of the topics that are of significant importance for the rest of the thesis is going to be given in this section, since the thesis is heavily based on these topics. It starts by describing the general problem area that our work addresses in Section~\ref{sec:problem_area}. Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patterns, and organizational structure. Section~\ref{sec:similar_models} describes similar models that might be a source of confusion, and how they are different than DS or DC, and how some concepts can fit in the bigger picture. Section~\ref{sec:virtualization_techniques} describes different virtualization methods that are used in CC for systems and/or applications. Section~\ref{sec:deployment} describes different architecture and application model and how deployment can be done in large DS. Section~\ref{sec:dev_roles} describes different development roles in the modern complex software environment, with focus on technical roles, while Section~\ref{sec:concurency_parallelism} describes the difference between concurrency and parallelism and introduces an actor system, that will be used later on in the thesis. Section~\ref{sec:problem_statement}, specifies the exact problem that our work addresses, and Section~\ref{sec:research_hyphotesis_and_golas} describes our hypothesis and research goals. Section~\ref{sec:structure_of_thesis} presents the structure of the thesis.
 %
 %
 %
@@ -338,7 +338,7 @@ New tools and methods that have been developed rely on DS and one specific featu
 
 Two examples of how huge generated data could be have already been given in~\ref{sec:problem_area}, and when other IoT sensors and devices are included these numbers will just keep getting bigger and bigger~\cite{SarigiannidisLR20}.
 
-Contrary to relational databases that mostly deal with structured data, big data is dealing with various kinds of data~\cite{FisherDCD12, Tsai2015, GuoFZ12}:
+Contrary to relational databases that mostly deal with structured data, Big Data is dealing with various kinds of data~\cite{FisherDCD12, Tsai2015, GuoFZ12}:
 
 \begin{itemize}
 	\item \textbf{Structured} data is a kind of data that have some fixed structure and format. A typical example of this is data stored inside a table of some database. Organizations usually have no huge problem extracting some kind of value out of the data.
@@ -347,7 +347,11 @@ Contrary to relational databases that mostly deal with structured data, big data
 \end{itemize}
 
 \noindent
-Along with the share size, big data have other instantly recognizable features called \textbf{V's} of big data~\cite{PatgiriA16}. The name is derived from initial letters of the other features that are describing big data. Image~\ref{fig:fig3} show 6 V's commonly used to represent the big data.
+Along with the share size, big data have other instantly recognizable features called \textbf{V's} of big data~\cite{PatgiriA16}. 
+
+The name is derived from initial letters of the other features that are describing big data. 
+
+Image~\ref{fig:fig3} show 6 V's commonly used to represent the big data.
 
 \begin{figure}[H]
 	\begin{center}
@@ -508,7 +512,7 @@ The solution to this problem is to use a centralized logging service -- \textbf{
 
 To resolve this problem of DS execution timeline, Google develops a new technique called \textbf{tracing}~\cite{36356}. The trace represents a single execution timeline or execution of one request. Trace will create a tree, and the tree is used to establish order. Every node in the tree represents a unit of work and it is called span. A tree unites all the elements needed to carry out an originating request. In every span or unit of work, we can attach more details about that particular execution element. 
 
-\new{Figure~\ref{fig:fig18} show the simple example of \textit{RequestX} path through the processes in a distributed system, where each service \textbf{call} could be RPC, HTTP or some other request.}
+Figure~\ref{fig:fig18} shows the simple example of \textit{RequestX} path through the processes in a distributed system, where each service \textbf{call} could be RPC, HTTP or some other request.
 
 \begin{figure}[H]
 	\begin{center}
@@ -520,7 +524,7 @@ To resolve this problem of DS execution timeline, Google develops a new techniqu
 \end{figure}
 
 \noindent
-\new{And last, but not the least option is \textbf{alerting}. Alerting of a monitored system can be represented as a set of rules that performs actions based on changes in specific metric. Alerting enables a system to notify users when something important happens or (probably) is going to happen.}
+And last, but not the least option is \textbf{alerting}. Alerting of a monitored system can be represented as a set of rules that performs actions based on changes in specific metric. Alerting enables a system to notify users when something important happens or (probably) is going to happen.
 
 DS logging, tracing and alerting represents the important role of any system, and as such, it should not be neglected especially in the DS environment. Every user request should be traced and logged from an infrastructure perspective, but we should allow users to store logs from their applications.
 %
@@ -703,19 +707,18 @@ Deployment is based around changing parts of the OS, its services that run insid
 %
 \section{Development roles}\label{sec:dev_roles}
 %
-\new{
-In our modern internet-connected world of applications, we have few distinctive development roles. Each of them plays the important role in order that modern software runs smooth, and with less downtime. These development roles could be separated in few categories (focuse is on the technical roles):
+In our modern internet-connected world of applications, we have several distinctive development roles. Each of them plays an important role in order that modern software runs smoothly, and with less downtime. These development roles could be separated in a few categories (focuse is on the technical roles):
 
 \begin{itemize}
-	\item \textbf{Developer} is usually a person responsabile for developing software for the user. Developer is responsible for maintainnig existing, and/or developing new features. There could be different subroles, dealing with specific part of the complex software systems.
-	\item \textbf{DevOps} role represents a multidisciplinary organizational effort to automate application deployments trough continuous delivery of new software updates~\cite{LeiteRKMM20}. It combines software development with technology operations~\cite{JabbariAPT16} to shorten the development life cycle.
-	\item \textbf{Site Reliability Engineer (SRE)} role is responsible for availability, latency, performance, efficiency, change management, monitoring, emergency response, and capacity planning~\cite{beyer2016site}. It is a software engineering role needs to have an understanding of the fundamentals of computing~\cite{JonesUN15}, aplied to the infrastructure and operations problems.
+	\item \textbf{Developer} is usually a person responsible for developing software for the user. A developer is responsible for maintaining existing, and/or developing new features. There could be different subroles, dealing with specific parts of the complex software systems.
+	\item \textbf{DevOps} role represents a multidisciplinary organizational effort to automate application deployments through continuous delivery of new software updates~\cite{LeiteRKMM20}. It combines software development with technology operations~\cite{JabbariAPT16} to shorten the development life cycle.
+	\item \textbf{Site Reliability Engineer (SRE)} role is responsible for availability, latency, performance, efficiency, change management, monitoring, emergency response, and capacity planning~\cite{beyer2016site}. It is a software engineering role and needs to have an understanding of the fundamentals of computing~\cite{JonesUN15}, aplied to the infrastructure and operations problems.
 \end{itemize}
 
 \noindent
-DevOps and SREs are kinda similar roles, they both are trying to bridge the gap between development and operations. As such they have a very large conceptual overlap in how they operate~\cite{46939}, but also have some differences. 
+DevOps and SREs are seem to be similar roles, they are both trying to bridge the gap between development and operations. As such they have a very large conceptual overlap in how they operate~\cite{46939}, but also have some differences. 
 
-Table~\ref{tab:table10} sum the differences between the DevOps and SREs.
+Table~\ref{tab:table10} sums the differences between the DevOps and SREs.
 
 \begin{table}[H]
 	\begin{center}
@@ -741,8 +744,7 @@ Table~\ref{tab:table10} sum the differences between the DevOps and SREs.
 \end{table}
 
 \noindent
-In modern complex software development, SREs should keep things running smoothly, while DevOps principles should be used to improve processes. So it is not either/or, but it seems that combination of approaches may provide best results. However, in some smaller organizations these roles can overlaps.
-}
+In modern complex software development, SREs should keep things running smoothly, while DevOps principles should be used to improve processes. So it is not either/or, but it seems that combination of approaches may provide best results. However, in some smaller organizations these roles can overlap.
 %
 %
 \section{Concurrency and parallelism}\label{sec:concurency_parallelism}
@@ -781,7 +783,7 @@ Table~\ref{tab:table6} gives differences between an actor model and CSP.
 \end{table}
 
 \noindent
-Actors do not share a memory, and they are isolated by nature. An actor can create another actor/s and even watch on them in case they stop unexpectedly. And when an actor finished its job, and it is not needed anymore, it disappears. These actors can create complicated networks that are easy to understand, model, and reason about, and everything is based on a simple message passing mechanism. 
+Actors do not share a memory, and they are isolated by nature. An actor can create another actor/s and even watch on them in case they stop unexpectedly. When an actor finished its job, and it is not needed anymore, it disappears. These actors can create complicated networks that are easy to understand, model, and reason about, and everything is based on a simple message passing mechanism. 
 
 Every actor has a designated message box. When a message arrives, the actor will test the message type and do the job according to the message type he received. In this way, we are not dependent on lock-based synchronization that can be hard to understand, and it can cause serious problems.
 
