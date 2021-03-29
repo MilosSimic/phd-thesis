@@ -866,7 +866,7 @@ If we have stored user request on cluster formation protocol, and we receive a n
 
 This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}. 
 
-We can go even a little bit further and use CRDTs and SEC to store and replicate data on copies of the services that are required for the idempotency test.
+We can go even a little bit further and use CRDTs and SEC to store and replicate data on copidres of the services that are required for the idempotency test.
 
 Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
 
