@@ -680,7 +680,7 @@ Immutable infrastructure deployment offers several models on how to deploy chang
 \noindent
 With mutable infrastructure, these strategies would be hard to implement, and maybe it is not possible at all. Besides infrastructure deployment, there is another side that we must be considered, and that is how to describe these deployments. Two different strategies can be considered here:
 
-\begin{itemize}
+\begin{itemize}\label{lab:dep_types}
 	\item \textbf{Imperative}, with this option users have to write code or specific instructions step by step by step what the specific tool needs to do, so that the application or infrastructure is properly setup. In this approach, we have a \textit{smart} user who describes \textit{dumb} machine what is needed to be done and in what order to achieve the desired state.
 	\item \textbf{Declarative}, with this option a user has to describe the end state or what is his desired state, and the tool needs to figure out the way how to do this. Here we have a \textit{smart system} that will find a way how to achieve the \textbf{desired state}, and we have user who\textit{does not care} in what order actions need to be done --- that is what the system needs to do. Users do not need to worry about timing, this simplifies the whole process and the code always represents the latest state. With this type of deployment, we can offer users two different models: 
 	

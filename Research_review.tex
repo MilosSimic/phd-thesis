@@ -5,7 +5,7 @@ In this chapter, we present the the results of the research reviews addressing i
 
 Few directions are feasible: \textbf{(1)} focusing on adapting existing solutions to fit EC model, \textbf{(2)} experiment and develop new ideas and solutions to maybe fit more the nature of EC, and \textbf{(3)} try to combine both ideas to cover more research area.
 
-Existing nodes organizational abilities are reviewed in section~\ref{sec:nodes_organization}. Section~\ref{sec:nodes_organization} reviews platform models from both industry and academia. Section~\ref{sec:task_offloading} reviews cloud offloading techniques, whereas section~\ref{sec:applications} reviews some application models. Section~\ref{sec:thesis_position} concludes this chapter, and gives the position of this thesis, compared to research previously reviewed.
+Existing nodes organizational abilities are reviewed in section~\ref{sec:nodes_organization}. Section~\ref{sec:nodes_organization} reviews platform models from both industry and academia. Section~\ref{sec:task_offloading} reviews cloud offloading techniques, whereas section~\ref{sec:applications} reviews some application models. Section~\ref{sec:infrastructure_management} reviews some models used in cloud infrastructure management. Section~\ref{sec:thesis_position} concludes this chapter, and gives the position of this thesis, compared to research previously reviewed.
 %
 %
 \section{Nodes organization}\label{sec:nodes_organization}
@@ -69,6 +69,19 @@ Satyanarayanan et al.~\cite{SatyanarayananK19} propose the concept of edge-nativ
 In~\cite{inproceedingsBeck} Beck et al. argue that applications should use message bus, streams, or topics because most mobile or edge applications are expected to be event-driven. The message bus system is an interesting proposition because the virtualized applications can subscribe to message streams, i.e., topics, and act only when data arrive. Applications might not be alive the whole time. And if for some reason mobile edge applications cannot reach a close EC server, it can always send data to the cloud. So cloud applications should be changed so slightly, just to cover this edge case.
 
 In~\cite{JararwehDAAAB16}, Jararweh et al. show how integration between EC with CC principles will create more complex services and applications at the edge of the network opening new possibilities for applications to reduce the load on the centralized cloud model but also avoid bottlenecks and single points of failure.
+%
+%
+\section{Infrastructure management}\label{sec:infrastructure_management}
+%
+IaC refers to managing infrastructure (e.g. hardware, VMs, platforms, container systems, services, and topologies) through declarative or imperative definitions (cf. page~\pageref{lab:dep_types}), instead of manual configuration or the use of traditional configuration tools.
+
+In the era of CC, microservices and DS, open source community and different companies provided various tools for this puropse. 
+
+Tools like Terraform, Polumni or CFEngine are representative of declarative movement, using platform independent language to specify configuration, policies, security and much more. Some use exising formats like \emph{JSON} or \emph{YAML}, and others use their own domain specific language to achieve same goal.
+
+On thee other hand, well known tools like Chef, Ansible and Puppet usually rely on some specific language to code the instructions what must be done to achieve the same or similar job.
+
+IaC has grown in popularity in recet years, because it applies the same kind of version control and repeatability to orchestration of the infrastructure as developers use for applications source code. Second benefit is that configuration is decoupled from the system, it can more readily be deployed on a similar system elsewhere.
 %
 %
 \section{Thesis position}\label{sec:thesis_position}
