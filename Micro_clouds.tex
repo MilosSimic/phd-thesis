@@ -5,8 +5,7 @@ In this section, the core idea of this thesis will be presented, from the point 
 
 Throughout this section, we are going to rely on the research presented in chapters~\ref{chapter:Intro} and~\ref{chapter:Review}, and make a connection with the existing CC model.
 
-In Section~\ref{sec:configurable_model_structure} we present a high overview of the system -- an architecture that is influenced by the standard CC model but adapted for a different environment. Section~\ref{sec:separation_of_concerns}introduces the separation of concerns model for previously defined system architecture. Section~\ref{sec:application_model} presents a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. How this system could be offered as a service, and which options can be offered to the potential users for developing their applications is discussed in Section~\ref{sec:as_a_service_model}. Section~\ref{sec:immutable_infrastructure} presents the desired option for infrastructure and application deployment, and why immutability is important in a micro-cloud geo-distributed environment. Section~\ref{sec:formal_model} presents why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation. 
-Section~\ref{sec:system_observability} shows system observability mechanisms important for geo-distributed environments like micro-clouds. Section~\ref{sec:access_pattern} shows access patterns that could be used in micro-clouds and geo-distributed environments. Section~\ref{sec:repercussion} gives repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems. This chapter is concluded with Section~\ref{sec:limitations}, which presents limitations of our model.
+In Section~\ref{sec:configurable_model_structure} we present a high overview of the system -- an architecture that is influenced by the standard CC model but adapted for a different environment. Section~\ref{sec:separation_of_concerns}introduces the separation of concerns model for previously defined system architecture. Section~\ref{sec:application_model} presents a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. How this system could be offered as a service, and which options can be offered to the potential users for developing their applications is discussed in Section~\ref{sec:as_a_service_model}. Section~\ref{sec:immutable_infrastructure} presents the desired option for infrastructure and application deployment, and why immutability is important in a micro-cloud geo-distributed environment. Section~\ref{sec:formal_model} presents why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation.  Section~\ref{sec:long_live_transactions} shows transactions that appear in such complex system, and garbage collection done on resources that are not used anymore. Section~\ref{sec:system_observability} shows system observability mechanisms important for geo-distributed environments like micro-clouds. Section~\ref{sec:access_pattern} shows access patterns that could be used in micro-clouds and geo-distributed environments. Section~\ref{sec:repercussion} gives repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems. This chapter is concluded with Section~\ref{sec:limitations}, which presents limitations of our model.
 %
 %
 \section{Configurable Model Structure}\label{sec:configurable_model_structure}
@@ -1052,7 +1051,11 @@ Similarly, as for $G_2$, we remark $\G_3$ could also be modeled using standard M
 %
 \subsection{List detail protocol}\label{sec:list_detail_protocol}
 %
-The final communication protocol in our system appears in the information retrieval process. Using labels, the user can specify what part of the system he wants to retrieve, namely, on formed topologies. This protocol could be useful, for example, if the user wants to visualize his topologies, regions, or clusters on some dashboard and monitor for some changes, alerts, etc. This protocol comes with two available options: 
+The final communication protocol in our system appears in the information retrieval process. Using labels, the user can specify what part of the system he wants to retrieve, namely, on formed topologies. This protocol could be useful, for example, if the user wants to visualize his topologies, regions, or clusters on some dashboard and monitor for some changes, alerts, etc. 
+
+This operation may span over multiple services to retreive complete informations about the clusters and/or nodes. For this purpose some of the distributed queries methods (cf.~\ref{sec:distributed_queries}) can be used. For some patterns api composition may be more suited, while for others CQRS may be the better solution to optimize queries.
+
+This protocol comes with two available options: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{global view} of the system -- all topologies the user manages. This will return just basic information about regions and clusters and their utilization.
@@ -1177,13 +1180,52 @@ For instance, type $\ST_\mathtt{log}$ specifies $\mathtt{log}$ gets included in 
 Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using standard MPST (e.g.,~\cite{HondaYC08}), but again the projection types would be undefined, while following the approach of ~\cite{HuY17} with explicit connections, all valid projections have been obtained.
 %
 %
+\section{Long-lived transactions}\label{sec:long_live_transactions}
+%
+To operate micro clouds properly, such system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offers (cf.~page~\ref{sec:microservices}). But still, we musth be aware of all problems that comes along with them.
+
+That beens said, one of the problems we have to deal with are transactions that apear in such distributed system. Because of the nature of the system \emph{sagas} seems like better pattern to use (cf. page~\ref{sec:sagas}).
+
+When a user submit the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (no avalible resources or nodes for example etc.), such task is done and it goes to \emph{FAILD} state and this concluds the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, task will go to \emph{IN PROGRESS} state. 
+
+In this state, the system needs to save newly formed cluster information, prepare metrics service, add watchers for the cluster nodes health-check, and so on. This operation will span over multiple services, and that process can be separated in multiple sub-transacetions. State of the task, will prevent user for submitting other tasks on cluster that is not formed yet. 
+
+If any error happend during this process, we can always invoke the rollback mechanism, or try to fix the the occured issue with some of retry streategy.
+
+If the cluster formation is done, and there are no problems occured the transaction is complited, and the task is moved to \emph{CREATED} state. If some error happend during this proces, and cluster cannot be formed, the task will go again to \emph{FAILD} state, and this concluds the transaction.
+
+Figure~\ref{fig:fig19} shows state diagram for cluster formation message.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=1]{images/Figure19.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{State diagram for cluster formation message}
+	\label{fig:fig19}
+\end{figure}
+
+Cluster formation protocol will most likely span over multiple services, and strategies like sagas can be useful to implement transactions and rollbacks properly.
+%
+%
+\subsection{Garbage collection}\label{sec:garbage}
+%
+When user submit the task to the system, if for whatever reason that task fail we have option to immediately remove that task, and possibly all task connected items. Or, the system should have a specific process in the background, which only purpose is the garbage collection in order to restore unused and fragmented system resources.
+
+Second option seems more acceptable, because one item can have a graph of items that are connected to that specific item. This graph can be complex, and immediate deletion may slow down the entire system. In the backgroud, garbage collection process can mark unused items and delete them when the time is right.
+
+User should also be able to delete certain items with its dependencies as well, invoking \emph{cascading deletion}. Dependencies may be deleted immediately, or marked as \emph{orphans}, and deleted by garbage collection process.
+
+It make sense that users are able to influence garbage collection by submitting their own policies when and how often to do this operation, to delete only items or container images as well and so on.
+%
+%
 \section{System observability}\label{sec:system_observability}
 %
-Observability is an importatnt part of any real-world computing system (cf. \pageref{sec:log_aggregation}). It is important part of any platform that strive to be offered as a service to large groups of different users. 
+Observability is an importatnt part of any real-world computing system (cf. page~\pageref{sec:log_aggregation}). It is important part of any platform that strive to be offered as a service to large groups of different users. 
 
 At every moment, we must know what is happening in the system, where are bottlenecks and how we can resolve problems. This is of significant importance in DS, where state and calculations are scattered across multiple nodes, clusters and even DCs.
 
-In the micro-clouds environment that involves multile layers (cf.~\pageref{lab:three-tier}), this technique is even more inportant to give us insight what is happening in the system, and how we can optimize different layers of the system. On the other hands, users who use such system needs to know what is happening with their services.
+In the micro-clouds environment that involves multile layers (cf. page~\pageref{lab:three-tier}), this technique is even more inportant to give us insight what is happening in the system, and how we can optimize different layers of the system. On the other hands, users who use such system needs to know what is happening with their services.
 
 Because of these two really important parameters, observability myst be implemented on two levels:
 

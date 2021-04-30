@@ -3,7 +3,7 @@
 %
 An overview of the topics that are of significant importance for the rest of the thesis is going to be given in this section, since the thesis is heavily based on these topics. 
 
-Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patterns, and organizational structure. Section~\ref{sec:similar_models} describes similar models that might be a source of confusion, and how they are different than DS or DC, and how some concepts can fit in the bigger picture. Section~\ref{sec:virtualization_techniques} describes different virtualization methods that are used in CC for systems and/or applications. Section~\ref{sec:deployment} describes different architecture and application model and how deployment can be done in large DS. Section~\ref{sec:dev_roles} describes different development roles in the modern complex software environment, with focus on technical roles, while Section~\ref{sec:concurency_parallelism} describes the difference between concurrency and parallelism and introduces an actor system, that will be used later on in the thesis. 
+Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patterns, and organizational structure. Section~\ref{sec:similar_models} describes similar models that might be a source of confusion, and how they are different than DS or DC, and how some concepts can fit in the bigger picture. Section~\ref{sec:transactions} describes different transaction models used for different applications. Section~\ref{sec:garbage_collection} describes basics of garbage collection techniques and why it is important. Section~\ref{sec:virtualization_techniques} describes different virtualization methods that are used in CC for systems and/or applications. Section~\ref{sec:deployment} describes different architecture and application model and how deployment can be done in large DS. Section~\ref{sec:dev_roles} describes different development roles in the modern complex software environment, with focus on technical roles, while Section~\ref{sec:concurency_parallelism} describes the difference between concurrency and parallelism and introduces an actor system, that will be used later on in the thesis. 
 
 \section{Distributed systems}\label{sec:distributed_systems}
 %
@@ -91,7 +91,7 @@ But despite all the obvious benefits, for a DS to work properly, we need the wri
 
 For example, users need to be aware when using DS which of them is related to distributed data storage systems. Storage implementations that rely on vertical scaling to ensure scalability and fault tolerance, have one nasty feature. 
 
-This nasty feature is represented in theorem called \textbf{CAP theorem} presented by Eric Brewer~\cite{Brewer2000}, and proven after inspection by Gilbert et a.~\cite{GilbertL02}. The CAP theorem states that it is impossible for a distributed data store to simultaneously provide more than two out of three guarantees shown in Figure~\ref{fig:fig17}.
+This nasty feature is represented in theorem called \textbf{CAP theorem}~\label{lab:cap} presented by Eric Brewer~\cite{Brewer2000}, and proven after inspection by Gilbert et a.~\cite{GilbertL02}. The CAP theorem states that it is impossible for a distributed data store to simultaneously provide more than two out of three guarantees shown in Figure~\ref{fig:fig17}.
 
 \begin{figure}[H]
 	\begin{center}
@@ -473,12 +473,39 @@ Table~\ref{tab:table8} shows list of idempotent and non-idempotent for standard 
 \end{table}
 
 \noindent
-Crate operation is not idempotent by default, but to make it idempotent there are multiple strategies how to do so. The most common way is to create \textbf{idempotency key} that will be sent in the request, and based on that request server can decide if this operation is already invoked or not. If a server has already \say{seen} specified idempotency key than the operation is already done and we can return just the response that the operation is done but no operation will be done over the state of the service or application. If the server sees the idempotency key for the first time, that is the signal that this request is a new one, and it should be done.
+\emph{Crate} operation is \textbf{not} idempotent by default, but to make it idempotent there are multiple strategies how to do so. The most common way is to create \textbf{idempotency key} that will be sent in the request, and based on that request server can decide if this operation is already invoked or not. If a server has already \say{seen} specified idempotency key than the operation is already done and we can return just the response that the operation is done but no operation will be done over the state of the service or application. If the server sees the idempotency key for the first time, that is the signal that this request is a new one, and it should be done.
 
 Idempotency key could be stored in any kind of storage, it is not uncommon that these keys are stored in cache storage with some time to live (TTL) policy that will automatically remove the key after a specified time.
 
 Another option that is commonly used is hashing user specified actions. It is useful to know which part of the action set is already done and which is not. This strategy is used in scenarios where we must preserve the order of actions.
 
+\subsubsection{Distributed Queries}\label{sec:distributed_queries}
+%
+Applicatoins built using microservices architecture propose different strategies for data store. One common and recommended technique is \emph{database per service} patter~\cite{richardson2018microservices}.
+
+This technique, as a result have that overall state of the system will be distributed across multiple data stores, accessible only from their own microservices. This creates two important topics to think about: $(1)$ transactions that spans over multiple services can be implemented using \emph{Sagas} for example (cf.~\pageref{sec:sagas})
+, and $(2)$ The complex queries which require data from multiple databases.
+
+The complex queries will involve data available in multiple databases, and client can access all these microservices and aggregate data, however this is not the recommended solution becasue client does not have full understanding how system manages the data.
+
+There are two ways to solve this problem:
+%
+\paragraph{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs}
+%
+separates responsibility for \emph{modifying} data (command), and the \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the systm~\cite{richardson2018microservices, 8101372}.
+
+This increase the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}.
+
+When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. Service that will serve the queries will keep the \emph{read-only} replica of the data.
+%
+%
+\paragraph{API composition}\label{par:composition}
+%
+%
+it a simple way to query data in a microservice architecture~\cite{richardson2018microservices, 8890660}, alternative and more lightweight solution than CQRS. 
+
+The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns combined result to client.\\\\
+%
 The best chance to succeed when implementing a microservices architecture is to simply follow existing patterns and use existing solutions with proven quality.
 %
 %
@@ -610,6 +637,70 @@ Decentralized systems are similar to DS, in a technical sense, they are still DS
 By modern standards, when we are talk about decentralized systems, we usually think of blockchain or blockchain-like technology~\cite{LeibleSSG19}, since here we have distributed nodes, that are scattered and there is no single entity that owns all these nodes. But even if this technology is run in the cloud, it is loses the decentralized feature. This is the caveat we need to be aware of. These systems are facing different issues because any participant in the system might be malicious and they need to handle this case. 
 
 Nonetheless, CC can and should be decentralized in the sense that some computation can happen outside of cloud big DCs, closer to the sources of data. These computations could be owned by someone else, and big cloud companies could give their solution to this as well to relax centralization and problems that CC will have especially with ever-growing IoT and mobile devices.
+%
+%
+\section{Transactions}\label{sec:transactions}
+%
+Transactions are keeping data consistent even in the presence of highly concurrent data accesses and despite all sorts of failures~\cite{WeikumV2002}. Transactions are trying to resolve this problem in a generic way, in such way that is invisible to the application logic.
+
+The main goal of transactios is to maintain system integrity in the consistent state, by ensuring that all operations on the system are either all completed successfully or all canceled successfully. Transactions are typically used in systems that needs to preserve some state (e.g. database or some filesystems). 
+
+In their book Gray et al. makes a good parallel with the contract law, saing that transactions giving us the ability to \emph{clean up the situation}, if something does not work right.~\cite{GrayR93}.
+
+Transactions guarantees following four properties: $(1)$ atomicity, $(2)$ consistency, $(3)$ isolation, and $(4)$ durability, also known as \emph{ACID} properties. 
+%
+%
+\subsection{Distributed transactions}\label{sec:distributed_transactions}
+%
+Becasue of the nature of DS, more network hosts are involved which significantly complicated the transaction mechanism. Distributed transactions are required to have all four \emph{ACID} properties. This might not be so easy to achieve amongst other due to \emph{CAP} theorem~\pageref{lab:cap}. 
+
+In their book, Morgan et al. claim that here exists no distributed commit protocol that can guarantee independent process recovery in the presence of multiple failures (e.g., network partitionings)~\cite{WeikumV2002}.
+
+Distributed transactions include few protocols such as two-phase commit (2PC), three-phase commit (3PC), Paxos, and various other approaches to quorum giving programmers facade of global serializability~\cite{Helland07}. 
+
+Avoiding distributed transactions allows a much simpler, more robust and efficient solution.
+%
+%
+\subsection{Sagas}\label{sec:sagas}
+%
+In 1987, Molina et al. presented \emph{Sagas}~\cite{Garcia-MolinaS87} and their work in the are of \emph{long-lived transactions} (LLTs), types of transactions that holds resources for long periods of time, and as such delaying shorter and more common transactions. 
+
+These transactions are increasingly relevant and important, in the current technological landscape with distribution of components and microservices acrhicetectures.
+
+The saga transaction is composed of sub-transactions, executed in an atomic way, so that either all or none of the sub-transactions take effect. However, no isolation is necessarily guaranteed between the sub-transactions of different sagas.
+
+One transaction $T$ is composed of multiple sub-transactions $T_1,\ldots,T_n$, and every sub-transaction $T_i$ has an associated \emph{compensating transaction} $C_i$ or how the effects of the transaction can be rolled back. The saga transaction executes sub-transactions sequentially.
+
+Figure~\ref{fig:fig20} show example of one transaction separated in multiple sub-transactions where \emph{green} arrows represent succes path, while \emph{red} arrows represent rollbacks.structure of the saga transaction and at least previous and next element in the chain.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.9]{images/Figure20.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{Saga transactions separated in sub-transactions.}
+	\label{fig:fig20}
+\end{figure}
+
+\noindent
+Sagas can be implemented using two patterns: $(1)$ orchestration where one centralized element is responsible for all the coordinating, or $(2)$ choreography, where each service know the 
+
+This isolation can be added in the application layer~\cite{Frank}l for example using \emph{semantic lock}. This strategy will change state so that some data are in process and should be treated differently. 
+
+For example, an order can be in one of the following state: $(1)$ \emph{PENDING}, $(2)$ \emph{COMPLETED}, or $(3)$ \emph{CANCELED} state. Other transactions will not make use the data if status is not set to \emph{COMPLETED}.
+%
+%
+\section{Garbage collection}\label{sec:garbage_collection}
+%
+Most modern programming languages nowadays allow programmers to allocate and free memory. This process can be in total responsibility of programmer, or language can handle this process for programmer. When there is some automatic process involved to release unused resources, that prcess is calleg \textbf{garbage colection} or GC. 
+
+In~\cite{JonesL96}, Jones et al. describes \emph{garbage collection} as the automatic management of dynamically allocated storage. However, the term \emph{garbage collection} is not exclusive to programming languages. It is widely used to refer to all form of automatic management of dynamically allocated resources.
+
+Even with rapid growth of memory sizes, and lowering the overall cost memory is not inexhaustible. Like any other limited resources, it requires careful consideration and recycling. Even tools like Kubernetes, have some form of garbage collection that is used to remove unused items and their references in the system.
+
+Over the years, different algorithms are used to do reference counting and tracing methods, to discover unused resources and to free them. One of the most common algorithms for garbage colection is \emph{mark-sweep} algorithm~\cite{McCarthy60} developed in 1960. Variety on topic exists today, but essence of the algorithm remains widely used today.
+
+Traditional automated garbage collection is usually seen as slow, and disruptive to executing programs. Modern implementations of the garbage collection, substantially reduced the overhead of the system~\cite{JonesL96}.
 %
 %
 \section{Virtualization techniques}\label{sec:virtualization_techniques}
