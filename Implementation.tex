@@ -138,9 +138,11 @@ Rollback mechanism is implemented using \emph{choreography}, and as communicatio
 %
 \subsection{Garbage collection}\label{sec:gc}
 %
-Current garbage collection process is pretty trivial, ,since there is no any complicated graph of items connected to the cluster information details.
+Current garbage collection process is pretty trivial, since there is no any complicated graph of items connected to the cluster information details.
 
 The process will scan tasks with the state \emph{FAILD} in the background, and it will remove those items. Related details to the cluster informations, for example node metrics, will expire automatically since there is a lease attached to them.
+
+Other resource that will be automatically deleted is nodes data. If a node health-check message do not reach the system in some time, the node lease will expire and data will be removed automatically.
 %
 %
 \subsection{Limitations}\label{sec:framework_limits}
