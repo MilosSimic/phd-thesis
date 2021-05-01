@@ -125,6 +125,24 @@ Its job is to organize nodes into clusters, regions, and topologies, to make the
 The upper layer must have set up the infrastructure to do any processing or storage. This middle layer is the binding element between the layers.
 %
 %
+\subsection{Transactions}\label{sec:transaction}
+%
+Current implementation follows the saga pattern (cf.~page~\pageref{sec:sagas}) for transactions, and isolation is added using semantic lock by adding states to the task. The task can be in one of following states: $(1)$ PENDING, $(2)$ IN PROGRESS, $(3)$ CREATED, and $(4)$ FAILD. 
+
+Until task reach \emph{Created} state, no other operation is able to be done on that cluster configuration.
+
+The cluster formation transaction is splited into few sub-transactions: $(1)$ reserving nodes, $(2)$ writing cluster informations, and $(3)$ sending cluster informatoins to push service and ultimately sending informations to the nodes. 
+
+Rollback mechanism is implemented using \emph{choreography}, and as communication between the various services is done asynchronously using message queues.
+%
+%
+\subsection{Garbage collection}\label{sec:gc}
+%
+Current garbage collection process is pretty trivial, ,since there is no any complicated graph of items connected to the cluster information details.
+
+The process will scan tasks with the state \emph{FAILD} in the background, and it will remove those items. Related details to the cluster informations, for example node metrics, will expire automatically since there is a lease attached to them.
+%
+%
 \subsection{Limitations}\label{sec:framework_limits}
 % 
 The framework at the current state has some limitations that we \textbf{must address}. As shown in figure~\ref{fig:fig11}, for purpose of testing the system, and to give the users any way to interact with the system, a CLI application is implemented. This is a good option for initiating commands to the system. The problem with this approach is that showing logs, and topologies might be limiting the users, especially if they monitor and supervise multiple topologies with regions and clusters.
@@ -133,7 +151,9 @@ For monitoring, a tool with UI would be a better solution and it can show more d
 
 The current implementation of the queueing system is \textbf{limiting} because if we want to extend the system with new queues we need to shut down the whole service, and that is not the best solution. But since the goal of this thesis is not queue management, but micro-cloud formation, protocols, and formal modeling.
 
-Since the goal of this thesis is not queue management, and the purpose of this thesis is not Human-computer interaction, but micro-cloud formation, protocols, and formal modeling, mentioned limitations should be the topic of the future work~\ref{sec:future_work}.
+Since the goal of this thesis is not queue management, and the purpose of this thesis is not Human-computer interaction, but micro-cloud formation, protocols, and formal modeling, mentioned limitations should be the topic of the future work~\ref{sec:future_work} section.
+
+The current implementation do not include garbage collection of connected dependent items, and users cannot influence garbage collection decisions. This should be one of the topic of the future work~\ref{sec:future_work} section as well.
 %
 %
 \section{Operations}\label{sec:framework_operations}
@@ -143,7 +163,9 @@ In this section, we are going to describe all implemented operations in the fram
 %
 \subsection{Query}\label{sec:query} 
 % 
-The query operation is used to show all free nodes or filtered free nodes that are registered into the system, to the user (yellow arrows in Figure~\ref{fig:fig11}.). When a user wants to get information about free nodes, they need to submit a \textbf{selector} value which is composed of multiple \textbf{key-value} pairs.  These key-value pairs can be any alphanumeric set of symbols for both keys and values. Based on that key-value pair the system will do the query of the free nodes.
+The query operation is used to show all free nodes or filtered free nodes that are registered into the system, to the user (yellow arrows in Figure~\ref{fig:fig11}.). 
+
+When a user wants to get information about free nodes, they need to submit a \textbf{selector} value which is composed of multiple \textbf{key-value} pairs.  These key-value pairs can be any alphanumeric set of symbols for both keys and values. Based on that key-value pair the system will do the query of the free nodes.
 
 The selector will be used as a search mechanism to compare the labels of every free node that exists in the system. The nodes that are satisfying the rules~\ref{frm:query_rule} defined in Section~\ref{sec:cluster_formation_protocol} will be present in the result.
 
@@ -155,12 +177,15 @@ Figure~\ref{fig:fig14} shows a communication diagram for the query action, with 
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.8]{images/Figure14}
+		\includegraphics[scale=1]{images/Figure14}
 	\end{center}
 	\vspace{-0.7cm}
 	\caption{Low level communication protocol diagram of query operation.}
 	\label{fig:fig14}
 \end{figure}
+
+\noindent
+Query operation is implemented using \emph{api composition} pattern (cf.~page~\pageref{par:composition}).
 %
 %
 \subsection{Mutate}\label{sec:mutate} 
@@ -219,7 +244,7 @@ There are two levels of details that user can specify:
 \end{enumerate}
 
 \noindent
-Both options can be useful if operations people need different details levels for different topologies. 
+Both options can be useful if operations people need different details levels for different topologies. List operation is implemented using \emph{api composition} pattern (cf.~page~\pageref{par:composition}).
 %
 %
 \subsection{Logs}\label{sec:logs}
