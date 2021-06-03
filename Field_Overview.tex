@@ -478,8 +478,9 @@ Table~\ref{tab:table8} shows list of idempotent and non-idempotent for standard 
 Idempotency key could be stored in any kind of storage, it is not uncommon that these keys are stored in cache storage with some time to live (TTL) policy that will automatically remove the key after a specified time.
 
 Another option that is commonly used is hashing user specified actions. It is useful to know which part of the action set is already done and which is not. This strategy is used in scenarios where we must preserve the order of actions.
-
-\subsubsection{Distributed Queries}\label{sec:distributed_queries}
+%
+%
+\subsubsection{Distributed Queries}
 %
 Applicatoins built using microservices architecture propose different strategies for data store. One common and recommended technique is \emph{database per service} patter~\cite{richardson2018microservices}.
 
@@ -489,7 +490,6 @@ This technique, as a result have that overall state of the system will be distri
 The complex queries will involve data available in multiple databases, and client can access all these microservices and aggregate data, however this is not the recommended solution becasue client does not have full understanding how system manages the data.
 
 There are two ways to solve this problem:
-%
 \paragraph{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs}
 %
 separates responsibility for \emph{modifying} data (command), and the \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the systm~\cite{richardson2018microservices, 8101372}.
@@ -663,15 +663,15 @@ Avoiding distributed transactions allows a much simpler, more robust and efficie
 %
 \subsection{Sagas}\label{sec:sagas}
 %
-In 1987, Molina et al. presented \emph{Sagas}~\cite{Garcia-MolinaS87} and their work in the are of \emph{long-lived transactions} (LLTs), types of transactions that holds resources for long periods of time, and as such delaying shorter and more common transactions. 
+In 1987, Molina et al. presented \emph{Sagas}~\cite{Garcia-MolinaS87} and their work in the are of \emph{long-lived transactions (LLTs)}, types of transactions that hold resources for long periods, and as such delaying shorter and more common transactions. 
 
-These transactions are increasingly relevant and important, in the current technological landscape with distribution of components and microservices acrhicetectures.
+These transactions are increasingly relevant and important, in the current technological landscape with the distribution of components and microservices architectures.
 
-The saga transaction is composed of sub-transactions, executed in an atomic way, so that either all or none of the sub-transactions take effect. However, no isolation is necessarily guaranteed between the sub-transactions of different sagas.
+The saga transaction is composed of sub-transactions, executed in an atomic way so that either all or none of the sub-transactions take effect. However, no isolation is necessarily guaranteed between the sub-transactions of different sagas.
 
 One transaction $T$ is composed of multiple sub-transactions $T_1,\ldots,T_n$, and every sub-transaction $T_i$ has an associated \emph{compensating transaction} $C_i$ or how the effects of the transaction can be rolled back. The saga transaction executes sub-transactions sequentially.
 
-Figure~\ref{fig:fig20} show example of one transaction separated in multiple sub-transactions where \emph{green} arrows represent succes path, while \emph{red} arrows represent rollbacks.structure of the saga transaction and at least previous and next element in the chain.
+Figure~\ref{fig:fig20} shows an example of one transaction separated into multiple sub-transactions where \emph{green} arrows represent success path, while \emph{red} arrows represent rollbacks. structure of the saga transaction and at least the previous and next element in the chain.
 
 \begin{figure}[H]
 	\begin{center}
@@ -692,15 +692,15 @@ For example, an order can be in one of the following state: $(1)$ \emph{PENDING}
 %
 \section{Garbage collection}\label{sec:garbage_collection}
 %
-Most modern programming languages nowadays allow programmers to allocate and free memory. This process can be in total responsibility of programmer, or language can handle this process for programmer. When there is some automatic process involved to release unused resources, that prcess is calleg \textbf{garbage colection} or GC. 
+Most modern programming languages nowadays allow programmers to allocate and free memory. This process can be in total responsibility of the programmer, or language can handle this process for the programmer. When there is some automatic process involved to release unused resources, that process is called \textbf{garbage colection} or GC. 
 
-In~\cite{JonesL96}, Jones et al. describes \emph{garbage collection} as the automatic management of dynamically allocated storage. However, the term \emph{garbage collection} is not exclusive to programming languages. It is widely used to refer to all form of automatic management of dynamically allocated resources.
+In~\cite{JonesL96}, Jones, et al. describe \emph{garbage collection} as the automatic management of dynamically allocated storage. However, the term \emph{garbage collection} is not exclusive to programming languages. It is widely used to refer to all forms of automatic management of dynamically allocated resources.
 
-Even with rapid growth of memory sizes, and lowering the overall cost memory is not inexhaustible. Like any other limited resources, it requires careful consideration and recycling. Even tools like Kubernetes, have some form of garbage collection that is used to remove unused items and their references in the system.
+Even with the rapid growth of memory sizes, and lowering the overall cost of memory is not inexhaustible. Like any other limited resources, it requires careful consideration and recycling. Even tools like Kubernetes, have some form of garbage collection that is used to remove unused items and their references in the system.
 
-Over the years, different algorithms are used to do reference counting and tracing methods, to discover unused resources and to free them. One of the most common algorithms for garbage colection is \emph{mark-sweep} algorithm~\cite{McCarthy60} developed in 1960. Variety on topic exists today, but essence of the algorithm remains widely used today.
+Over the years, different algorithms are used to do reference counting and tracing methods, to discover unused resources, and to free them. One of the most common algorithms for garbage collection is \emph{mark-sweep} algorithm~\cite{McCarthy60} developed in 1960. The variety on the topic exists today, but the essence of the algorithm remains widely used today.
 
-Traditional automated garbage collection is usually seen as slow, and disruptive to executing programs. Modern implementations of the garbage collection, substantially reduced the overhead of the system~\cite{JonesL96}.
+Traditional automated garbage collection is usually seen as slow, and disruptive to executing programs. Modern implementations of the garbage collection substantially reduced the overhead of the system~\cite{JonesL96}.
 %
 %
 \section{Virtualization techniques}\label{sec:virtualization_techniques}
@@ -736,59 +736,58 @@ Figure~\ref{fig:fig5} represents architectural differences between VMs, containe
 %
 Over the years two different approaches evolved how to deploy infrastructure and applications. The difference just gets more amplified, when CC and microservices get into the picture, where frequent deployment is very common. 
 
-Here evolves a new strategy to manage and deploy complicated infrastructure elements -- Infrastructure as code (IaC). In his book~\cite{wittig2018amazon} Wittig et al. describes it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools.
+Here evolves a new strategy to manage and deploy complicated infrastructure elements -- Infrastructure as code (IaC). In his book~\cite{wittig2018amazon} Wittig et al. describe it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools.
 
 Deployments in such complex environment can be separated by how they handle changes on existing infrastructure or applications on:
 
 \begin{itemize}
-	\item \textbf{Mutable model}, is a model where we have in place changes which mean that the parts of the existing infrastructure or applications get updated or changed to do an update. In place change can produce some problems, and has: 
+	\item \textbf{A mutable model} is a model where we have in place changes which mean that the parts of the existing infrastructure or applications get updated or changed to do an update. In place change can produce some problems, and has:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 		\item more risk because in-place change may not finish, which puts our infrastructure or the application in a possible bad state. This is especially a problem if we have a lot of services and multiple copies of the same service. The possibility that our system is not on is a lot higher.
-		\item high complexity, this is a direct implication of the previous feature. Since our change might not get fully done, it cannot be guaranteed that our infrastructure or application is transitioned from one version to another -- change is not \textbf{descrete}, but \textbf{continues} since we might end up in some state in between where we are now and where we want to be.
+		\item high complexity, this is a direct implication of the previous feature. Since our change might not get fully done, it cannot be guaranteed that our infrastructure or application is transitioned from one version to another -- change is not \textbf{discrete}, but \textbf{continues} since we might end up in some state in between where we are now and where we want to be.
 	\end{enumerate}
 	
-	\item \textbf{Immutable model}, is a model where no in-place changes on existing infrastructure or application is done whatsoever. In this model, it is replaced completely with a new version that is updated or changed compared to the previous version. The previous version gets discarded in favor of the new version. Compared to the previous model, immutable deployment has: 
+	\item \textbf{An immutable model} is a model where no in-place changes on existing infrastructure or application are done whatsoever. In this model, the previous version is replaced completely with a new version that is updated or changed compared to the previous version. The previous version gets discarded in favor of the new version. Compared to the previous model, immutable deployment:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-		\item less risk, since the existing infrastructure or the application is not changed, but a new one is started and the previous one is shut down. This is important especially in DS where everything can fail at any time.
-		\item less complexity of the mutable deployment model. This is a direct implication of the previous feature, since the previous version is shut down and fully replaced with the new one. This is a \textbf{descrete} version change and atomic deployment with deferring deployments with fast rollback and recovery processes. 
+		\item has less risk, since the existing infrastructure or the application, is not changed, but a new one is started and the previous one is shut down. This is important especially in DS where everything can fail at any time.
+		\item has less complexity of the mutable deployment model. This is a direct implication of the previous feature since the previous version is shut down and fully replaced with the new one. This is a \textbf{discrete} version change and atomic deployment with deferring deployments with fast rollback and recovery processes.
+		\item requires more resources~\cite{Helland16}, since both versions must be present on the node for this process to be done. The second problem is the data that the application has generated should not be lost. The problem is solved by externalizing the data. We should not rely on local storage but store that data elsewhere, especially when the parts of the system are volatile and changed often. The key advantage of this approach is avoiding downtime experienced by the end-user when new features are released. 
 	\end{enumerate}
-	
-	On the other hand, this process requires more resources~\cite{Helland16}, since both versions must be present on the node for this process to be done. The second problem is the data that the application has generated should not be lost. The problem is solved by externalizing the data. We should not rely on local storage but store that data elsewhere, especially when the parts of the system are volatile and changed often. The key advantage of this approach is avoiding downtime experienced by the end-user when new features are released.
 \end{itemize}
 
 Immutability is a simple concept to understand and simplifies a lot especially in DS~\cite{Helland16}. Write down some data, and ensure that it never changes. It can never be modified, updated, or deleted~\cite{perry2020art}. When this is combined with the promise that downtime can be avoided especially in complex DS, it is clear why the immutable model is gaining more and more popularity (especially with the arrival of containers). 
 
-Immutable infrastructure deployment offers several models on how to deploy change on the services, even in production to test it or switch to the whole new version. These strategies include:
+Immutable infrastructure deployment offers several benefits on how to deploy changes. Even in production, it is easier to switch to a whole new version. These strategies include:
 
 \begin{itemize}
-	\item \textbf{Blue-Green deployment}, this strategy requires two separate environments: \textbf{(1)} \textit{Blue} current running version, and \textbf{(2)} \textit{Green} is the new version that needs to be deployed. When there is a satisfaction that the green version is working properly, the traffic can be gradually rerouted from the old environment to the new one,  for example by modifying Domain Name System (DNS). This strategy offers near-zero downtime.
-	\item \textbf{Canary update} is the strategy where a small number of requests are directed to the new version --- the canary. If the change is satisfactory, the number of requests can be increased, and it should be monitored how the service is working with increasing load, if there are errors, etc.
-	\item \textbf{Rolling update} strategy updates large environments of a few nodes at a time. The setup is similar to blue-green deployment, but here there is a single environment. With this strategy, the new version gradually replaces the old one. But this is not the only benefit. If for whatever reason the new version is not working properly on the larger amount of nodes, rolling back to the previous version can always be done.
+	\item \textbf{Blue-Green deployment}, this strategy requires two separate environments: \textbf{(1)} \textit{Blue} current running version, and \textbf{(2)} \textit{Green} is the new version that needs to be deployed. When there is satisfaction that the green version is working properly, the traffic can be gradually rerouted from the old environment to the new one,  for example by modifying the Domain Name System (DNS). This strategy offers near-zero downtime.
+	\item \textbf{A canary update} is a strategy where a small subset of requests is directed to the new version --- the canary, and the rest of them are directed to an old version. If the change is satisfactory, the number of requests can be increased, and it should be monitored how the service is working with increasing load, if there are errors, etc.
+	\item \textbf{Rolling update} strategy updates large environments, a few nodes at the time. The setup is similar to blue-green deployment, but here there is a single environment. With this strategy, the new version gradually replaces the old one. If for whatever reason the new version is not working properly on the larger number of nodes, rolling back to the previous version can always be done.
 \end{itemize}
 
 \noindent
 With mutable infrastructure, these strategies would be hard to implement, and maybe it is not possible at all. Besides infrastructure deployment, there is another side that we must be considered, and that is how to describe these deployments. Two different strategies can be considered here:
 
 \begin{itemize}\label{lab:dep_types}
-	\item \textbf{Imperative}, with this option users have to write code or specific instructions step by step by step what the specific tool needs to do, so that the application or infrastructure is properly setup. In this approach, we have a \textit{smart} user who describes \textit{dumb} machine what is needed to be done and in what order to achieve the desired state.
-	\item \textbf{Declarative}, with this option a user has to describe the end state or what is his desired state, and the tool needs to figure out the way how to do this. Here we have a \textit{smart system} that will find a way how to achieve the \textbf{desired state}, and we have user who\textit{does not care} in what order actions need to be done --- that is what the system needs to do. Users do not need to worry about timing, this simplifies the whole process and the code always represents the latest state. With this type of deployment, we can offer users two different models: 
+	\item \textbf{Imperatively}, with this option users have to write code or specific instructions step by step what the specific tool needs to do so that the application or infrastructure is properly set up. In this approach, we have a \textit{smart} user who describes \textit{dumb} machine what is needed to be done and in what order to achieve the desired state.
+	\item \textbf{Declaratively}, with this option a user has to describe the end state or what is his desired state, and the tool needs to figure out the way how to do this. Here we have a \textit{smart system} that will find a way how to achieve the \textbf{desired state}, and we have a user who\textit{does not care} in what order actions need to be done --- that is what the system needs to do. Users do not need to worry about timing, this simplifies the whole process and the code always represents the latest state. With this type of deployment, we can offer users, two different models:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-		\item use existing platform independent formats that users are familiar with, like \textit{JSON, YAML, XML}, etc.
-		\item create a new domain-specific language that users need to learn, but we might be able to optimize description.
+		\item using existing platform independent formats that users are familiar with, like \textit{JSON, YAML, XML}, etc.
+		\item using a domain-specific language (DSL) that users need to learn, but we might be able to optimize description.
 	\end{enumerate}
-	
-	So far, the first option is preferred by many companies.
 \end{itemize}
 
 \noindent
+So far, the first option is preferred by many companies, because users are already familiar with these formats, and does not require developers time to develop new DSL. If the platform becomes too complicated then it makes sense to develop DSL for this purpose.
+
 Figure~\ref{fig:fig12} summarizes the difference between mutable and immutable deployment models.
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.9]{images/Figure12.png}
+		\includegraphics[scale=1]{images/Figure12.png}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Difference between mutable and immutable deployment models.}
@@ -796,25 +795,25 @@ Figure~\ref{fig:fig12} summarizes the difference between mutable and immutable d
 \end{figure}
 
 \noindent
-With the introduction of \textit{LinuxKit}, Linux subsystems based around very secure containers can be created. With LinuxKit, every part of the Linux subsystem runs inside the container, so a Linux subsystem can be assembled with services that are needed. As a result, systems created with LinuxKit have a smaller attack surface~\cite{abs-1802-10375} than general-purpose systems. 
+With the introduction of \textit{LinuxKit}, Linux subsystems are based around very secure containers. With LinuxKit, every part of the Linux subsystem runs inside the container, so a Linux subsystem can be assembled with services that are needed. As a result, systems created with LinuxKit have a smaller attack surface~\cite{abs-1802-10375} than general-purpose systems. 
 
-This is important not only from the security point of view, but also infrastructure deployment, because specific OS, based around containers and needed for a different purpose, can be created. They can be updated, changed and adapted for every machine or purpose needed.
+This is important not only from the security point of view but also for infrastructure deployment as well. Specific OSs can be created, based on the containers for a different purpose. They can be updated, changed, and adapted for every machine or purpose needed.
 
-Deployment is based around changing parts of the OS, its services that run inside containers. As a result, everything can be removed or replaced. It's highly portable and can work on desktops, servers, IoT, mainframes, bare metal, and virtualized systems.
+Deployment is based on changing parts of the OS, and services that run inside the containers. As a result, everything can be removed or replaced. It's highly portable and can work on desktops, servers, IoT, mainframes, bare metal, micro data centers at the edge, and virtualized systems.
 %
 %
 \section{Development roles}\label{sec:dev_roles}
 %
-In our modern internet-connected world of applications, we have several distinctive development roles. Each of them plays an important role in order that modern software runs smoothly, and with less downtime. These development roles could be separated in a few categories (focuse is on the technical roles):
+In our modern internet-connected world of applications, we have several distinctive development roles. Each of them plays an important role so that modern software runs smoothly, and with less downtime. These development roles could be separated into a few categories (focus is on the technical roles):
 
 \begin{itemize}
-	\item \textbf{Developer} is usually a person responsible for developing software for the user. A developer is responsible for maintaining existing, and/or developing new features. There could be different subroles, dealing with specific parts of the complex software systems.
+	\item \textbf{A developer} is usually a person responsible for developing software for the user. A developer is responsible for maintaining existing, and/or developing new features. There could be different sub-roles, dealing with specific parts of the complex software systems.
 	\item \textbf{DevOps} role represents a multidisciplinary organizational effort to automate application deployments through continuous delivery of new software updates~\cite{LeiteRKMM20}. It combines software development with technology operations~\cite{JabbariAPT16} to shorten the development life cycle.
-	\item \textbf{Site Reliability Engineer (SRE)} role is responsible for availability, latency, performance, efficiency, change management, monitoring, emergency response, and capacity planning~\cite{beyer2016site}. It is a software engineering role and needs to have an understanding of the fundamentals of computing~\cite{JonesUN15}, aplied to the infrastructure and operations problems.
+	\item \textbf{Site Reliability Engineer (SRE)} role is responsible for availability, latency, performance, efficiency, change management, monitoring, emergency response, and capacity planning~\cite{beyer2016site}. It is a software engineering role and needs to have an understanding of the fundamentals of computing~\cite{JonesUN15}, applied to the infrastructure and operations problems.
 \end{itemize}
 
 \noindent
-DevOps and SREs are seem to be similar roles, they are both trying to bridge the gap between development and operations. As such they have a very large conceptual overlap in how they operate~\cite{46939}, but also have some differences. 
+DevOps and SREs seem to be similar roles, they are both trying to bridge the gap between development and operations. As such they have a very large conceptual overlap in how they operate~\cite{46939}, but also have some differences. 
 
 Table~\ref{tab:table10} sums the differences between the DevOps and SREs.
 
@@ -826,13 +825,13 @@ Table~\ref{tab:table10} sums the differences between the DevOps and SREs.
 			\textbf{Task} & \multirow{2}{10em}{Scaling, uptime, robustness} & \multirow{2}{10em}{Development pipeline} \\
 			& & \\
 			\textbf{Essence} & Practices and metrics &  Mindset and culture \\
-			\textbf{Team structure} & \multirow{3}{10em}{Wide range of roles: QA, developers, SREs etc.} &  \multirow{3}{10em}{SREs with operations and development skils} \\
+			\textbf{Team structure} & \multirow{3}{10em}{Wide range of roles: QA, developers, SREs etc.} &  \multirow{3}{10em}{SREs with operations and development skills} \\
 			&  &  \\
 			&  &  \\
-			\textbf{Focuse} & \multirow{2}{10em}{System availability and reliability} & \multirow{2}{10em}{Development and delivery continuity} \\
+			\textbf{Focus} & \multirow{2}{10em}{Development and delivery continuity} & \multirow{2}{10em}{System availability and reliability} \\
 			&  &  \\
 			\hline
-			\textbf{Goal} & \multicolumn{2}{c}{\multirow{2}{15em}{Bridge the gap between developement and operations}} \\
+			\textbf{Goal} & \multicolumn{2}{c}{\multirow{2}{15em}{Bridge the gap between development and operation}} \\
 			&  &  \\
 		\end{tabular}
 	\end{center}
@@ -844,7 +843,7 @@ Table~\ref{tab:table10} sums the differences between the DevOps and SREs.
 \noindent
 In modern complex software development, SREs should keep things running smoothly, while DevOps principles should be used to improve processes. 
 
-So it is not either/or, but it seems that combination of approaches may provide best results. However, in some smaller organizations these roles can overlap.
+So it is not either/or, but it seems that a combination of approaches may provide the best results. However, in some smaller organizations, these roles can overlap.
 %
 %
 \section{Concurrency and parallelism}\label{sec:concurency_parallelism}

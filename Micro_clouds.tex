@@ -1182,17 +1182,17 @@ Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using 
 %
 \section{Long-lived transactions}\label{sec:long_live_transactions}
 %
-To operate micro clouds properly, such system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offers (cf.~page~\ref{sec:microservices}). But still, we musth be aware of all problems that comes along with them.
+To operate micro clouds properly, such a system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offer (cf.~page~\ref{sec:microservices}). But still, we must be aware of all problems that come along with them.
 
-That beens said, one of the problems we have to deal with are transactions that apear in such distributed system. Because of the nature of the system \emph{sagas} seems like better pattern to use (cf. page~\ref{sec:sagas}).
+That been said, one of the problems we have to deal with are transactions that appear in such distributed system. Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. page~\ref{sec:sagas}).
 
-When a user submit the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (no avalible resources or nodes for example etc.), such task is done and it goes to \emph{FAILD} state and this concluds the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, task will go to \emph{IN PROGRESS} state. 
+When a user submits the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (no available resources or nodes for example, etc.), such task is done and it goes to \emph{FAILD} state, and this concludes the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, the task will go to \emph{IN PROGRESS} state. 
 
-In this state, the system needs to save newly formed cluster information, prepare metrics service, add watchers for the cluster nodes health-check, and so on. This operation will span over multiple services, and that process can be separated in multiple sub-transacetions. State of the task, will prevent user for submitting other tasks on cluster that is not formed yet. 
+In this state, the system needs to save newly formed cluster information, prepare metrics service, add watchers for the cluster nodes health-check, and so on. This operation will span over multiple services, and that process can be separated into multiple sub-transactions. The state of the task will prevent the user from submitting other tasks on a cluster that is not formed yet. 
 
-If any error happend during this process, we can always invoke the rollback mechanism, or try to fix the the occured issue with some of retry streategy.
+If any error happens during this process, we can always invoke the rollback mechanism, or try to fix the occurred issue with some of the retry strategies.
 
-If the cluster formation is done, and there are no problems occured the transaction is complited, and the task is moved to \emph{CREATED} state. If some error happend during this proces, and cluster cannot be formed, the task will go again to \emph{FAILD} state, and this concluds the transaction.
+If the cluster formation is done, and there are no problems occurred the transaction is completed, and the task is moved to \emph{CREATED} state. If some error happens during this process, and a cluster cannot be formed, the task will go again to \emph{FAILD} state, and this concludes the transaction.
 
 Figure~\ref{fig:fig19} shows state diagram for cluster formation message.
 
@@ -1210,13 +1210,13 @@ Cluster formation protocol will most likely span over multiple services, and str
 %
 \subsection{Garbage collection}\label{sec:garbage}
 %
-When user submit the task to the system, if for whatever reason that task fail we have option to immediately remove that task, and possibly all task connected items. Or, the system should have a specific process in the background, which only purpose is the garbage collection in order to restore unused and fragmented system resources.
+When the user submits the task to the system if for whatever reason that task fails we have the option to immediately remove that task, and possibly all task connected items. Or, the system should have a specific process in the background, which the only purpose is the garbage collection to restore unused and fragmented system resources.
 
-Second option seems more acceptable, because one item can have a graph of items that are connected to that specific item. This graph can be complex, and immediate deletion may slow down the entire system. In the backgroud, garbage collection process can mark unused items and delete them when the time is right.
+The second option seems more acceptable because one item can have a graph of items that are connected to that specific item. This graph can be complex, and immediate deletion may slow down the entire system. In the background, the garbage collection process can mark unused items and delete them when the time is right.
 
-User should also be able to delete certain items with its dependencies as well, invoking \emph{cascading deletion}. Dependencies may be deleted immediately, or marked as \emph{orphans}, and deleted by garbage collection process.
+Users should also be able to delete certain items with their dependencies as well, invoking \emph{cascading deletion}. Dependencies may be deleted immediately, or marked as \emph{orphans}, and deleted by the garbage collection process.
 
-It make sense that users are able to influence garbage collection by submitting their own policies when and how often to do this operation, to delete only items or container images as well and so on.
+It makes sense that users can influence garbage collection by submitting their policies when and how often to do this operation, to delete only items or container images as well, and so on.
 %
 %
 \section{System observability}\label{sec:system_observability}

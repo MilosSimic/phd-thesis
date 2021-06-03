@@ -129,20 +129,20 @@ The upper layer must have set up the infrastructure to do any processing or stor
 %
 Current implementation follows the saga pattern (cf.~page~\pageref{sec:sagas}) for transactions, and isolation is added using semantic lock by adding states to the task. The task can be in one of following states: $(1)$ PENDING, $(2)$ IN PROGRESS, $(3)$ CREATED, and $(4)$ FAILD. 
 
-Until task reach \emph{Created} state, no other operation is able to be done on that cluster configuration.
+Until the task reaches \emph{Created} state, no other operation can be done on that cluster configuration.
 
-The cluster formation transaction is splited into few sub-transactions: $(1)$ reserving nodes, $(2)$ writing cluster informations, and $(3)$ sending cluster informatoins to push service and ultimately sending informations to the nodes. 
+The cluster formation transaction is split into a few sub-transactions: $(1)$ reserving nodes, $(2)$ writing cluster information, and $(3)$ sending cluster information to push service and ultimately sending pieces of information to the nodes. 
 
-Rollback mechanism is implemented using \emph{choreography}, and as communication between the various services is done asynchronously using message queues.
+The rollback mechanism is implemented using \emph{choreography}, and communication between the various services is done asynchronously using message queues.
 %
 %
 \subsection{Garbage collection}\label{sec:gc}
 %
-Current garbage collection process is pretty trivial, since there is no any complicated graph of items connected to the cluster information details.
+The current garbage collection process is pretty trivial since there is no complicated graph of items connected to the cluster information details.
 
-The process will scan tasks with the state \emph{FAILD} in the background, and it will remove those items. Related details to the cluster informations, for example node metrics, will expire automatically since there is a lease attached to them.
+The process will scan tasks with the state \emph{FAILD} in the background, and it will remove those items. Related details to the cluster information, for example, node metrics, will expire automatically since there is a lease attached to them.
 
-Other resource that will be automatically deleted is nodes data. If a node health-check message do not reach the system in some time, the node lease will expire and data will be removed automatically.
+Another resource that will be automatically deleted is node data. If a node health-check message does not reach the system in some time, the node lease will expire and data will be removed automatically.
 %
 %
 \subsection{Limitations}\label{sec:framework_limits}
