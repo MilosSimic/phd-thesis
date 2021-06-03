@@ -100,14 +100,14 @@ Exclusiveness in the previous formula, means that position of micro-clouds is mo
 
 Three-tier~\label{lab:three-tier} architecture with numerous clients at the bottom, micro clouds in the middle, and cloud on the top, seem to resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
 
-On lower levels, response time is the fastest, since data is on the device. At the same time, there is very limited storage capacity and processing power. As we go on the upper tiers, there is more and more storage capacity and processing power, but the response time is higher and higher, especially when distance and huge volumes of data that need to be moved to the cloud is considered.
+On lower levels, response time is the fastest, since data is processed closer to the source. At the same time, there is a limited storage capacity and processing power. As we go on the upper tiers, there is more and more storage capacity and processing power, but the response time is higher and higher, especially when distance and huge volumes of data that need to be moved to the cloud are considered.
 
-Figure~\ref{fig:fig9}. shows the three-tier architecture, with the response time and resource avelability.
+Figure~\ref{fig:fig9}. shows the three-tier architecture, with the response time and resource availability.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{images/Figure9}
 	\vspace{-0.7cm}
-	\caption{3 tier architecture, with the response time and resource availability}
+	\caption{Three tier architecture, with the response time and resource availability}
 	\label{fig:fig9}
 \end{figure}
 
@@ -264,7 +264,7 @@ It is important to note that every action in the system should be logged and tra
 %
 \section{Formal model}\label{sec:formal_model}
 %
-Ensuring the reliability and correctness of any D is very difficult, and should be mathematically based. Formal methods are techniques that allow us to create specifications and verification of complex (software and hardware) systems based on mathematics and formal logic. There are several options for how to formally describe DS: TLA+, $pi$ calculus, combinational topology, asynchronous session types (MST), etc. 
+Ensuring the reliability and correctness of any DS is a very difficult task, and should be mathematically based. Formal methods are techniques that allow us to create specifications and verification of complex (software and hardware) systems based on mathematics and formal logic. There are several options for how to formally describe DS: TLA+, $pi$ calculus, combinational topology, asynchronous session types (MST), etc. 
 
 Unfortunately, because of their nature DS cannot always be formally described by any of the existing techniques. There are a lot of variables that could influence this. But if the nature of the DS that is developing is such that can be formally described, it is recommended and beneficial. A formally described and correct model can save hours, days, and even months of hard debugging, testing to reveal all bugs and problems in the system that may only happen in some specific circumstances that are hard to initiate.
 
