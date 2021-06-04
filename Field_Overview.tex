@@ -497,6 +497,17 @@ separates responsibility for \emph{modifying} data (command), and the \emph{read
 This increase the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}.
 
 When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. Service that will serve the queries will keep the \emph{read-only} replica of the data.
+
+Figure~\ref{fig:fig21} shows an example diagram for CQRS pattern.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.9]{images/Figure21.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{CQRS pattern diagram.}
+	\label{fig:fig21}
+\end{figure}
 %
 %
 \paragraph{API composition}\label{par:composition}
@@ -507,6 +518,17 @@ it a simple way to query data in a microservice architecture~\cite{richardson201
 The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns combined result to client.\\\\
 %
 The best chance to succeed when implementing a microservices architecture is to simply follow existing patterns and use existing solutions with proven quality.
+
+Figure~\ref{fig:fig22} shows an example diagram for CQRS pattern.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.9]{images/Figure22.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{API Compossition pattern diagram.}
+	\label{fig:fig22}
+\end{figure}
 %
 %
 \subsection{Observability}\label{sec:log_aggregation}
@@ -671,7 +693,7 @@ The saga transaction is composed of sub-transactions, executed in an atomic way 
 
 One transaction $T$ is composed of multiple sub-transactions $T_1,\ldots,T_n$, and every sub-transaction $T_i$ has an associated \emph{compensating transaction} $C_i$ or how the effects of the transaction can be rolled back. The saga transaction executes sub-transactions sequentially.
 
-Figure~\ref{fig:fig20} shows an example of one transaction separated into multiple sub-transactions where \emph{green} arrows represent success path, while \emph{red} arrows represent rollbacks. structure of the saga transaction and at least the previous and next element in the chain.
+Figure~\ref{fig:fig20} shows an example of one transaction separateu into multiple sub-transactions where \emph{green} arrows represent success path, while \emph{red} arrows represent rollbacks. structure of the saga transaction and at least the previous and next element in the chain.
 
 \begin{figure}[H]
 	\begin{center}
