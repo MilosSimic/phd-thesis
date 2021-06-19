@@ -80,7 +80,7 @@ The organization of these concepts should be fully optional. So for example, we 
 \myequations{Cluster size limits}
 
 \noindent
-If we go a little bit further, we can represent the city as one region, where parts of the city are organized into clusters. A city topology can even be formed by splitting the city into multiple regions containing multiple clusters, and ultimately a country topology can be formed by splitting the country into regions, with cities being clusters.\\ 
+If we go a little bit further, we can represent the city as one region, where parts of the city are organized into clusters. A city topology can even be formed by splitting the city into multiple regions containing multiple clusters, and ultimately a country topology can be formed by splitting the country into regions, with cities being clusters.\\
 
 Nodes that belong to the same cluster should run some form of membership protocol presented in~\ref{sec:memership_protocol}. Gossip style protocols, like SWIM~\cite{DasGM02} (cf. page~\pageref{swim}), are standard in the cloud environment. The same strategy could be applied here, used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16, CRDTS_Nuno} making the whole system more resilient. 
 
@@ -98,9 +98,9 @@ mc \in \left( Cloud\ computing,\ Edge\ computing \right)
 \noindent
 Exclusiveness in the previous formula, means that position of micro-clouds is moveable in between CC and EC depending do we want our model to be more CC like or more EC like, but it should not become one of them. It could be integral part for both of these models (even at the same time).
 
-Three-tier~\label{lab:three-tier} architecture with numerous clients at the bottom, micro clouds in the middle, and cloud on the top, seem to resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
+To achieve such elasticity, we must abstract the infrastructure to level of software, creating "infrastructure programming”~\cite{Fitzgerald}, allowing micro cloud infrastructure to be managed in a similar way as the software is.
 
-On lower levels, response time is the fastest, since data is processed closer to the source. At the same time, there is a limited storage capacity and processing power. As we go on the upper tiers, there is more and more storage capacity and processing power, but the response time is higher and higher, especially when distance and huge volumes of data that need to be moved to the cloud are considered.
+Three-tier~\label{lab:three-tier} architecture with numerous clients at the bottom, micro clouds in the middle, and cloud on the top, seem to resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
 
 Figure~\ref{fig:fig9}. shows the three-tier architecture, with the response time and resource availability.
 
@@ -112,6 +112,8 @@ Figure~\ref{fig:fig9}. shows the three-tier architecture, with the response time
 \end{figure}
 
 \noindent
+On lower levels, response time is the fastest, since data is processed closer to the source. At the same time, there is a limited storage capacity and processing power. As we go on the upper tiers, there is more and more storage capacity and processing power, but the response time is higher and higher, especially when distance and huge volumes of data that need to be moved to the cloud are considered.
+
 In everything as a service model~\cite{DuanFZSNH15}, ECC as a service fits in between CaaS and PaaS, depending on the user needs. 
 %
 %

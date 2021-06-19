@@ -3,7 +3,7 @@
 %
 An overview of the topics that are of significant importance for the rest of the thesis is going to be given in this section, since the thesis is heavily based on these topics. 
 
-Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patterns, and organizational structure. Section~\ref{sec:similar_models} describes similar models that might be a source of confusion, and how they are different than DS or DC, and how some concepts can fit in the bigger picture. Section~\ref{sec:transactions} describes different transaction models used for different applications. Section~\ref{sec:garbage_collection} describes basics of garbage collection techniques and why it is important. Section~\ref{sec:virtualization_techniques} describes different virtualization methods that are used in CC for systems and/or applications. Section~\ref{sec:deployment} describes different architecture and application model and how deployment can be done in large DS. Section~\ref{sec:dev_roles} describes different development roles in the modern complex software environment, with focus on technical roles, while Section~\ref{sec:concurency_parallelism} describes the difference between concurrency and parallelism and introduces an actor system, that will be used later on in the thesis. 
+Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} describe the theoretical background behind the problem, where we examine distributed systems (DS) and distributed computing (DC), focusing on design details, communication patterns, and organizational structure. Section~\ref{sec:similar_models} describes similar models that might be a source of confusion, and how they are different than DS or DC, and how some concepts can fit in the bigger picture. Section~\ref{sec:transactions} describes different transaction models used for different applications. Section~\ref{sec:garbage_collection} describes basics of garbage collection techniques and why it is important. Section~\ref{sec:virtualization_techniques} describes different virtualization methods that are used in CC for systems and/or applications. Section~\ref{sec:deployment} describes different architecture and application model and how deployment can be done in large DS. Section~\ref{sec:ias} describes infrastructure as software model that allows abstracting infrastructure to software level. Section~\ref{sec:dev_roles} describes different development roles in the modern complex software environment, with focus on technical roles, while Section~\ref{sec:concurency_parallelism} describes the difference between concurrency and parallelism and introduces an actor system, that will be used later on in the thesis. 
 
 \section{Distributed systems}\label{sec:distributed_systems}
 %
@@ -245,9 +245,9 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 \noindent
 In recent years there is one extension of CC from a series standpoint called \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15}. 
 
-A multi-cloud environment is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
+A multi-cloud is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
 
-CC is gives a user an illusion that he is using a single machine, while the background implementation is fairly complicated and consists of various elements that are composed of countless machines. CC is a typical example of a horizontally scalable system presented in~\ref{sec:scalability}.
+CC gives a user an illusion that he is using a single machine, while the background implementation is fairly complicated and consists of various elements that are composed of countless machines. CC is a typical example of a horizontally scalable system presented in~\ref{sec:scalability}.
 %
 %
 \subsection{Membership protocol}\label{sec:memership_protocol}
@@ -489,46 +489,41 @@ This technique, as a result have that overall state of the system will be distri
 
 The complex queries will involve data available in multiple databases, and client can access all these microservices and aggregate data, however this is not the recommended solution becasue client does not have full understanding how system manages the data.
 
-There are two ways to solve this problem:
-\paragraph{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs}
-%
-separates responsibility for \emph{modifying} data (command), and the \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the systm~\cite{richardson2018microservices, 8101372}.
+In microservices archtiecture, there are two standard ways to solve this problem~\cite{richardson2018microservices}:
 
-This increase the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}.
+\begin{enumerate}
+	\item \textbf{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs} separates responsibility for \emph{modifying} data (command), and the \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the systm~\cite{richardson2018microservices, 8101372}. This increase the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}. 
+	
+	When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. Service that will serve the queries will keep the \emph{read-only} replica of the data. 
+	
+	Figure~\ref{fig:fig21} shows an example diagram for CQRS pattern.
+	
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[scale=1]{images/Figure21.png}
+		\end{center}
+		\vspace{-0.6cm}
+		\caption{CQRS pattern diagram.}
+		\label{fig:fig21}
+	\end{figure}
 
-When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. Service that will serve the queries will keep the \emph{read-only} replica of the data.
+	\item \textbf{API composition}\label{par:composition} it a simple way to query data in a microservice architecture~\cite{richardson2018microservices, 8890660}, alternative and more lightweight solution than CQRS. 
+	
+	The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns combined result to client. Making it easier to implement, because we do not need to refresh database every time when some change occurs in the system. On the other hand, it may yield a slower response, depending on how many services we need to constant for the information, their availability, and time to merge and prepare data in memory. 
 
-Figure~\ref{fig:fig21} shows an example diagram for CQRS pattern.
+	Figure~\ref{fig:fig22} shows an example diagram for API Compossition pattern.
 
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[scale=0.9]{images/Figure21.png}
-	\end{center}
-	\vspace{-0.6cm}
-	\caption{CQRS pattern diagram.}
-	\label{fig:fig21}
-\end{figure}
-%
-%
-\paragraph{API composition}\label{par:composition}
-%
-%
-it a simple way to query data in a microservice architecture~\cite{richardson2018microservices, 8890660}, alternative and more lightweight solution than CQRS. 
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[scale=1]{images/Figure22.png}
+		\end{center}
+		\vspace{-0.6cm}
+		\caption{API Compossition pattern diagram.}
+		\label{fig:fig22}
+	\end{figure}
+\end{enumerate}
 
-The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns combined result to client.\\\\
-%
-The best chance to succeed when implementing a microservices architecture is to simply follow existing patterns and use existing solutions with proven quality.
-
-Figure~\ref{fig:fig22} shows an example diagram for CQRS pattern.
-
-\begin{figure}[H]
-	\begin{center}
-		\includegraphics[scale=0.9]{images/Figure22.png}
-	\end{center}
-	\vspace{-0.6cm}
-	\caption{API Compossition pattern diagram.}
-	\label{fig:fig22}
-\end{figure}
+The best chance to succeed when implementing a microservices architecture is to simply follow existing patterns and use existing solutions with proven quality. 
 %
 %
 \subsection{Observability}\label{sec:log_aggregation}
@@ -756,9 +751,7 @@ Figure~\ref{fig:fig5} represents architectural differences between VMs, containe
 %
 \section{Deployment}\label{sec:deployment}
 %
-Over the years two different approaches evolved how to deploy infrastructure and applications. The difference just gets more amplified, when CC and microservices get into the picture, where frequent deployment is very common. 
-
-Here evolves a new strategy to manage and deploy complicated infrastructure elements -- Infrastructure as code (IaC). In his book~\cite{wittig2018amazon} Wittig et al. describe it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools.
+Over the years different approaches evolved how to deploy infrastructure and applications. The difference just gets more amplified, when CC and microservices get into the picture, where frequent deployment is very common. 
 
 Deployments in such complex environment can be separated by how they handle changes on existing infrastructure or applications on:
 
@@ -822,6 +815,28 @@ With the introduction of \textit{LinuxKit}, Linux subsystems are based around ve
 This is important not only from the security point of view but also for infrastructure deployment as well. Specific OSs can be created, based on the containers for a different purpose. They can be updated, changed, and adapted for every machine or purpose needed.
 
 Deployment is based on changing parts of the OS, and services that run inside the containers. As a result, everything can be removed or replaced. It's highly portable and can work on desktops, servers, IoT, mainframes, bare metal, micro data centers at the edge, and virtualized systems.
+
+\section{Infrastructure as software}~\label{sec:ias}
+The infrastructure needs to be constantly deployed and maintained, so it would be beneficial to view the infrastructure as software (IaS)~\cite{Fitzgerald}. The benefit of this approach lies in the already available tools, principles, and techniques (e.g. reuse, testing, modeling, and evaluation) that can equally be used for the infrastructure definitions ~\cite{Osterweil, Fitzgerald}.
+
+In his work~\cite{Osterweil}, Osterweil et al. argued that software and software processes share some similar characteristics: (1) both are executed, (2) both have requirements that need to be understood, (3) both benefit from being modeled, and (4) both can be guided by measurement.
+
+Fitzgerald et al.~\cite{Fitzgerald} argue that process programming, defined by Osterweil~\cite{Osterweil} et al., is applicable in the infrastructure domain. The authors claim that it is useful to extend the “software process as software” paradigm to include infrastructure as software (IaS). The move towards multi-tier systems that involve cloud and cyber-physical systems will only stimulate the connection between software and reliable infrastructure systems.
+
+Looking at the infrastructure configuration as the software allows application developers to venture into the “infrastructure programming”~\cite{Fitzgerald}, allowing platforms and infrastructure to be managed in a similar way as the software is.
+
+In a cloud environment, it is an essential technique to properly implement continuous deployment, giving us tools to automate the configuration and provisioning process of infrastructure using cloud instances~\cite{RahmanMW19}. Wittig et al. describe it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools~\cite{wittig2018amazon}. 
+
+\subsection{Infrastructure as code}
+In modern cloud and microservices era, evolves a new strategy to manage and deploy complicated infrastructure elements -- Infrastructure as code (IaC). In his book~\cite{wittig2018amazon} Wittig et al. describe it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools. 
+
+IaC has grown in popularity in recent years because it applies the same kind of version control and repeatability to the orchestration of the infrastructure as developers use for applications source code~\cite{ArtacBNGT17}. The second benefit is that configuration is decoupled from the system, it can more readily be deployed on a similar system elsewhere. 
+
+IaC is a continuation of earlier works of Osterweil et al.~\cite{Osterweil}, and Fitzgerald et al.~\cite{Fitzgerald}, trying to move infrastructure to level of software, keeping existing tools, best practices and techniques. It relys on the \textbf{reconciler pattern}~\cite{luksa2018kubernetes}, widely used in scheduling systems like Kubernetes.
+
+This pattern enables tracking of resources using two simple states: (1) expected state, and (2) current state. The expected state represents the desired state, while the current state refers to the actual system state. The reconciler pattern runs a \textbf{reconciliation loop} that ensures that the current state remains the same as the expected state.
+
+Every node must provide its current state regularly, and when some state is divergent from the desired state, the system must act to ensure that this situation is corrected automatically. The node can send its state over existing channels e.g., \textbf{health-check} pings to minimize load and data transferred over the network, or a dedicated channel just for this purpose may exist.
 %
 %
 \section{Development roles}\label{sec:dev_roles}

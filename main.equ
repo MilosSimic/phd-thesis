@@ -4,20 +4,20 @@
 \contentsline {myequations}{\numberline {2.2}Associative formula.}{17}{Item.56}% 
 \contentsline {myequations}{\numberline {2.2}Idempotent formula.}{17}{Item.56}% 
 \contentsline {myequations}{\numberline {2.3}Idempotency law formula}{31}{equation.2.2.3}% 
-\contentsline {myequations}{\numberline {4.1}Cluster size limits}{71}{equation.4.1.1}% 
-\contentsline {myequations}{\numberline {4.2}Position od micro clouds.}{72}{equation.4.1.2}% 
-\contentsline {myequations}{\numberline {4.3}Global type construction}{85}{equation.4.6.3}% 
-\contentsline {myequations}{\numberline {4.4}Local type representation syntax.}{86}{equation.4.6.4}% 
-\contentsline {myequations}{\numberline {4.5}Extending free servers set.}{89}{equation.4.6.5}% 
-\contentsline {myequations}{\numberline {4.6}Extending label set.}{90}{equation.4.6.6}% 
-\contentsline {myequations}{\numberline {4.6}Health-check global protocol.}{91}{definition.4.6.4}% 
-\contentsline {myequations}{\numberline {4.6}Health-check global protocol projection.}{92}{definition.4.6.4}% 
-\contentsline {myequations}{\numberline {4.7}Query selector formation.}{95}{equation.4.6.7}% 
-\contentsline {myequations}{\numberline {4.10}Server selector.}{96}{equation.4.6.10}% 
-\contentsline {myequations}{\numberline {4.11}Extending task queue set.}{96}{equation.4.6.11}% 
-\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol.}{98}{Item.121}% 
-\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol projection.}{100}{Item.123}% 
-\contentsline {myequations}{\numberline {4.11}Idempotency check global protocol.}{106}{Item.135}% 
-\contentsline {myequations}{\numberline {4.11}Idempotency check global protocol projection.}{108}{Item.137}% 
-\contentsline {myequations}{\numberline {4.11}List detail global protocol.}{110}{algocf.6}% 
-\contentsline {myequations}{\numberline {4.11}List detail global protocol projection.}{111}{algocf.6}% 
+\contentsline {myequations}{\numberline {4.1}Cluster size limits}{73}{equation.4.1.1}% 
+\contentsline {myequations}{\numberline {4.2}Position od micro clouds.}{74}{equation.4.1.2}% 
+\contentsline {myequations}{\numberline {4.3}Global type construction}{87}{equation.4.6.3}% 
+\contentsline {myequations}{\numberline {4.4}Local type representation syntax.}{88}{equation.4.6.4}% 
+\contentsline {myequations}{\numberline {4.5}Extending free servers set.}{91}{equation.4.6.5}% 
+\contentsline {myequations}{\numberline {4.6}Extending label set.}{92}{equation.4.6.6}% 
+\contentsline {myequations}{\numberline {4.6}Health-check global protocol.}{93}{definition.4.6.4}% 
+\contentsline {myequations}{\numberline {4.6}Health-check global protocol projection.}{94}{definition.4.6.4}% 
+\contentsline {myequations}{\numberline {4.7}Query selector formation.}{97}{equation.4.6.7}% 
+\contentsline {myequations}{\numberline {4.10}Server selector.}{98}{equation.4.6.10}% 
+\contentsline {myequations}{\numberline {4.11}Extending task queue set.}{98}{equation.4.6.11}% 
+\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol.}{100}{Item.123}% 
+\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol projection.}{102}{Item.125}% 
+\contentsline {myequations}{\numberline {4.11}Idempotency check global protocol.}{108}{Item.137}% 
+\contentsline {myequations}{\numberline {4.11}Idempotency check global protocol projection.}{110}{Item.139}% 
+\contentsline {myequations}{\numberline {4.11}List detail global protocol.}{112}{algocf.6}% 
+\contentsline {myequations}{\numberline {4.11}List detail global protocol projection.}{113}{algocf.6}% 

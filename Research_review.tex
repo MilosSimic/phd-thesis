@@ -69,12 +69,12 @@ Satyanarayanan et al.~\cite{SatyanarayananK19} propose the concept of edge-nativ
 In~\cite{inproceedingsBeck} Beck et al. argue that applications should use message bus, streams, or topics because most mobile or edge applications are expected to be event-driven. The message bus system is an interesting proposition because the virtualized applications can subscribe to message streams, i.e., topics, and act only when data arrive. Applications might not be alive the whole time. And if for some reason mobile edge applications cannot reach a close EC server, it can always send data to the cloud. So cloud applications should be changed so slightly, just to cover this edge case.
 
 In~\cite{JararwehDAAAB16}, Jararweh et al. show how integration between EC with CC principles will create more complex services and applications at the edge of the network opening new possibilities for applications to reduce the load on the centralized cloud model but also avoid bottlenecks and single points of failure.
+
+In~\cite{cherrueau}, authors propose solution that relies on the modularity of the microservices: (1) one application instance is at the edge, making the system robust to network partitions (local requests can still be satisfied), and (2) collaboration can be programmed with service mesh.
 %
 %
 \section{Infrastructure management}\label{sec:infrastructure_management}
 %
-IaC refers to managing infrastructure (e.g. hardware, VMs, platforms, container systems, services, and topologies) through declarative or imperative definitions (cf. page~\pageref{lab:dep_types}), instead of manual configuration or the use of traditional configuration tools.
-
 In the era of CC, microservices, and DS, the open-source community and different companies provided various tools for this purpose. 
 
 Tools like Terraform, Polumni, or CFEngine are representative of the declarative movement, using platform-independent language to specify configuration, policies, security, and much more. Some use existing formats like \emph{JSON} or \emph{YAML}, and others use their domain-specific language to achieve the same goal.
