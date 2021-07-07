@@ -54,9 +54,21 @@ These fallacies were introduced over a decade ago, and more than four decades si
 Scalability is the property of a system to handle a growing amount of work by adding resources to the system~\cite{Bondi00}. When talking about computer systems, scalability can be represented in two ways:
 
 \begin{itemize}
-	\item \textbf{Scaling vertically} means upgrading the hardware that computer systems are running on. Vertical scaling can increase performance to what the latest hardware can offer, and here we are limited by the laws of physics and Moor's law \cite{Gustafson2011}. A typical example that requires this type of scaling is a relation database server. These capabilities are insufficient for moderate to big workloads.
+	\item \textbf{Scaling vertically} means upgrading the hardware that computer systems are running on --- adding mode CPU, RAM, storage. Vertical scaling can increase performance to what the latest hardware can offer, and here we are limited by the laws of physics and Moor's law \cite{Gustafson2011}. A typical example that requires this type of scaling is a relation database server. These capabilities are insufficient for moderate to big workloads.
 	\item \textbf{Scaling horizontally} means that we scale our system by adding more and more computers, rather than upgrading the hardware of a single one. With this approach, we are (almost) limitless on how much we can scale. Whenever performance degrades we can simply add more computers (or nodes). These nodes are not required to be some high-end machines.
 \end{itemize}
+
+\noindent
+Figure~\ref{fig:fig23} show difference betweeen scaling vertically and horizontally.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.80]{images/Figure23.png}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{Difference betweeen scaling vertically and horizontally}
+	\label{fig:fig23}
+\end{figure}
 
 \noindent
 Table~\ref{tab:table1} summarizes differences between horizontall and verticall scaling.
@@ -242,10 +254,14 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 	\label{tab:table2}
 \end{table}
 
-\noindent
+\subsubsection{Multi-cloid}
 In recent years there is one extension of CC from a series standpoint called \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15}. 
 
-A multi-cloud is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
+A multi-cloud is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. 
+
+A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
+
+This strategy allows creation a single heterogeneous architecture, allowing distribution of cloud assets and workloads across multiple providers (active-active), or deploy a single workload on one provider, with a backup on another (active-passive)~\cite{Multicloud2019}.
 
 CC gives a user an illusion that he is using a single machine, while the background implementation is fairly complicated and consists of various elements that are composed of countless machines. CC is a typical example of a horizontally scalable system presented in~\ref{sec:scalability}.
 %
