@@ -18,7 +18,7 @@ To extend the system in a new direction, we can look for some inspiration in exi
 
 The first building block of CC architecture is a cluster, and a cluster can be defined as a set of nodes or servers that operate as a single unit to achieve some goal. This is where resources are, and this is where user applications are running on. The next building block that consists of multiple clusters is called Regions (or DCs). Regions are isolated and independent from each other, and they contain resource application needs. These resources come in form of clusters. Regions are usually composed of a few availability zones~\cite{SouzaMFAK19}. These zones are the defense against the fail. If for whatever reason, one zone fails or goes offline, there are still more of them to serve user requests, there is a better availability, scalability, and resilience.
 
-If we now observer micro-clouds as geo-distributed systems, we can use a similar model, with some adaptations. Rely on a similar proven strategy, do not reinvent the wheel, but adopt for the different use-case.
+If we now observe micro-clouds as geo-distributed systems, we can use a similar model with some adaptations. Rely on a similar proven strategy, do not reinvent the wheel, but adapt for the different use-case.
 
 Table~\ref{tab:table5} presents similar concepts between CC and edge-centric computing (ECC) concepts. The accent is here put on the difference between the physical logical concepts in the two models.
 
@@ -38,7 +38,7 @@ Table~\ref{tab:table5} presents similar concepts between CC and edge-centric com
 \end{table}
 
 \noindent
-Since we are talking about geo-distributed systems, our scenario is a little bit different than the one used in the standard CC model. We can still combine multiple EC nodes into clusters, that is what MDCs already propose. If we want to go a little bit further, we can define cluster as a:
+Since we are talking about geo-distributed systems, our scenario is a little bit different than the one used in the standard CC model. We can still combine multiple EC nodes into clusters, that is what MDCs already propose. If we want to go a little bit further, we can define a cluster as a:
 
 \begin{definition}
 	A micro-cloud cluster is a group of nodes that are virtually and/or geographically separated, that works together to provide the same service to clients.
@@ -61,7 +61,9 @@ In MDCs, a cluster is as big as the population nearby that is using it~\cite{Gre
 \end{definition}
 
 \noindent
-With the previous definition, we have to be careful not to introduce huge latency in the system. To lower the region latency, the vast distances between clusters should be strongly avoided in normal circumstances. new nodes have to be brought and connected physically to the rest of the infrastructure~\cite{Hamilton07}, while in the ECC the region should be extended just by changing the definition to whom the specific cluster belongs.
+With the previous definition, we have to be careful not to introduce huge latency in the system. To lower the region latency, the vast distances between clusters should be strongly avoided in normal circumstances. 
+
+In the CC model, new nodes have to be brought and connected physically to the rest of the infrastructure~\cite{Hamilton07}, while in the ECC, just by changing the definition to which the specific cluster belongs, we can extend the region.
 
 Multiple regions should be able to form a second logical layer -- $topology$. In the geo-distributed systems such as ECC or micro-clouds, topology can formally be described as:
 
@@ -88,7 +90,7 @@ Replication could be used not only in nodes inside the cluster, but data can als
 
 Single $topology$ reflects one CC provider, so multiple topologies are forming micro-clouds that can help CC with huge latency issues, pre-processing in huge volumes of data, and relax and decentralize strict centralized CC model.
 
-These micro-clouds have much fewer resources compared to standard clouds, but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later. Formaly, the position of micro-clouds $mc$ in between CC and EC like:
+These micro-clouds have much fewer resources compared to standard clouds, but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later. Formally, the position of micro-clouds $mc$ in between CC and EC like:
 
 \begin{equation}
 mc \in \left( Cloud\ computing,\ Edge\ computing \right)
@@ -96,11 +98,11 @@ mc \in \left( Cloud\ computing,\ Edge\ computing \right)
 \myequations{Position od micro clouds.}
 
 \noindent
-Exclusiveness in the previous formula, means that position of micro-clouds is moveable in between CC and EC depending do we want our model to be more CC like or more EC like, but it should not become one of them. It could be integral part for both of these models (even at the same time).
+Exclusiveness in the previous formula means that the position of micro-clouds is moveable in between CC and EC depending do we want our model to be more CC-like or more EC-like, but it should not become one of them. It could be an integral part of both of these models (even at the same time).
 
-To achieve such elasticity, we must abstract the infrastructure to level of software, creating "infrastructure programming”~\cite{Fitzgerald}, allowing micro cloud infrastructure to be managed in a similar way as the software is.
+To achieve such elasticity, we must abstract the infrastructure to the level of software, creating "infrastructure programming”~\cite{Fitzgerald}, allowing micro cloud infrastructure to be managed similarly as the software is.
 
-Three-tier~\label{lab:three-tier} architecture with numerous clients at the bottom, micro clouds in the middle, and cloud on the top, seem to resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
+Three-tier~\label{lab:three-tier} architecture with numerous clients at the bottom, micro clouds in the middle, and cloud on the top seem to resemble cache level architecture in CPU~\cite{FarshinRMK19}. 
 
 Figure~\ref{fig:fig9}. shows the three-tier architecture, with the response time and resource availability.
 
@@ -1073,7 +1075,7 @@ Figure~\ref{fig:fig8} shows a low-level view of the list operation protocol, whe
 	\begin{center}
 		\includegraphics[scale=0.9]{images/FIG4}
 	\end{center}
-	\vspace{-1.2cm}
+	\vspace{-0.4cm}
 	\caption{Low level view of list operation communication.}
 	\label{fig:fig8}
 \end{figure}
@@ -1186,15 +1188,15 @@ Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using 
 %
 To operate micro clouds properly, such a system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offer (cf.~page~\ref{sec:microservices}). But still, we must be aware of all problems that come along with them.
 
-That been said, one of the problems we have to deal with are transactions that appear in such distributed system. Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. page~\ref{sec:sagas}).
+That been said, one of the problems we have to deal with are transactions that appear in such distributed system --- distributed transactions (cf. page~\ref{sec:distributed_transactions}). Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. page~\ref{sec:sagas}).
 
-When a user submits the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (no available resources or nodes for example, etc.), such task is done and it goes to \emph{FAILD} state, and this concludes the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, the task will go to \emph{IN PROGRESS} state. 
+When a user submits the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (e.g., no available resources or nodes, etc.) the task is finished, and it goes to \emph{FAILD} state, and this concludes the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, the task will go to \emph{IN PROGRESS} state.
 
-In this state, the system needs to save newly formed cluster information, prepare metrics service, add watchers for the cluster nodes health-check, and so on. This operation will span over multiple services, and that process can be separated into multiple sub-transactions. The state of the task will prevent the user from submitting other tasks on a cluster that is not formed yet. 
+In this state, the system needs to save newly formed cluster information, prepare metrics service, add watchers for the cluster nodes health-check, etc. This operation spans multiple services, creating sub-transactions. The task state will prevent the users from applying other tasks, configurations, and actions on a not yet formed cluster.
 
-If any error happens during this process, we can always invoke the rollback mechanism, or try to fix the occurred issue with some of the retry strategies.
+We can always invoke the rollback mechanism if any error happens during this process. Other options would be to try to fix the occurred issue with some of the retry strategies.
 
-If the cluster formation is done, and there are no problems occurred the transaction is completed, and the task is moved to \emph{CREATED} state. If some error happens during this process, and a cluster cannot be formed, the task will go again to \emph{FAILD} state, and this concludes the transaction.
+If there are no errors, the cluster formation transaction finishes, changing the task state to \emph{CREATED}. If there are errors during this process, the cluster formation transaction ends without creating the cluster. The task will go again to \emph{FAILD} state, and this concludes the transaction.
 
 Figure~\ref{fig:fig19} shows state diagram for cluster formation message.
 
