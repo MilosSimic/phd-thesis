@@ -39,6 +39,8 @@ In~\cite{abs-1802-10375} the de Guzm{\'{a}}n et al. present solution based on Ku
 In~\cite{SamiM20} Sami et al. show an interesting platform for dynamic services distribution over Fog nodes using volunteer nodes. Their platform is tuned for container placement with relevance and efficiency on volunteering fog devices, near users with maximum time availability and shortest distance. They do this \textit{on the fly}  with improved QoS.
 
 Besides academy efforts, the industry as well introduced a few interesting platforms and frameworks for EC. For example, Amazon introduced their framework Greengrass~\cite{kurniawan_2018} that can run on various hardware to do some processing. Amazon turns to the option that their framework is deeply connected to the rest of the AWS cloud ecosystem.  KubeEdge~\cite{KubeEdge} is a lightweight extension of the Kubernetes framework, to operate in an EC environment. The same as regular Kubernetes, all workloads are done in the domain of a single cluster which might not be the best solution for geo-distributed micro-clouds. Both Greengrass and KubeEdge are frameworks that are mainly used for user-based applications. On the other hand, there is General Electric with its Predix~\cite{GE_Predix} platform. Predix is a scalable platform used for industrial IoT applications.
+
+Osmotic computing is a relatively new infrastructure paradigm aiming to decompose applications into services dynamically tailored for the smart environments exploiting resources in edge and cloud infrastructures~\cite{VillariFDRJR19}. The applications developed for this computing paradigm are deployed in the cloud and edge systems equalizing the microservices concentrations on both sides. This thesis can serve as a base for osmotic computing, allowing dynamic and efficient management of micro cloud infrastructure to avoid application breakdown and degradation of QoS.
 %
 %
 \section{Task offloading}\label{sec:task_offloading}
@@ -75,11 +77,29 @@ In~\cite{cherrueau}, authors propose solution that relies on the modularity of t
 %
 \section{Infrastructure management}\label{sec:infrastructure_management}
 %
-In the era of CC, microservices, and DS, the open-source community and different companies provided various tools for this purpose. 
+In the era of distributed systems, cloud computing, and microservices the open-source community and different companies provided various tools for the purpose of abstracting infrastructure at the level of software. These tools can be separated into two subgroups, based on how users send instructions to the systems on \textbf{(1)} declarative, and \textbf{(2)} imperative.
 
-Tools like Terraform, Polumni, or CFEngine are representative of the declarative movement, using platform-independent language to specify configuration, policies, security, and much more. Some use existing formats like \emph{JSON} or \emph{YAML}, and others use their domain-specific language to achieve the same goal.
+Newly created tools like Terraform, Polumni, or CFEngine are representative of the declarative movement, using platform-independent language to specify configuration, policies, security, and much more. Users specify their intentions usually through some existing formats like \emph{JSON} or \emph{YAML}, while others use their domain-specific language to achieve the same goal.
 
-On the other hand, well-known tools like Chef, Ansible, and Puppet usually rely on some specific language to code the instructions what must be done to achieve the same or similar job.
+In both cases, users do not specify explicit commands that the system needs to execute. Instead, they declare what they want to achieve, and leave it for the system to determine the optimal way of achieving it. The main difference between an existing format, and a domain-specific language is how verbose specification is. Existing formats may be a little bit more verbose, but users are most likely already familiar with them. Developing domain-specific language takes more time and requires users to learn them from scratch, but the final outcome is usually a more concise, expressive and optimized set of instructions.
+
+These tools are turning out to be very important in a multi-cloud environment. The users need to specify artifacts, independently from the cloud provider, and let the system deal with the cloud provider specifics.
+
+On the other hand, already existing and well-known tools like Chef, Ansible, and Puppet usually rely on some specific language, and the user needs to code the instructions that must be done to achieve the same or similar job.
+
+This is more prone to error, since users may introduce a bug in the system that might be hard to debug and find. At the same time, these tools have existed for a long time, and there are existing best practices and a lot of available examples for users to utilize.
+
+Every major cloud provider offers a proprietary solution, deeply integrated into their ecosystem. AWS offers CloudFormation, a configuration tool that allows users to code their infrastructure to automate deployments.
+
+Microsoft Azure offers a Resource Manager that allows users to define the infrastructure and dependencies in templates, and organize dependent resources into groups that can be deployed or deleted in a single action, access control, and more.
+
+Google Cloud offers a Deployment Manager that offers many features to automate cloud infrastructure stack. Users can create templates using \emph{YAML} or \emph{Python} programming language. Users can preview changes before deployment, in a console user interface, and much more.
+
+In terms of adoptability in micro data-centers on the edge, already existing tools might be used to set up infrastructure in both places, in the cloud and at the edge, if they allow extensibility. Declarative tools would be harder to adopt since they are built with different goals in mind. While imperative tools might be easier to utilize, they may introduce unnecessary complications to the system.
+
+On the other hand, a newly created IaC system can communicate with existing tools via some standard interfaces to set up the cloud infrastructure, while a new, custom made engine could handle organizing geo-distributed nodes into micro data centers.
+
+With this strategy, we are getting the best of both worlds. The new user application model would be based on the existing cloud application model, offering users a fast and elegant way to develop new human-centered applications.
 
 IaC has grown in popularity in recent years because it applies the same kind of version control and repeatability to the orchestration of the infrastructure as developers use for applications source code~\cite{ArtacBNGT17}. The second benefit is that configuration is decoupled from the system, it can more readily be deployed on a similar system elsewhere.
 %

@@ -33,7 +33,7 @@ In the rest of this section, we will see details about all operations, as well a
 	\begin{center}
 		\includegraphics[scale=0.7]{images/FIG5}
 	\end{center}
-	\vspace{-0.9cm}
+	\vspace{-0.5cm}
 	\caption{Proof of concept implemented system.}
 	\label{fig:fig11}
 \end{figure}
@@ -295,17 +295,46 @@ To increase capaticity, we extended clusters by creating new ones using \emph{th
 
 The last test was to test health-check protocol once again - we disconnected one random node from the power supply, and since that node ping was missing, the system was able to detect which node was \emph{down}. This concluded our experiment.
 %
+\section{The existing solutions enhancement}~\label{enhancement_of_the_existing_solutions}
+%
+The protocols defined in this thesis could serve as a base layer for the system developed from scratch. On top of such a solution, we can add other services and features like scheduling, storage, applications, management, monitoring, etc. The protocols described in this thesis ensure proper node registration into the system, organization, and reorganization of node resources into clusters, regions, and topologies, bringing disposable micro clouds closer to the users at the network edge, allowing that requests are served from the local micro cloud.
+
+The existing orchestrator engines (e.g., Kubernetes, Apache Mesos, Docker Swarm, etc.) operate one cluster level~\cite{BurnsGOBW16, VermaPKOTW15, RossiCPN20, KubeEdge, KubeMulti}. The single cluster could span over multiple availability zones in the cloud, minimizing the chance that a failure in one zone impairs services in other zones~\cite{KubeMulti}. Kubernetes allow extension in terms of multi-cluster deployments~{\cite{KubeMulti}}. In such a scenario, Kubernetes is handling these clusters as disposable --- "treating \textbf{clusters} as cattle, not pets" (i.e., numerous servers/clusters built using automated tools designed for failure, where no servers/clusters are irreplaceable~\cite{CERN}).
+
+The model proposed in this thesis goes one step further, allowing the creation of disposable micro clouds. Such an extension allows infrastructure optimization in more dimensions~\cite{ForestieroMMPS14}. The users are allowed to build numerous micro clouds designed for failure using automated tools where no micro cloud is irreplaceable --- "treating \textbf{micro clouds} as cattle, not pets."
+
+The existing solutions can integrate the model proposed in this thesis to serve as a node register. Such integration allows the registration of new nodes into the system, allowing the existing orchestration engines to use new nodes, and expand their available resource pool. In form of specification, the users can provide a list of which available EC nodes need to be part of some micro cloud. The system will communicate with the existing orchestrator agent to register/unregister them with the existing cluster. In such a scenario, we can hook on the existing orchestrator health-check mechanism informing our system that a node in some cluster is alive. Unused nodes still use the health-check protocol defined in this thesis informing the system that they are still available for utilization.
+
+The proposed model preserves the node's topology allowing cloud providers and orchestrator engines to treat micro clouds disposable, abstracting infrastructure to the level of software --- infrastructure as software~{\cite{Fitzgerald}}. This approach benefits from the already available tools, principles, and techniques (e.g., reuse, testing, modeling, and evaluation). The already available tools can be used for the disposable micro cloud infrastructure definitions.
+
+The model developed in this thesis is not competing with the existing orchestrator tools. It is not orchestrating applications, but it is a free nodes register and micro clouds infrastructure descriptor allowed to be offered as a stand-alone service bringing disposable micro clouds model to the users. The model allows integration with the existing orchestration tools, leveraging existing mechanisms and best practices. Cloud providers can create an operator for various orchestration engines. This allows them to offer dynamically created, disposable micro clouds as a service to their users, using infrastructure as software principles.
+%
 %
 \section{Applications}\label{sec:app}
 %
 This research focuses on a platform with geo-distributed edge nodes that can be organized dynamically into the micro data-centers and regions based on the cloud model, but adapted for a different environment. This middle layer helps the power-hungry servers reduce traffic by serving the nearby population requests. Users are getting a new platform as a blank canvas, and there is no limitation in what applications they can develop. Integrating hardware and/or software, even more, connecting sensors and things around us and eventually an operating system that will be capable of running city/state infrastructure without human intervention.
 
-Let us consider the scenario in which such a system is implemented and a new catastrophic event (earthquake, tsunami, war, terrorist attack, pandemic, etc.) struck the human population. An increasing amount of ambulance vehicles must be routed to hospitals fast. Suddenly the traffic control system needs more resources to continue operating properly. We can then organize our resources differently to accommodate such situations. On the way to the hospital, we can monitor patient's health in real-time~\cite{Al-KhafajiyBCAK19} and store it in some healthcare platform~\cite{OmarBBKR19, inproceedingsSimic5}. giving the health workers crucial information on ambulance arrival. 
-
-Such a scenario is relatively easy to solve if using the cloud resource wisely. As we increase resource demand, the cloud can provide us with more resources. The main advance of EC, when compared to the cloud-only approach, is the acceleration of the communication speed. In the scenario previously discussed, the cloud could bring huge latency, while EC originates from peer to peer systems~\cite{LopezMEDHIBFR15}, serving only local population needs, minimizing potentially huge round-trip time of the cloud. Furthermore, our model expands peer to peer systems into new directions and blends them with the cloud to allow novel human-centered applications. 
+The main advance of EC, when compared to the cloud-only approach, is the acceleration of the communication speed. The cloud could bring huge latency, while EC originates from peer to peer systems~\cite{LopezMEDHIBFR15}, serving only local population needs, minimizing potentially huge round-trip time of the cloud. Furthermore, presented model expands peer to peer systems into new directions and blends them with the cloud to allow novel human-centered applications. 
 
 If we imagine that we put sensors on a specific group of users and/or places in the city/state and monitor them in real-time, we can process these streams of data directly close to where they are, where they are moving and going. We could monitor air pollution for example, and make decisions in real-time to suggest users not to walk in some area, especially if they have some known respiratory problem.
 
-Geo-distributed nodes represent a great idea to do any kinda monitoring and processing especially for natural phenomenons and do alert as soon as probes, sensors, or other things detect even the slightest changes. For applications like self-driving cars, delivery drones, or power balancing in electric grids require real-time processing for proper decision making or any other application that future developers may develop. Content delivery networks, content sharing could be implemented to serve content to the users faster than going over the cloud, since micro-clouds should serve the local population that is nearby.
+Geo-distributed nodes represent a great idea to do any kinda monitoring and processing especially for natural phenomenons and do alert as soon as probes, sensors, or other things detect even the slightest changes. For applications like self-driving cars, delivery drones, or power balancing in electric grids require real-time processing for proper decision making or any other application that future developers may develop. Content delivery networks, content sharing could be implemented to serve content to the users faster than going over the cloud, since micro clouds should serve the local population that is nearby.
+
+\subsection{COVID-19 MIlan area traffic control example}\label{sec:covid_example}
+Let us consider a use case that can benefit from our model. In the context of the recent COVID-19 outbreak, we can examine the city of Milan, Italy. Into nine municipalities, numbered from 1 to 9 the city is split. Let us follow the natural subdivision having Milan \emph{topology} where municipalities have one or more \emph{regions}. Population density implemented applications and needs dictate the number of \emph{clusters} per region serving the population nearby. 
+
+If city subdivision changes in the future, reorganization of \emph{regions} and \emph{clusters} is easy to be done dynamically, using \emph{cluster formation protocol}. A prerequisite for this to be done: there must be EC nodes deployed on the territory, and nodes are connected to the system using \emph{health check protocol}.
+
+During the COVID-19 outbreak, an increased amount of ambulance vehicles and medical personnel had to be routed to hospitals as fast as possible. Let us consider that the city is using some platform for supervised area traffic control. Utilizing the principles from the presented model, we can target ambulance vehicles, giving them a higher priority, compared to regular vehicles.
+
+In such a scenario, micro clouds can run three kinds of \emph{frontend services}, specifically tailored for this application: \textbf{(1)} a service that follows the ambulance vehicles, \textbf{(2)} a service that will regulate the traffic light control, and \textbf{(3)} GPS routing service.
+
+Suddenly increased number of ambulance vehicles causes an increased need for resources (e.g., decisions that require more processing power) at the \emph{frontend service} regulating the traffic routing and light control. Micro cloud \emph{clusters} allow resource rearrange, or even a dedicated \emph{cluster} just for this purpose. If more resources are required, \emph{regions} can be changed as well, and finally, the whole \emph{topology} can be repurposed or merged with a city nearby to support an increased number of requests.
+
+We can monitor patient health in real-time~\cite{BCAK19, JeonK19, ChiariniRAMG13} transferring data to healthcare platform~\cite{OmarBBKR19, inproceedingsSimic5}. On patient's arrival, health workers already have crucial information, while robotic systems can help in diagnosis and screening~\cite{ShenGLMDXHKCZT21}. Such a platform in cooperation with area traffic control increases patient survival chances. At the same time, reduce the hospital spending on unnecessary tests.
+
+For the research purpose, the depersonalized data can be transferred to the \emph{backend service} for deeper analysis, behavior modeling, etc. This should be regulated by a trustworthy body. The proposed model would be helpful for researchers, giving them valuable insight into the outbreak in real-time. 
+
+The same applications strategy could be reused by others or adjusted to best suit their needs. Such a service may exist only during the outbreak. When the situation is under control, the service could be dismissed. If fewer resources are required, or the pandemic is over, we can rearrange resources according to different needs. We can reuse the strategy on the next pandemic spike.
 %
 %
