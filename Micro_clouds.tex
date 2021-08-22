@@ -195,10 +195,18 @@ Some examples of applications may include:
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{events} that notify users if some value is above or below some defined threshold; 
 	\item \textbf{stream} or processing data as it comes to the system;
+	\item \textbf{micro-batch} processing delivers data more slowly than real-time data processing but faster than typical batch processing. It is performed in smaller batches, than traditional batch processing. This type of processing is for applications that require high-throughput processing over large data streams~\cite{AbdelhamidMDA20};
 	\item \textbf{batch} does processing in predefined times over some bigger collection of data ;
 	\item \textbf{daemons} or processing that are that do some tasks or executions in the background without explicit user intervention, usually their execution could be time defined but it is not mandatory;
 	\item \textbf{services} or applications that would operate over standard request-response model or some variation of that protocol. For example, the NATS messaging system has a request-reply form implemented over topics;
-	\item \textbf{other}, something that falls outside these models, or it is a composition of multiple operations at once. This type should get events from some topic as they arrive, and a user can define his strategy what needs to be done and how it needs to be processed. Users can contact other existing services, and the user is responsible for optimization;
+	\item \textbf{other}, something that falls outside these models, or it is a composition of multiple operations at once. This can be represented as a function composition in mathematics:
+	
+	\begin{center}
+		\( (f \circ g)(x) = f(g(x))\) 
+	\end{center}
+	\myequations{Function composition}
+	
+	This type should get events from some topic as they arrive, and a user can define his strategy what needs to be done and how it needs to be processed. Users can contact other existing services, and the user is responsible for optimization;
 \end{enumerate}
 
 \noindent
@@ -220,7 +228,7 @@ At the moment, containers are a more mature solution than unikernels and require
 
 In~\cite{inproceedingsSimic3} Simi\' c et al. show benefits of using containers in large scale edge computing systems from the theoretical point of view, by looking into architecture difference. Authors focus on differences between VMs and containers in cases where services need to run on ARM devices with limited resources.
 
-In the future and when unikernels are more matured and tested, they could be used for particular use-cases and applications, especially like events or serverless implementations. The containers will probably not be fully replaced, but they can co-exist with unikernels in some cases where more control over running a single function is needed.
+In terms of boot times, throughput, and memory consumption, unikernels are famous for providing excellent performance~\cite{abs-2104-12721}. In the future and when unikernels are more matured and tested, they could be used for particular use-cases and applications, especially like events or serverless implementations. The containers will probably not be fully replaced, but they can co-exist with unikernels in some cases where more control over running a single function is needed.
 
 Like any other system, users can create variants of the systems and different flavors optimized for certain solutions. In that cases, they may favor one solution over the other one. In general, containers and unikernels should be the preferred way to package, run, and distribute user applications in a micro-clouds environment.
 %

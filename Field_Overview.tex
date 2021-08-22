@@ -254,8 +254,8 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 	\label{tab:table2}
 \end{table}
 
-\subsubsection{Multi-cloid}
-In recent years there is one extension of CC from a series standpoint called \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15}. 
+\subsubsection{Multi-cloid and sky computing}
+In recent years there is one extension of CC from a series standpoint called \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15} or sky computing~\cite{StoicaS21} (terms are going to be used interchangeably). 
 
 A multi-cloud is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. 
 
@@ -316,7 +316,7 @@ The first idea that introduced task offloading from the cloud~\cite{FernandoLR13
 
 The cloud is usually far away from end devices because DCs are built on specific locations in the world to target as many users nearby as possible. This sparse deployment will most likely lead to high latency, and bad quality of experience (QoE)~\cite{LinLJL19} for most users. Latency-sensitive applications especially will have a hard time. As a model, MCC is not much different from the standard CC model. The good thing is that the cloud has been relaxed a little bit, and a small number of tasks has been moved from the cloud. But this model opens the door for the next-generation models.
 
-The development led to new computing areas like edge computing (EC). EC is a next-generation model where computing and storage resources are in proximity to data sources~\cite{Satyanarayanan17}. This idea might overcome cloud latency issues and known MCC problems. The main strength of the EC lays in the CC enhancements with new processing ideas, for the next-generation use-cases~\cite{NingLSY20}. 
+The development led to new computing areas like EC, osmotic computig~\cite{VillariFDRJR19, VillariCF17}, sky computing~\cite{StoicaS21}, etc. EC is a next-generation model where computing and storage resources are in proximity to data sources~\cite{Satyanarayanan17}. This idea might overcome cloud latency issues and known MCC problems. The main strength of the EC lays in the CC enhancements with new processing ideas, for the next-generation use-cases~\cite{NingLSY20}. 
 
 EC has brought a few different models over the years. Models like fog~\cite{BonomiMNZ14}, cloudlets~\cite{MonsalveCC18}, and mobile edge computing (MEC)~\cite{WangZZWYW17} emerged. This thesis will refer to all these models as edge nodes. Different EC models rely on the concept of data and computation offloading from the cloud closer to the ground~\cite{KhuneP19}. Only heavy computation remains in the cloud because of more available resources~\cite{NingLSY20}, compared to edge nodes. 
 
@@ -516,7 +516,7 @@ In microservices archtiecture, there are two standard ways to solve this problem
 	
 	\begin{figure}[H]
 		\begin{center}
-			\includegraphics[scale=1]{images/Figure21}
+			\includegraphics[scale=0.7]{images/Figure21}
 		\end{center}
 		\vspace{-0.6cm}
 		\caption{CQRS pattern diagram.}
@@ -531,7 +531,7 @@ In microservices archtiecture, there are two standard ways to solve this problem
 
 	\begin{figure}[H]
 		\begin{center}
-			\includegraphics[scale=1]{images/Figure22}
+			\includegraphics[scale=0.7]{images/Figure22}
 		\end{center}
 		\vspace{-0.6cm}
 		\caption{API Compossition pattern diagram.}
@@ -560,7 +560,7 @@ Figure~\ref{fig:fig18} shows the simple example of \textit{RequestX} path throug
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=1]{images/Figure18}
+		\includegraphics[scale=0.8]{images/Figure18}
 	\end{center}
 	\vspace{-0.9cm}
 	\caption{\textit{RequestX} path through the processes in a distributed system.}
@@ -588,7 +588,7 @@ Figure~\ref{fig:fig2} shows difference in network topology between P2P networks 
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.7]{images/Figure2}
+		\includegraphics[scale=0.6]{images/Figure2}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{P2P network and client-server network.}
@@ -622,7 +622,7 @@ Figure~\ref{fig:fig16} shows difference between mater-slave $(left)$ and peer-to
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.7]{images/Figure16}
+		\includegraphics[scale=0.6]{images/Figure16}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Handling requests master-slave and peer-to-peer}
@@ -644,9 +644,7 @@ DC and parallel computing seem like models that are the same, and that may share
 
 Differencies between the two can be presented as follows: in parallel computing, all processor units have access to the shared memory and have some way of the faster inter-process communication, while in DS and DC all processors have their memory on their machine and communicate over the network to other nodes which are significantly slower. 
 
-These models are similar, but they are not identical, and the kinds of problems they are designed to work on are different. 
-
-Figure~\ref{fig:fig4} visually summarizes the architectural  differences between DC $(up)$ and parallel computing $(down)$.
+These models are similar, but they are not identical, and the kinds of problems they are designed to work on are different. Figure~\ref{fig:fig4} visually summarizes the architectural  differences between DC $(up)$ and parallel computing $(down)$.
 
 \begin{figure}[H]
 	\begin{center}
