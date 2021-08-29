@@ -261,6 +261,17 @@ Geo-distributed micro-clouds model that is described in this chapter should oper
 \end{enumerate}
 
 \noindent
+Figure~\ref{fig:fig24} shows flow chart for rolling update in micro clouds for both services and infrastructure.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[width=\columnwidth]{images/Figure24}
+	\end{center}
+	\vspace{-0.5cm}
+	\caption{Rolling update flow chart}
+	\label{fig:fig24}
+\end{figure}
+
 It is important to notice, that both deployments should be closely followed, for possible errors and problems so that users can act accordingly. These deployment messages, logs, and traces~\cite{36356} should be stored in a centralized log system, for convenient lookup, alerting, and reporting.
 
 Separation like this simplifies deployment and usage for both application development spectrums: 
@@ -877,15 +888,10 @@ If we have cached idempotency data for user requests, and if a user tries to sen
 \noindent
 If we have stored user request on cluster formation protocol, and we receive a new request with the same name, \textbf{then} we can take the intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
 
-This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}. 
-
-We can go even a little bit further and use CRDTs and SEC to store and replicate data on copidres of the services that are required for the idempotency test.
-
-Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
-
+This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}.  We can go even a little bit further and use CRDTs and SEC to store and replicate data on copidres of the services that are required for the idempotency test. Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.7]{images/Figure13}
+		\includegraphics[scale=0.6]{images/Figure13}
 	\end{center}
 	\vspace{-0.7cm}
 	\caption{Low level view of idempotency check communication.}

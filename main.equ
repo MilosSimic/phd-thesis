@@ -7,17 +7,17 @@
 \contentsline {myequations}{\numberline {4.1}Cluster size limits}{75}{equation.4.1.1}% 
 \contentsline {myequations}{\numberline {4.2}Position od micro clouds.}{76}{equation.4.1.2}% 
 \contentsline {myequations}{\numberline {4.2}Function composition}{83}{Item.91}% 
-\contentsline {myequations}{\numberline {4.3}Global type construction}{89}{equation.4.6.3}% 
-\contentsline {myequations}{\numberline {4.4}Local type representation syntax.}{90}{equation.4.6.4}% 
-\contentsline {myequations}{\numberline {4.5}Extending free servers set.}{93}{equation.4.6.5}% 
+\contentsline {myequations}{\numberline {4.3}Global type construction}{90}{equation.4.6.3}% 
+\contentsline {myequations}{\numberline {4.4}Local type representation syntax.}{91}{equation.4.6.4}% 
+\contentsline {myequations}{\numberline {4.5}Extending free servers set.}{94}{equation.4.6.5}% 
 \contentsline {myequations}{\numberline {4.6}Extending label set.}{95}{equation.4.6.6}% 
 \contentsline {myequations}{\numberline {4.6}Health-check global protocol.}{96}{definition.4.6.4}% 
-\contentsline {myequations}{\numberline {4.6}Health-check global protocol projection.}{96}{definition.4.6.4}% 
-\contentsline {myequations}{\numberline {4.7}Query selector formation.}{99}{equation.4.6.7}% 
-\contentsline {myequations}{\numberline {4.10}Server selector.}{100}{equation.4.6.10}% 
-\contentsline {myequations}{\numberline {4.11}Extending task queue set.}{100}{equation.4.6.11}% 
-\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol.}{102}{Item.124}% 
-\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol projection.}{104}{Item.126}% 
+\contentsline {myequations}{\numberline {4.6}Health-check global protocol projection.}{97}{definition.4.6.4}% 
+\contentsline {myequations}{\numberline {4.7}Query selector formation.}{100}{equation.4.6.7}% 
+\contentsline {myequations}{\numberline {4.10}Server selector.}{101}{equation.4.6.10}% 
+\contentsline {myequations}{\numberline {4.11}Extending task queue set.}{101}{equation.4.6.11}% 
+\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol.}{103}{Item.124}% 
+\contentsline {myequations}{\numberline {4.11}Cluster formation global protocol projection.}{105}{Item.126}% 
 \contentsline {myequations}{\numberline {4.11}Idempotency check global protocol.}{110}{Item.138}% 
 \contentsline {myequations}{\numberline {4.11}Idempotency check global protocol projection.}{112}{Item.140}% 
 \contentsline {myequations}{\numberline {4.11}List detail global protocol.}{114}{algocf.6}% 
