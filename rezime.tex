@@ -107,7 +107,7 @@ Resursi predstavljaju EC \v cvorove i, da bi \v cvor bio deo sistema, mora zadov
 \item Mora biti sposoban da pokrene operativni sistem sa sistemom datoteka;
 \item Mora biti u mogu\'cnosti da pokrene neki od dostupnih alata za izolaciju aplikacija, na primer \textit{container} ili \textit{unikernel}; 
 \item Mora imati dostupne resurse za kori\v s\'cenje (npr. CPU, GPU, disk itd.);
-\item Mora imati stalnu internet vezu.
+\item Mora imati internet vezu.
 \end{enumerate}
 
 Servisi pru\v zaju resurse aplikacijama putem definisanog interfejsa i \v cine ih dostupnim preko interneta~\cite {JinCJL14}. Servisi odmah odgovaraju na klijentske zahteve, ako je to mogu\'ce, ili mogu da skladi\v ste prona\dj enu informaciju za neke budu\'ce korisni\v cke upite~\cite {SatyanarayananBCD09, YaoXWYZP20}. Servisi koji se izvr\v savaju u oblaku treba da budu u stanju da prihvate unapred obra\dj ene podatke i odgovorni su za obradu i skladi\v stenje podataka \v ciji kapacitet prevazilazi mogu\'cnosti EC \v cvorova. Ovi servisi tako\dj e treba da budu zamenska opcija u slu\v caju da prethodno definisani sistem bude nedostupan iz bilo kog razloga.
@@ -139,9 +139,9 @@ Proces modelovanja odvija se u dva koraka:
 Na osnovu prethodno opisanih ideja i mogu\'cnosti, defini\v semo problem koji ova teza obra\dj uje kroz slede\'ca tri istra\v ziva\v cka pitanja:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]\label{rez:questions}
-	\item \textit{Da li mo\v zemo da organizujemo geografski distribuirane \v cvorove na sli\v can na\v cin kao ra\v cunarstvo u oblaku, prilago\dj ene druga\v cijem okru\v zenju sa jasnom podelom nadle\v znosti i poznatim modelom razvoja aplikacija za korisnike?}
-	\item \textit{Da li mo\v zemo da ponudimo ovako organizovane \v cvorove kao uslugu programerima i istra\v ziva\v cima za budu\'ce aplikacije usmerene vi\v se ka ljudima, a zasnovane na poznatom pay as you go modelu?}
-	\item \textit{Da li mo\v zemo da formuli\v semo model na takav na\v cin da je formalno ispravan, lak za pro\v sirivanje, razumevanje i obrazlo\v zenje?}
+	\item Kako se mo\v ze definisati formalan pro\v siriv model sa jasnom podelom nadle\v znosti, po ugledu na organizaciju ra\v cunarstva u oblaku, koji bi bio prilago\dj en druga\v cijem okru\v zenju izvr\v savanja sa jasnim aplikativnim modelom koji \'ce moći da iskoristi novu, prilago\dj enu arhitekturu?
+	\item Kako je mogu\'ce ovako organizovane \v cvorove predstaviti kao uslugu korisnicima za razvoj budu\'cih aplikacija, po poznatom modelu naplate po utro\v sku (eng. pay as you go)?
+	\item Kako se mo\v ze definisati formalno ispravan model koji \'ce biti lak za pro\v sirenje?
 \end{enumerate}
 
 Ako su prethodna istra\v ziva\v cka pitanja potvrdna, onda pro\v sirenje nalik na oblak pro\v siruje resurse van granica pojedina\v cnog \v cvora \v sto \v citav sistem, kao i same aplikacije koje bi se izvr\v savale u njemu, \v cini dostupnijim i pouzdanijim.
@@ -153,19 +153,19 @@ Godinama nakon svog osnivanja, EC vi\v se nije samo ideja~\cite{SatyanarayananK1
 Na osnovu prethodno definisanih istra\v ziva\v ckih pitanja i motivacija~\ref{rez:questions}, izvodimo hipoteze na kojima se temelji ova teza rezimirano na slede\'ci na\v cin:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Hipoteza:} \textit{Mogu\'ce je organizovati \v cvorove na standardni na\v cin, zasnovan na arhitekturi ra\v cunarstva u oblaku i prilago\dj en druga\v cije rasprostranjenom geografskom okru\v zenju, pru\v zaju\'ci korisnicima mogu\'cnost da na najbolji mogu\'ci na\v cin organizuju \v cvorove i klastere po raznim geografskim oblastima kako bi opslu\v zivali samo lokalno stanovni\v stvo u neposrednoj blizini.}
-	\item \textbf{Hipoteza:} \textit{Mogu\'ce je ponuditi dobijeni model istra\v ziva\v cima i programerima da kreiraju nove aplikacije usmerene vi\v se ka ljudima. Ako nam je potrebno vi\v se resursa na jednoj strani, mo\v zemo uzeti odre\dj enu koli\v cinu resursa i premestiti je na mesto gde su oni zaista potrebni ili ih organizovati na bilo koji drugi \v zeljeni na\v cin.}
-	\item \textbf{Hipoteza:} \textit{Mogu\'ce je predstaviti jasnu podelu nadle\v znosti za budu\'ci sistem, koji bi bio pru\v zen korisnicima kao usluga, i uspostaviti dobro organizovan sistem u kojem svaki deo ima intuitivnu i jasnu ulogu.}
+	\item \textbf{Hipoteza:} \textit{Mogu\'ce je organizovati \v cvorove na standardni na\v cin, zasnovan na arhitekturi ra\v cunarstva u oblaku i prilago\dj en druga\v cije rasprostranjenom geografskom okru\v zenju pru\v zaju\'ci korisnicima mogu\'cnost da na najbolji mogu\'ci na\v cin organizuju \v cvorove i klastere po raznim geografskim oblastima kako bi opslu\v zivali samo lokalno stanovni\v stvo u neposrednoj blizini –-- model distribuiranog mikro okru\v zenja ra\v cunarstva u oblaku.}
+	\item \textbf{Hipoteza:} \textit{Model distribuiranog mikro okru\v zenja ra\v cunarstva u oblaku se mo\v ze iskoristiti za upravljanje infrastrukturnim resursima u blizini korisnika. Ako je potrebno vi\v se resursa na jednoj strani, mo\v ze se uzeti odre\dj ena koli\v cina resursa i reorganizovati u skladu sa potrebama sistema ili se mogu reorganizovati na bilo koji drugi \v zeljeni na\v cin.}
+	\item \textbf{Hipoteza:} \textit{Mogu\'ce je predstaviti jasnu podelu nadle\v znosti za budu\'ci sistem, koji bi se pru\v zio korisnicima kao usluga, i uspostaviti dobro organizovan sistem u kojem svaki deo ima intuitivnu i jasnu ulogu.}
 	\item \textbf{Hipoteza:} \textit{Mogu\'ce je predstaviti objedinjeni model, koji podr\v zava heterogene \v cvorove, sa jasnim setom tehni\v ckih zahteva koje budu\'ci \v cvorovi moraju ispuniti ako \v zele da postanu deo sistema.}
-	\item \textbf{Hipoteza:} \textit{Mogu\'ce je predstaviti jasan aplikativni model, intuitivan korisnicima, kako bi se mogao iskoristiti puni potencijal novonastale infrastrukture.}
+	\item \textbf{Hipoteza:} \textit{Mogu\'ce je predstaviti jasan aplikativni model, intuitivan korisnicima, kako bi se mogao iskoristiti puni potencijal predstavljenog re\v senja.}
 \end{enumerate}
 
 Iz prethodno definisanih hipoteza izvodimo primarne ciljeve ove teze pri \v cemu o\v cekivani rezultati uklju\v cuju slede\'ce:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textit{Postojanje konstrukcije modela sa jasnom podelom nadle\v znosti, po ugledu na organizaciju ra\v cunarstva u oblaku, koji bi bio prilago\dj en druga\v cijem okru\v zenju izvr\v savanja sa jasnim aplikativnim modelom koji \'ce mo\'ci da iskoristi novu, prilago\dj enu arhitekturu. Ovaj cilj odnosi se na prvo istra\v ziva\v cko pitanje, a definisano je kroz poglavlje~\ref{chapter:Micro_clouds}.}
-	\item \textit{Definisani model je dostupniji i elasti\v can sa manje ka\v snjenja u pore\dj enju sa pojedina\v cnim malim serverima i, kao takav, \v siroj javnosti mo\v ze se ponuditi kao bilo koja druga usluga u oblaku. Ovo se odnosi na drugo istra\v ziva\v cko pitanje i tema je poglavlja~\ref{chapter:Micro_clouds}.}
-	\item \textit{Definisani model dobro je opisan formalno, uz oslanjanje na \v cvrstu matemati\v cku osnovu, ali tako\dj e je pogodan za pro\v sirivanje (i formalno i tehni\v cki), lak je za razumevanje i obrazlo\v zenje. Ovo se odnosi na tre\'ce istra\v ziva\v cko pitanje i tema je poglavlja~\ref{chapter:Micro_clouds}.}
+	\item \textit{Definisanje formalnog pro\v sirivog modela sa jasnom podelom nadle\v znosti, po ugledu na organizaciju ra\v cunarstva u oblaku, koji bi bio prilago\dj en okru\v zenju gde se obrada i skladištenje vr\v se bli\v ze korisnicima sa jasnim aplikativnim modelom koji će mo\'ci da iskoristi novu prilagođenu arhitekturu. Ovaj cilj odnosi se na prvo istra\v ziva\v cko pitanje, a definisano je kroz poglavlje \ref{chapter:Micro_clouds}.}
+	\item \textit{Definisani model je dostupniji i elasti\v can sa manje ka\v snjenja u pore\dj enju sa pojedina\v cnim malim serverima i mo\v ze se koristiti kao bilo koja druga usluga u oblaku. Ovaj cilj odnosi se na prvo istra\v ziva\v cko pitanje, a definisano je kroz poglavlje \ref{chapter:Micro_clouds}.}
+	\item \textit{Implementacija i verifikacija prototipa kojim bi se potvrdila prakti\v cna primenljivost navedenog modela i identifikovale sve njegove prednosti i eventualni nedostaci. Ovo se odnosi na tre\'ce istra\v ziva\v cko pitanje i tema je poglavlja \ref{chapter:Micro_clouds} i \ref{chapter:Implementation}.}
 \end{enumerate}
 
 \noindent

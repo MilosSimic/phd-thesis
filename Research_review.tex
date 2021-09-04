@@ -77,6 +77,7 @@ In~\cite{cherrueau}, authors propose solution that relies on the modularity of t
 %
 \section{Infrastructure management}\label{sec:infrastructure_management}
 %
+\new{
 In the era of distributed systems, cloud computing, and microservices the open-source community and different companies provided various tools for the purpose of abstracting infrastructure at the level of software. These tools can be separated into two subgroups, based on how users send instructions to the systems on \textbf{(1)} declarative, and \textbf{(2)} imperative.
 
 Newly created tools like Terraform, Polumni, or CFEngine are representative of the declarative movement, using platform-independent language to specify configuration, policies, security, and much more. Users specify their intentions usually through some existing formats like \emph{JSON} or \emph{YAML}, while others use their domain-specific language to achieve the same goal.
@@ -102,6 +103,7 @@ On the other hand, a newly created IaC system can communicate with existing tool
 With this strategy, we are getting the best of both worlds. The new user application model would be based on the existing cloud application model, offering users a fast and elegant way to develop new human-centered applications.
 
 IaC has grown in popularity in recent years because it applies the same kind of version control and repeatability to the orchestration of the infrastructure as developers use for applications source code~\cite{ArtacBNGT17}. The second benefit is that configuration is decoupled from the system, it can more readily be deployed on a similar system elsewhere.
+}
 %
 %
 \section{Thesis position}\label{sec:thesis_position}

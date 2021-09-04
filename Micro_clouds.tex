@@ -1202,17 +1202,18 @@ Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using 
 %
 \section{Long-lived transactions}\label{sec:long_live_transactions}
 %
+\new{
 To operate micro clouds properly, such a system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offer (cf.~page~\ref{sec:microservices}). But still, we must be aware of all problems that come along with them.
 
 That been said, one of the problems we have to deal with are transactions that appear in such distributed system --- distributed transactions (cf. page~\ref{sec:distributed_transactions}). Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. page~\ref{sec:sagas}).
 
-When a user submits the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (e.g., no available resources or nodes, etc.) the task is finished, and it goes to \emph{FAILD} state, and this concludes the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, the task will go to \emph{IN PROGRESS} state.
+When a user submits the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (e.g., no available resources or nodes, etc.) the task is finished, and it goes to \emph{FAILED} state, and this concludes the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, the task will go to \emph{IN PROGRESS} state.
 
 In this state, the system needs to save newly formed cluster information, prepare metrics service, add watchers for the cluster nodes health-check, etc. This operation spans multiple services, creating sub-transactions. The task state will prevent the users from applying other tasks, configurations, and actions on a not yet formed cluster.
 
 We can always invoke the rollback mechanism if any error happens during this process. Other options would be to try to fix the occurred issue with some of the retry strategies.
 
-If there are no errors, the cluster formation transaction finishes, changing the task state to \emph{CREATED}. If there are errors during this process, the cluster formation transaction ends without creating the cluster. The task will go again to \emph{FAILD} state, and this concludes the transaction.
+If there are no errors, the cluster formation transaction finishes, changing the task state to \emph{CREATED}. If there are errors during this process, the cluster formation transaction ends without creating the cluster. The task will go again to \emph{FAILED} state, and this concludes the transaction.
 
 Figure~\ref{fig:fig19} shows state diagram for cluster formation message.
 
@@ -1226,10 +1227,12 @@ Figure~\ref{fig:fig19} shows state diagram for cluster formation message.
 \end{figure}
 
 Cluster formation protocol will most likely span over multiple services, and strategies like sagas can be useful to implement transactions and rollbacks properly.
+}
 %
 %
 \subsection{Garbage collection}\label{sec:garbage}
 %
+\new{
 When the user submits the task to the system if for whatever reason that task fails we have the option to immediately remove that task, and possibly all task connected items. Or, the system should have a specific process in the background, which the only purpose is the garbage collection to restore unused and fragmented system resources.
 
 The second option seems more acceptable because one item can have a graph of items that are connected to that specific item. This graph can be complex, and immediate deletion may slow down the entire system. In the background, the garbage collection process can mark unused items and delete them when the time is right.
@@ -1237,10 +1240,12 @@ The second option seems more acceptable because one item can have a graph of ite
 Users should also be able to delete certain items with their dependencies as well, invoking \emph{cascading deletion}. Dependencies may be deleted immediately, or marked as \emph{orphans}, and deleted by the garbage collection process.
 
 It makes sense that users can influence garbage collection by submitting their policies when and how often to do this operation, to delete only items or container images as well, and so on.
+}
 %
 %
 \section{System observability}\label{sec:system_observability}
 %
+\new{
 Observability is an importatnt part of any real-world computing system (cf. page~\pageref{sec:log_aggregation}). It is important part of any platform that strive to be offered as a service to large groups of different users. 
 
 At every moment, we must know what is happening in the system, where are bottlenecks and how we can resolve problems. This is of significant importance in DS, where state and calculations are scattered across multiple nodes, clusters and even DCs.
@@ -1258,6 +1263,7 @@ Because of these two really important parameters, observability myst be implemen
 Every service should log details about its usage and calls as well as traces how requests are going, regardless it is platform or user. Log data should be stored outside the service and the virtualization tool (eg. using sidecar pattern with containers~\cite{BurnsO16}), while pieces of information will be sent to centralized log storage. Sending intervals should be be able to change and adapt for both levels.
 
 Log storage could be searched to see the general state of the system, and pieces of information about user requests and the state of their requests.
+}
 %
 %
 \section{Access pattern}\label{sec:access_pattern}
@@ -1306,6 +1312,7 @@ Since the perfect model never existed, the model that is proposed in this thesis
 %
 \subsection{Discussion}
 %
+\new{
 The specialized infrastructure in models like~\cite{BaccarelliNSSA17, GuoRG20, JeonK19, BCAK19, ChiariniRAMG13} is required to solve a single problem. The model proposed in this thesis is more oriented towards a wider specter of applications, without the need for specialized hardware or software. Users should build applications, similarly as they are building them for the cloud. Even existing applications models (e.g., microservices, serverless functions) could be transferred from cloud to micro cloud.
 
 One advantage is that specialized models are developed and optimized for a specific use case taking the maximum out existing of hardware and software. Compared to the presented model (in terms of speed), in some situations, they might outperform the proposed model. On the other hand, the proposed model offers much more freedom for development (in terms of agility and applicability). This development freedom gives the users a new platform for creating interesting human-centered applications spanning over CC and micro clouds~\cite{VillariCF17}.
@@ -1313,5 +1320,6 @@ One advantage is that specialized models are developed and optimized for a speci
 Specialized platforms usually require special types of applications, while the proposed model does not limit users (in terms of development tools and techniques), as long as their application could be virtualized in some way (e.g., using virtual machines, containers, or unikernes). The developers may reuse existing knowledge to develop their applications.
 
 The proposed model allows the organization of storage and processing resources according to priority if a catastrophic event (e.g., COVID-19 see page~\pageref{sec:covid_example}) hits the human population. Humanity can organize its resources and manage its digital infrastructure, where developers make applications that will help its citizens in those tough times.
+}
 %
 %
