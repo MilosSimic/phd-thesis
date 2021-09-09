@@ -74,10 +74,10 @@ In geo-distributed systems, topology represents the highest logical concept that
 \noindent
 With these simple abstractions, any geographical region can be easily covered with the ability to shrink or expand clusters, regions, and topologies. Size and formation of $clusters$, $regions$, and $topologies$ should be a matter of need, agreement, and usages of nearby population similar to the size of MDCs~\cite{GreenbergHMP09}, and modeling in Big Data systems~\cite{SonbolOAA20, WangCAL14}. This separation and organization gives one interesting feature. A more natural administrative division of some region can be followed, and resources can be organized by population usages.
 
-The organization of these concepts should be fully optional. So for example, we could fit clusters in an interval of nano-DCs~\cite{inbookKurniawan} and MDCs~\cite{GreenbergHMP09} or as wide as the whole city or as small as all devices in a single household and everything in between. Formally, the size of some cluster $c$ can be represented like:
+The organization of these concepts should be fully optional. So for example, we could fit clusters in an interval of nano-DCs~\cite{inbookKurniawan} and MDCs~\cite{GreenbergHMP09} or as wide as the whole city or as small as all devices in a single household and everything in between. Formally, the size of some cluster micro cloud cluster ($mccc$) can be represented like:
 
-\begin{equation}
-	c \in \left[ nano\ DCs,\ MDCs \right]
+\begin{equation}~\label{size:eq1}
+	mcc \in \left[ nano\ DCs,\ MDCs \right]
 \end{equation}
 \myequations{Cluster size limits}
 
@@ -90,9 +90,9 @@ Replication could be used not only in nodes inside the cluster, but data can als
 
 Single $topology$ reflects one CC provider, so multiple topologies are forming micro-clouds that can help CC with huge latency issues, pre-processing in huge volumes of data, and relax and decentralize strict centralized CC model.
 
-These micro-clouds have much fewer resources compared to standard clouds, but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later. Formally, the position of micro-clouds $mc$ in between CC and EC like:
+These micro-clouds have much fewer resources compared to standard clouds, but they are much closer to the user meaning they have a much faster response. In the case of storage, if data is not present at the time of user request, they can pull data from the cloud and cache it for later. Formally, the position of micro clouds ($mc$) in between CC and EC like:
 
-\begin{equation}
+\begin{equation}~\label{size:eq2}
 mc \in \left( Cloud\ computing,\ Edge\ computing \right)
 \end{equation}
 \myequations{Position od micro clouds.}
@@ -289,7 +289,7 @@ It is important to note that every action in the system should be logged and tra
 %
 \section{Formal model}\label{sec:formal_model}
 %
-Ensuring the reliability and correctness of any DS is a very difficult task, and should be mathematically based. Formal methods are techniques that allow us to create specifications and verification of complex (software and hardware) systems based on mathematics and formal logic. There are several options for how to formally describe DS: TLA+, $pi$ calculus, combinational topology, asynchronous session types (MST), etc. 
+Ensuring the reliability and correctness of any DS is a very difficult task, and should be mathematically based. Formal methods are techniques that allow us to create specifications and verification of complex (software and hardware) systems based on mathematics and formal logic. There are several options for how to formally describe DS: TLA+~\cite{YuML99}, $pi$ calculus~\cite{0018113}, combinational topology~\cite{Upadhyay16}, asynchronous session types (MST)~\cite{HondaYC08}, etc. 
 
 Unfortunately, because of their nature DS cannot always be formally described by any of the existing techniques. There are a lot of variables that could influence this. But if the nature of the DS that is developing is such that can be formally described, it is recommended and beneficial. A formally described and correct model can save hours, days, and even months of hard debugging, testing to reveal all bugs and problems in the system that may only happen in some specific circumstances that are hard to initiate.
 
@@ -1294,6 +1294,22 @@ The model presented in this chapter, has three possible execution repercussions:
 	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because -- the communication should be implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an organization tool.
 	\item \textbf{Combination}, this approach can be done over multi-cloud principles. Some cloud tasks could be offloaded to the nearest micro-cloud.
 \end{enumerate} 
+%
+%
+\section{User data in micro clouds}\label{sec:user_data}
+%
+One of the benefits of having micro cloud in near proximity is that user data can be processed and stored locally, and users are able to control to which extend data can be shared with the cloud~\cite{SatyanarayananK19} (see section~\ref{sec:problem_statement}). User data would be relatively easy to replicate inside region using CRDTs for example, to eliminate expensive coordination~\cite{inproceedingsSimic2}.
+
+But since micro clouds storage capacity is less than traditional cloud, they should store most recently used data. The storage capacity is determined by the micro cloud size given by the equation~\ref{size:eq1}.
+
+Data locality in micro clouds creates two challenges, that must be addressed:
+
+\begin{enumerate}
+	\item user leaves a place, where the copy of his data exists, is data stationary, or follows him using some pattern? The decision should be left to users, micro cloud providers, and developers to decide. The proposed model allows the creation of different \textbf{data plans} that could be represented via \textbf{different policies} for every individual user or group of users. If data needs to follow the user, as a data transfer medium we could use the cloud as a backbone, to transfer data to the micro cloud in user proximity. The process is similar to the content delivery networks on the edge~\cite{inbookKurniawan}. In such a scenario, we must pay attention to the network pressure and transfer only the requested data. As an alternative option, we can serve data directly from the cloud and do not transfer anything.
+	\item how long, the user data should be stored in the micro cloud, if we assume that locally existing micro cloud will serve many users? The proposed model does not restrict how long the data should be stored and it is \textbf{policy-based}. Depending on the micro cloud size given by equation~\ref{size:eq1}, micro cloud providers may determine \textbf{different policies} --- Time to live (TTL)~\cite{CohenHK05} and offer to users. This process is somewhat similar to the leases mechanism in cache systems~\cite{GrayC89}. 
+\end{enumerate}
+
+The data retention and size in the micro cloud are decided and optimized with~\ref{size:eq1} and~\ref{size:eq2}, for the single user or group of users. This is giving developers, and miro cloud providers more room to optimize their policies offered to the users. While users may choose different options based on their needs.
 %
 %
 \section{Limitations}\label{sec:limitations}

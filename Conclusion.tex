@@ -64,6 +64,8 @@ For the first group, the first thing that should be implemented is remote cluste
 
 The system should also be extended with namespaces for usage in environments with many users in multiple teams -- multi-tenant environments. Namespaces provide the separation on virtual clusters, running on the same physical hardware. Speaking about multi-tenancy, we are also planning to implement role-based access control integrate with authentification and authorization services, with the addition of controlling different users with quotas, using rate limiting and resource limiting.
 
+Also one possible approach would be to extend resources dynamically using infrastructure auto-scaling mechanism, so that system can grow and shrink as needed.
+
 We are also planning to implement a full architecture and applications monitoring, alerting, and reporting that would be helpful to any administrator of such a system. We might also consider rethinking networking and making network isolation so that once formed topologies can communicate within themselves, and a possibility to specify 
 strategies of communication with other topologies.
 
