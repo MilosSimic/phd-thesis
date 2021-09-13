@@ -255,17 +255,16 @@ Table~\ref{tab:table2} shows common examples of SaaS, PaaS, and IaaS application
 \end{table}
 
 \subsubsection{Multi-cloud and sky computing}
-\new{
-In recent years there is one extension of CC from a series standpoint called \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15} or sky computing~\cite{StoicaS21} (terms are going to be used interchangeably). 
+%
+In recent years there has been one extension of CC from a series standpoint called \textbf{multi-cloud}~\cite{HongDSH19, Ardagna15} or sky computing~\cite{StoicaS21} (terms are going to be used interchangeably). 
 
-A multi-cloud is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. 
+It is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. 
 
 A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
 
-This strategy allows creation a single heterogeneous architecture, allowing distribution of cloud assets and workloads across multiple providers (active-active), or deploy a single workload on one provider, with a backup on another (active-passive)~\cite{Multicloud2019}.
+This strategy allows creation of a single heterogeneous architecture, allowing distribution of cloud assets and workloads across multiple providers (active-active), or deploy a single workload on one provider, with a backup on another (active-passive)~\cite{Multicloud2019}.
 
 CC gives a user an illusion that he is using a single machine, while the background implementation is fairly complicated and consists of various elements that are composed of countless machines. CC is a typical example of a horizontally scalable system presented in~\ref{sec:scalability}.
-}
 %
 %
 \subsection{Membership protocol}\label{sec:memership_protocol}
@@ -408,7 +407,7 @@ This architecture pattern is well aligned to the CC paradigm~\cite{LiZJLZLGGS19}
 		\end{tabular}
 	\end{center}
 	\vspace{-0.5cm}
-	\caption{Differences the monolith and microservices architecture.}
+	\caption{Differences between the monolith and microservices architecture.}
 	\label{tab:table3}
 \end{table}
 
@@ -500,20 +499,19 @@ Another option that is commonly used is hashing user specified actions. It is us
 %
 \subsubsection{Distributed Queries}
 %
-\new{
-Applicatoins built using microservices architecture propose different strategies for data store. One common and recommended technique is \emph{database per service} patter~\cite{richardson2018microservices}.
+Applications built using microservices architecture propose different strategies for data storage. One common and recommended technique is \emph{database per service} patter~\cite{richardson2018microservices}.
 
-This technique, as a result have that overall state of the system will be distributed across multiple data stores, accessible only from their own microservices. This creates two important topics to think about: $(1)$ transactions that spans over multiple services can be implemented using \emph{Sagas} for example (cf.~\pageref{sec:sagas})
-, and $(2)$ The complex queries which require data from multiple databases.
+The result of this technique is that overall state of the system will be distributed across multiple data stores, accessible only from their own microservices. This creates two important topics to think about: \textbf{(1)} transactions that span over multiple services can be implemented using \emph{Sagas} for example (cf.~\pageref{sec:sagas})
+, and \textbf{(2)} the complex queries which require data from multiple databases.
 
-The complex queries will involve data available in multiple databases, and client can access all these microservices and aggregate data, however this is not the recommended solution becasue client does not have full understanding how system manages the data.
+The complex queries will involve data available in multiple databases, and a client can access all these microservices and aggregate data, however, this is not the recommended solution because the client does not have full understanding how the system manages the data.
 
 In microservices archtiecture, there are two standard ways to solve this problem~\cite{richardson2018microservices}:
 
 \begin{enumerate}
-	\item \textbf{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs} separates responsibility for \emph{modifying} data (command), and the \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the systm~\cite{richardson2018microservices, 8101372}. This increase the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}. 
+	\item \textbf{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs} separates responsibility for \emph{modifying} data (command), and \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the system~\cite{richardson2018microservices, 8101372}. This increases the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}. 
 	
-	When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. Service that will serve the queries will keep the \emph{read-only} replica of the data. 
+	When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. The service that will serve the queries will keep the \emph{read-only} replica of the data. 
 	
 	Figure~\ref{fig:fig21} shows an example diagram for CQRS pattern.
 	
@@ -526,9 +524,9 @@ In microservices archtiecture, there are two standard ways to solve this problem
 		\label{fig:fig21}
 	\end{figure}
 
-	\item \textbf{API composition}\label{par:composition} it a simple way to query data in a microservice architecture~\cite{richardson2018microservices, 8890660}, alternative and more lightweight solution than CQRS. 
+	\item \textbf{API composition}\label{par:composition} is a simple way to query data in a microservice architecture~\cite{richardson2018microservices, 8890660}, alternative and more lightweight solution than CQRS. 
 	
-	The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns combined result to client. Making it easier to implement, because we do not need to refresh database every time when some change occurs in the system. On the other hand, it may yield a slower response, depending on how many services we need to constant for the information, their availability, and time to merge and prepare data in memory. 
+	The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns the combined result to client. Making it easier to implement, because database does not need to be refreshed every time when some change occurs in the system. On the other hand, it may yield a slower response, depending on how many services we need to contact for the information, their availability, and time to merge and prepare data in memory. 
 
 	Figure~\ref{fig:fig22} shows an example diagram for API Compossition pattern.
 
@@ -543,7 +541,6 @@ In microservices archtiecture, there are two standard ways to solve this problem
 \end{enumerate}
 
 The best chance to succeed when implementing a microservices architecture is to simply follow existing patterns and use existing solutions with proven quality. 
-}
 %
 %
 \subsection{Observability}\label{sec:log_aggregation}
@@ -676,34 +673,29 @@ Nonetheless, CC can and should be decentralized in the sense that some computati
 %
 \section{Transactions}\label{sec:transactions}
 %
-\new{
-Transactions are keeping data consistent even in the presence of highly concurrent data accesses and despite all sorts of failures~\cite{WeikumV2002}. Transactions are trying to resolve this problem in a generic way, in such way that is invisible to the application logic.
+Transactions are keeping data consistent even in the presence of highly concurrent data accesses and despite all sorts of failures~\cite{WeikumV2002}. Transactions are trying to resolve this problem in a generic way, in such a way that is invisible to the application logic.
 
-The main goal of transactios is to maintain system integrity in the consistent state, by ensuring that all operations on the system are either all completed successfully or all canceled successfully. Transactions are typically used in systems that needs to preserve some state (e.g. database or some filesystems). 
+The main goal of transactions is to maintain system integrity in the consistent state, by ensuring that all operations on the system are either all completed successfully or all canceled successfully. Transactions are typically used in systems that needs to preserve some state (e.g. database or some filesystems). 
 
-In their book Gray et al. makes a good parallel with the contract law, saing that transactions giving us the ability to \emph{clean up the situation}, if something does not work right.~\cite{GrayR93}.
+In their book Gray et al. make a good parallel with the contract law, saying that transactions give us the ability to \emph{clean up the situation}, if something does not work right.~\cite{GrayR93}.
 
-Transactions guarantees following four properties: $(1)$ atomicity, $(2)$ consistency, $(3)$ isolation, and $(4)$ durability, also known as \emph{ACID} properties.
-} 
+Transactions guarantee following four properties: \textbf{(1)} atomicity, \textbf{(2)} consistency, \textbf{(3)} isolation, and \textbf{(4)} durability, also known as \emph{ACID} properties.
 %
 %
 \subsection{Distributed transactions}\label{sec:distributed_transactions}
 %
-\new{
-Becasue of the nature of DS, more network hosts are involved which significantly complicated the transaction mechanism. Distributed transactions are required to have all four \emph{ACID} properties. This might not be so easy to achieve amongst other due to \emph{CAP} theorem~\pageref{lab:cap}. 
+Because of the nature of DS, more network hosts are involved which significantly complicates the transaction mechanism. Distributed transactions are required to have all four \emph{ACID} properties. This might not be so easy to achieve amongst other due to \emph{CAP} theorem~\pageref{lab:cap}. 
 
 In their book, Morgan et al. claim that here exists no distributed commit protocol that can guarantee independent process recovery in the presence of multiple failures (e.g., network partitionings)~\cite{WeikumV2002}.
 
 Distributed transactions include few protocols such as two-phase commit (2PC), three-phase commit (3PC), Paxos, and various other approaches to quorum giving programmers facade of global serializability~\cite{Helland07}. 
 
 Avoiding distributed transactions allows a much simpler, more robust and efficient solution.
-}
 %
 %
 \subsection{Sagas}\label{sec:sagas}
 %
-\new{
-In 1987, Molina et al. presented \emph{Sagas}~\cite{Garcia-MolinaS87} and their work in the are of \emph{long-lived transactions (LLTs)}, types of transactions that hold resources for long periods, and as such delaying shorter and more common transactions. 
+In 1987, Molina et al. presented \emph{Sagas}~\cite{Garcia-MolinaS87} and their work in the area of \emph{long-lived transactions (LLTs)}, types of transactions that hold resources for long periods, and as such delay shorter and more common transactions. 
 
 These transactions are increasingly relevant and important, in the current technological landscape with the distribution of components and microservices architectures.
 
@@ -711,7 +703,7 @@ The saga transaction is composed of sub-transactions, executed in an atomic way 
 
 One transaction $T$ is composed of multiple sub-transactions $T_1,\ldots,T_n$, and every sub-transaction $T_i$ has an associated \emph{compensating transaction} $C_i$ or how the effects of the transaction can be rolled back. The saga transaction executes sub-transactions sequentially.
 
-Figure~\ref{fig:fig20} shows an example of one transaction separateu into multiple sub-transactions where \emph{green} arrows represent success path, while \emph{red} arrows represent rollbacks. structure of the saga transaction and at least the previous and next element in the chain.
+Figure~\ref{fig:fig20} shows an example of one transaction separated into multiple sub-transactions where \emph{green} arrows represent success path, while \emph{red} arrows represent rollbacks, structure of the saga transaction and at least the previous and next element in the chain.
 
 \begin{figure}[H]
 	\begin{center}
@@ -723,17 +715,15 @@ Figure~\ref{fig:fig20} shows an example of one transaction separateu into multip
 \end{figure}
 
 \noindent
-Sagas can be implemented using two patterns: $(1)$ orchestration where one centralized element is responsible for all the coordinating, or $(2)$ choreography, where each service know the 
+Sagas can be implemented using two patterns: \textbf{(1)} orchestration where one centralized element is responsible for all the coordinating, or \textbf{(2)} choreography, where each service trigger local transactions in other services.
 
 This isolation can be added in the application layer~\cite{Frank}l for example using \emph{semantic lock}. This strategy will change state so that some data are in process and should be treated differently. 
 
-For example, an order can be in one of the following state: $(1)$ \emph{PENDING}, $(2)$ \emph{COMPLETED}, or $(3)$ \emph{CANCELED} state. Other transactions will not make use the data if status is not set to \emph{COMPLETED}.
-}
+For example, an order can be in one of the following states: \textbf{(1)} \emph{PENDING}, \textbf{(2)} \emph{COMPLETED}, or \textbf{(3)} \emph{CANCELED} state. Other transactions will not make use the data if status is not set to \emph{COMPLETED}.
 %
 %
 \section{Garbage collection}\label{sec:garbage_collection}
 %
-\new{
 Most modern programming languages nowadays allow programmers to allocate and free memory. This process can be in total responsibility of the programmer, or language can handle this process for the programmer. When there is some automatic process involved to release unused resources, that process is called \textbf{garbage colection} or GC. 
 
 In~\cite{JonesL96}, Jones, et al. describe \emph{garbage collection} as the automatic management of dynamically allocated storage. However, the term \emph{garbage collection} is not exclusive to programming languages. It is widely used to refer to all forms of automatic management of dynamically allocated resources.
@@ -743,7 +733,6 @@ Even with the rapid growth of memory sizes, and lowering the overall cost of mem
 Over the years, different algorithms are used to do reference counting and tracing methods, to discover unused resources, and to free them. One of the most common algorithms for garbage collection is \emph{mark-sweep} algorithm~\cite{McCarthy60} developed in 1960. The variety on the topic exists today, but the essence of the algorithm remains widely used today.
 
 Traditional automated garbage collection is usually seen as slow, and disruptive to executing programs. Modern implementations of the garbage collection substantially reduced the overhead of the system~\cite{JonesL96}.
-}
 %
 %
 \section{Virtualization techniques}\label{sec:virtualization_techniques}
@@ -844,32 +833,28 @@ Deployment is based on changing parts of the OS, and services that run inside th
 
 \section{Infrastructure as software}~\label{sec:ias}
 %
-\new{
 The infrastructure needs to be constantly deployed and maintained, so it would be beneficial to view the infrastructure as software (IaS)~\cite{Fitzgerald}. The benefit of this approach lies in the already available tools, principles, and techniques (e.g. reuse, testing, modeling, and evaluation) that can equally be used for the infrastructure definitions ~\cite{Osterweil, Fitzgerald}.
 
-In his work~\cite{Osterweil}, Osterweil et al. argued that software and software processes share some similar characteristics: (1) both are executed, (2) both have requirements that need to be understood, (3) both benefit from being modeled, and (4) both can be guided by measurement.
+In his work~\cite{Osterweil}, Osterweil et al. argue that software and software processes share some similar characteristics: \textbf{(1)} both are executed, \textbf{(2)} both have requirements that need to be understood, \textbf{(3)} both benefit from being modeled, and \textbf{(4)} both can be guided by measurement.
 
 Fitzgerald et al.~\cite{Fitzgerald} argue that process programming, defined by Osterweil~\cite{Osterweil} et al., is applicable in the infrastructure domain. The authors claim that it is useful to extend the “software process as software” paradigm to include infrastructure as software (IaS). The move towards multi-tier systems that involve cloud and cyber-physical systems will only stimulate the connection between software and reliable infrastructure systems.
 
 Looking at the infrastructure configuration as the software allows application developers to venture into the “infrastructure programming”~\cite{Fitzgerald}, allowing platforms and infrastructure to be managed in a similar way as the software is.
 
 In a cloud environment, it is an essential technique to properly implement continuous deployment, giving us tools to automate the configuration and provisioning process of infrastructure using cloud instances~\cite{RahmanMW19}. Wittig et al. describe it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools~\cite{wittig2018amazon}. 
-}
 %
 %
 \subsection{Infrastructure as code}
 %
-\new{
-In modern cloud and microservices era, evolves a new strategy to manage and deploy complicated infrastructure elements -- Infrastructure as code (IaC). In his book~\cite{wittig2018amazon} Wittig et al. describe it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools. 
+In modern cloud and microservices era, a new strategy to manage and deploy complicated infrastructure elements -- Infrastructure as code (IaC). In his book~\cite{wittig2018amazon} Wittig et al. describe it as a process of managing and provisioning computer data centers through machine-readable definition files, rather than physical hardware configuration or interactive configuration tools. 
 
 IaC has grown in popularity in recent years because it applies the same kind of version control and repeatability to the orchestration of the infrastructure as developers use for applications source code~\cite{ArtacBNGT17}. The second benefit is that configuration is decoupled from the system, it can more readily be deployed on a similar system elsewhere. 
 
 IaC is a continuation of earlier works of Osterweil et al.~\cite{Osterweil}, and Fitzgerald et al.~\cite{Fitzgerald}, trying to move infrastructure to level of software, keeping existing tools, best practices and techniques. It relys on the \textbf{reconciler pattern}~\cite{luksa2018kubernetes}, widely used in scheduling systems like Kubernetes.
 
-This pattern enables tracking of resources using two simple states: (1) expected state, and (2) current state. The expected state represents the desired state, while the current state refers to the actual system state. The reconciler pattern runs a \textbf{reconciliation loop} that ensures that the current state remains the same as the expected state.
+This pattern enables tracking of resources using two simple states: \textbf{(1)} expected state, and \textbf{(2)} current state. The expected state represents the desired state, while the current state refers to the actual system state. The reconciler pattern runs a \textbf{reconciliation loop} that ensures that the current state remains the same as the expected state.
 
 Every node must provide its current state regularly, and when some state is divergent from the desired state, the system must act to ensure that this situation is corrected automatically. The node can send its state over existing channels e.g., \textbf{health-check} pings to minimize load and data transferred over the network, or a dedicated channel just for this purpose may exist.
-}
 %
 %
 \section{Development roles}\label{sec:dev_roles}
@@ -906,7 +891,7 @@ Table~\ref{tab:table10} sums the differences between the DevOps and SREs.
 		\end{tabular}
 	\end{center}
 	\vspace{-0.5cm}
-	\caption{Ddifferences between DevOps and SREs.}
+	\caption{Differences between DevOps and SREs.}
 	\label{tab:table10}
 \end{table}
 

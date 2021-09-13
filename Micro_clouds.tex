@@ -1202,10 +1202,9 @@ Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using 
 %
 \section{Long-lived transactions}\label{sec:long_live_transactions}
 %
-\new{
 To operate micro clouds properly, such a system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offer (cf.~page~\ref{sec:microservices}). But still, we must be aware of all problems that come along with them.
 
-That been said, one of the problems we have to deal with are transactions that appear in such distributed system --- distributed transactions (cf. page~\ref{sec:distributed_transactions}). Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. page~\ref{sec:sagas}).
+That being said, one of the problems we have to deal with are transactions that appear in such distributed system --- distributed transactions (cf. page~\ref{sec:distributed_transactions}). Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. page~\ref{sec:sagas}).
 
 When a user submits the \emph{cluster creation message}, the system will accept the message and register the task with \emph{PENDING} state. If the system cannot proceed further, for whatever reason (e.g., no available resources or nodes, etc.) the task is finished, and it goes to \emph{FAILED} state, and this concludes the transaction. Otherwise, if there are no errors, and the system can proceed with the cluster formation protocol, the task will go to \emph{IN PROGRESS} state.
 
@@ -1227,43 +1226,38 @@ Figure~\ref{fig:fig19} shows state diagram for cluster formation message.
 \end{figure}
 
 Cluster formation protocol will most likely span over multiple services, and strategies like sagas can be useful to implement transactions and rollbacks properly.
-}
 %
 %
 \subsection{Garbage collection}\label{sec:garbage}
 %
-\new{
-When the user submits the task to the system if for whatever reason that task fails we have the option to immediately remove that task, and possibly all task connected items. Or, the system should have a specific process in the background, which the only purpose is the garbage collection to restore unused and fragmented system resources.
+When the user submits the task to the system, and if, for whatever reason that task fails, there is the option to immediately remove that task, and possibly all task connected items. Or, the system should have a specific process in the background, which only purpose is garbage collection to restore unused and fragmented system resources.
 
 The second option seems more acceptable because one item can have a graph of items that are connected to that specific item. This graph can be complex, and immediate deletion may slow down the entire system. In the background, the garbage collection process can mark unused items and delete them when the time is right.
 
 Users should also be able to delete certain items with their dependencies as well, invoking \emph{cascading deletion}. Dependencies may be deleted immediately, or marked as \emph{orphans}, and deleted by the garbage collection process.
 
 It makes sense that users can influence garbage collection by submitting their policies when and how often to do this operation, to delete only items or container images as well, and so on.
-}
 %
 %
 \section{System observability}\label{sec:system_observability}
 %
-\new{
-Observability is an importatnt part of any real-world computing system (cf. page~\pageref{sec:log_aggregation}). It is important part of any platform that strive to be offered as a service to large groups of different users. 
+Observability is an importatnt part of any real-world computing system (cf. page~\pageref{sec:log_aggregation}). It is an important part of any platform that strives to be offered as a service to large groups of different users. 
 
-At every moment, we must know what is happening in the system, where are bottlenecks and how we can resolve problems. This is of significant importance in DS, where state and calculations are scattered across multiple nodes, clusters and even DCs.
+At every moment, we must know what is happening in the system, where bottlenecks are, and how we can resolve problems. This is of significant importance in DS, where state and calculations are scattered across multiple nodes, clusters and even DCs.
 
-In the micro-clouds environment that involves multile layers (cf. page~\pageref{lab:three-tier}), this technique is even more inportant to give us insight what is happening in the system, and how we can optimize different layers of the system. On the other hands, users who use such system needs to know what is happening with their services.
+In the micro-clouds environment that involves multiple layers (cf. page~\pageref{lab:three-tier}), this technique is even more important to give us insight what is happening in the system, and how we can optimize different layers of the system. On the other hand, users who use such a system need to know what is happening with their services.
 
-Because of these two really important parameters, observability myst be implemented on two levels:
+Because of these two really important parameters, observability must be implemented on two levels:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{system level}, contains data that is generated by the system. This data should be avalible to the administrators and providers of the system \textbf{only}. Operations people in the team (eg. DevOps or SREs), and developers cannot see it.
-	\item \textbf{user level} contains informations about user requests that \textbf{only} operations people in the team (eg. DevOps or SREs) should be able see. This type of data should not be visible to the system providers, and for privacy reasons.
+	\item \textbf{user level} contains information about user requests that \textbf{only} operations people in the team (eg. DevOps or SREs) should be able see. This type of data should not be visible to the system providers, and for privacy reasons.
 \end{enumerate}
 
 \noindent
-Every service should log details about its usage and calls as well as traces how requests are going, regardless it is platform or user. Log data should be stored outside the service and the virtualization tool (eg. using sidecar pattern with containers~\cite{BurnsO16}), while pieces of information will be sent to centralized log storage. Sending intervals should be be able to change and adapt for both levels.
+Every service should log details about its usage and calls as well as traces how requests are going, regardless of whether it is a platform or user. Log data should be stored outside the service and the virtualization tool (eg. using sidecar pattern with containers~\cite{BurnsO16}), while pieces of information will be sent to centralized log storage. Sending intervals should be able to be changed and adapted for both levels.
 
 Log storage could be searched to see the general state of the system, and pieces of information about user requests and the state of their requests.
-}
 %
 %
 \section{Access pattern}\label{sec:access_pattern}
@@ -1298,6 +1292,7 @@ The model presented in this chapter, has three possible execution repercussions:
 %
 \section{User data in micro clouds}\label{sec:user_data}
 %
+\new{
 One of the benefits of having micro cloud in near proximity is that user data can be processed and stored locally, and users are able to control to which extend data can be shared with the cloud~\cite{SatyanarayananK19} (see section~\ref{sec:problem_statement}). User data would be relatively easy to replicate inside region using CRDTs for example, to eliminate expensive coordination~\cite{inproceedingsSimic2}.
 
 But since micro clouds storage capacity is less than traditional cloud, they should store most recently used data. The storage capacity is determined by the micro cloud size given by the equation~\ref{size:eq1}.
@@ -1310,6 +1305,7 @@ Data locality in micro clouds creates two challenges, that must be addressed:
 \end{enumerate}
 
 The data retention and size in the micro cloud are decided and optimized with~\ref{size:eq1} and~\ref{size:eq2}, for the single user or group of users. This is giving developers, and miro cloud providers more room to optimize their policies offered to the users. While users may choose different options based on their needs.
+}
 %
 %
 \section{Limitations}\label{sec:limitations}
@@ -1328,14 +1324,12 @@ Since the perfect model never existed, the model that is proposed in this thesis
 %
 \subsection{Discussion}
 %
-\new{
-The specialized infrastructure in models like~\cite{BaccarelliNSSA17, GuoRG20, JeonK19, BCAK19, ChiariniRAMG13} is required to solve a single problem. The model proposed in this thesis is more oriented towards a wider specter of applications, without the need for specialized hardware or software. Users should build applications, similarly as they are building them for the cloud. Even existing applications models (e.g., microservices, serverless functions) could be transferred from cloud to micro cloud.
+The specialized infrastructure in models like~\cite{BaccarelliNSSA17, GuoRG20, JeonK19, BCAK19, ChiariniRAMG13} is required to solve a single problem. The model proposed in this thesis is more oriented towards a wider specter of applications, without the need for specialized hardware or software. Users should build applications, similarly as they build them for the cloud. Even existing applications models (e.g., microservices, serverless functions) could be transferred from cloud to micro cloud.
 
-One advantage is that specialized models are developed and optimized for a specific use case taking the maximum out existing of hardware and software. Compared to the presented model (in terms of speed), in some situations, they might outperform the proposed model. On the other hand, the proposed model offers much more freedom for development (in terms of agility and applicability). This development freedom gives the users a new platform for creating interesting human-centered applications spanning over CC and micro clouds~\cite{VillariCF17}.
+One advantage is that specialized models are developed and optimized for a specific use case taking the maximum out of existing hardware and software. Compared to the presented model (in terms of speed), in some situations, they might outperform the proposed model. On the other hand, the proposed model offers much more freedom for development (in terms of agility and applicability). This development freedom gives the users a new platform for creating interesting human-centered applications spanning over CC and micro clouds~\cite{VillariCF17}.
 
-Specialized platforms usually require special types of applications, while the proposed model does not limit users (in terms of development tools and techniques), as long as their application could be virtualized in some way (e.g., using virtual machines, containers, or unikernes). The developers may reuse existing knowledge to develop their applications.
+Specialized platforms usually require special types of applications, while the proposed model does not limit users (in terms of development tools and techniques), as long as their application could be virtualized in some way (e.g., using virtual machines, containers, or unikernels). The developers may reuse existing knowledge to develop their applications.
 
 The proposed model allows the organization of storage and processing resources according to priority if a catastrophic event (e.g., COVID-19 see page~\pageref{sec:covid_example}) hits the human population. Humanity can organize its resources and manage its digital infrastructure, where developers make applications that will help its citizens in those tough times.
-}
 %
 %

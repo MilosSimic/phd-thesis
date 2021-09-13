@@ -127,26 +127,22 @@ The upper layer must have set up the infrastructure to do any processing or stor
 %
 \subsection{Long-lived transactions}\label{sec:transaction}
 %
-\new{
-Current implementation follows the saga pattern (cf.~page~\pageref{sec:sagas}) for transactions, and isolation is added using semantic lock by adding states to the task. The task can be in one of following states: $(1)$ PENDING, $(2)$ IN PROGRESS, $(3)$ CREATED, and $(4)$ FAILED. 
+Current implementation follows the sagas pattern (cf.~page~\pageref{sec:sagas}) for transactions, and isolation is added using semantic lock by adding states to the task. The task can be in one of following states: \textbf{(1)} \emph{PENDING}, \textbf{(2)} \emph{IN PROGRESS}, \textbf{(3)} \emph{CREATED}, and \textbf{(4)} \emph{FAILED}. 
 
 Until the task reaches \emph{Created} state, no other operation can be done on that cluster configuration.
 
-The cluster formation transaction is split into a few sub-transactions: $(1)$ reserving nodes, $(2)$ writing cluster information, and $(3)$ sending cluster information to push service and ultimately sending pieces of information to the nodes. 
+The cluster formation transaction is split into a few sub-transactions: \textbf{(1)} reserving nodes, \textbf{(2)} writing cluster information, and \textbf{(3)} sending cluster information to push service and ultimately sending pieces of information to the nodes. 
 
 The rollback mechanism is implemented using \emph{choreography}, and communication between the various services is done asynchronously using message queues.
-}
 %
 %
 \subsection{Garbage collection}\label{sec:gc}
 %
-\new{
 The current garbage collection process is pretty trivial since there is no complicated graph of items connected to the cluster information details.
 
-The process will scan tasks with the state \emph{FAILD} in the background, and it will remove those items. Related details to the cluster information, for example, node metrics, will expire automatically since there is a lease attached to them.
+The process will scan tasks with the state \emph{FAILED} in the background, and it will remove those items. Related details to the cluster information, for example, node metrics, will expire automatically since there is a lease attached to them.
 
 Another resource that will be automatically deleted is node data. If a node health-check message does not reach the system in some time, the node lease will expire and data will be removed automatically.
-}
 %
 %
 \subsection{Limitations}\label{sec:framework_limits}
@@ -301,8 +297,7 @@ The last test was to test health-check protocol once again - we disconnected one
 %
 \section{The existing solutions enhancement}~\label{enhancement_of_the_existing_solutions}
 %
-\new{
-The protocols defined in this thesis could serve as a base layer for the system developed from scratch. On top of such a solution, we can add other services and features like scheduling, storage, applications, management, monitoring, etc. The protocols described in this thesis ensure proper node registration into the system, organization, and reorganization of node resources into clusters, regions, and topologies, bringing disposable micro clouds closer to the users at the network edge, allowing that requests are served from the local micro cloud.
+The protocols defined in this thesis could serve as a base layer for the system developed from scratch. On top of such a solution, other services and features can be added like scheduling, storage, applications, management, monitoring, etc. The protocols described in this thesis ensure proper node registration into the system, organization, and reorganization of node resources into clusters, regions, and topologies, bringing disposable micro clouds closer to the users at the network edge, allowing that requests are served from the local micro cloud.
 
 The existing orchestrator engines (e.g., Kubernetes, Apache Mesos, Docker Swarm, etc.) operate one cluster level~\cite{BurnsGOBW16, VermaPKOTW15, RossiCPN20, KubeEdge, KubeMulti}. The single cluster could span over multiple availability zones in the cloud, minimizing the chance that a failure in one zone impairs services in other zones~\cite{KubeMulti}. Kubernetes allow extension in terms of multi-cluster deployments~{\cite{KubeMulti}}. In such a scenario, Kubernetes is handling these clusters as disposable --- "treating \textbf{clusters} as cattle, not pets" (i.e., numerous servers/clusters built using automated tools designed for failure, where no servers/clusters are irreplaceable~\cite{CERN}).
 
@@ -313,6 +308,5 @@ The existing solutions can integrate the model proposed in this thesis to serve 
 The proposed model preserves the node's topology allowing cloud providers and orchestrator engines to treat micro clouds disposable, abstracting infrastructure to the level of software --- infrastructure as software~{\cite{Fitzgerald}}. This approach benefits from the already available tools, principles, and techniques (e.g., reuse, testing, modeling, and evaluation). The already available tools can be used for the disposable micro cloud infrastructure definitions.
 
 The model developed in this thesis is not competing with the existing orchestrator tools. It is not orchestrating applications, but it is a free nodes register and micro clouds infrastructure descriptor allowed to be offered as a stand-alone service bringing disposable micro clouds model to the users. The model allows integration with the existing orchestration tools, leveraging existing mechanisms and best practices. Cloud providers can create an operator for various orchestration engines. This allows them to offer dynamically created, disposable micro clouds as a service to their users, using infrastructure as software principles.
-}
 %
 %

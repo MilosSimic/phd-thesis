@@ -2,26 +2,21 @@
 \chapter{Model usability}\label{chapter:Model usability}
 %
 %
-\new{
-In this chapter, we are going to discuss applicability of the proposed model. We are also going to give a case-study for the COVID-19 area traffic control example in city of Milan, Italy.
-}
+This chapter discusses applicability of the proposed model. We are also going to give a case-study for the COVID-19 area traffic control example in city of Milan, Italy.
 %
 \section{Applications}\label{sec:app}
 %
-\new{
-This research focuses on a platform with geo-distributed edge nodes that can be organized dynamically into the micro data-centers and regions based on the cloud model, but adapted for a different environment. This middle layer helps the power-hungry servers reduce traffic by serving the nearby population requests. Users are getting a new platform as a blank canvas, and there is no limitation in what applications they can develop. Integrating hardware and/or software, even more, connecting sensors and things around us and eventually an operating system that will be capable of running city/state infrastructure without human intervention.
+This research focuses on a platform with geo-distributed edge nodes that can be organized dynamically into the micro data-centers and regions based on the cloud model, but adapted for a different environment. This middle layer helps the power-hungry servers reduce traffic by serving the nearby population requests. Users are getting a new platform as a blank canvas, and there is no limitation in what applications they can develop. Integrating hardware and/or software, even more, connecting sensors and things around us and eventually an \textbf{operating system} that will be capable of running city/state infrastructure without human intervention. For such application, we would need great advances in \textbf{general artificial intelligence}. The system presented in this thesis is a stepping stone towards that idea.
 
-The main advance of EC, when compared to the cloud-only approach, is the acceleration of the communication speed. The cloud could bring huge latency, while EC originates from peer to peer systems~\cite{LopezMEDHIBFR15}, serving only local population needs, minimizing potentially huge round-trip time of the cloud. Furthermore, presented model expands peer to peer systems into new directions and blends them with the cloud to allow novel human-centered applications. 
+The main advance of EC, when compared to the cloud-only approach, is the acceleration of the communication speed. The cloud could bring huge latency, while EC originates from peer to peer systems~\cite{LopezMEDHIBFR15}, serving only local population needs, minimizing potentially huge round-trip time of the cloud. Furthermore, the presented model expands peer to peer systems into new directions and blends them with the cloud to allow novel human-centered applications. 
 
-If we imagine that we put sensors on a specific group of users and/or places in the city/state and monitor them in real-time, we can process these streams of data directly close to where they are, where they are moving and going. We could monitor air pollution for example, and make decisions in real-time to suggest users not to walk in some area, especially if they have some known respiratory problem.
+If we imagine sensors are put on a specific group of users and/or places in the city/state and monitor them in real-time, we can process these streams of data directly close to where they are, where they are moving and going. We could monitor air pollution for example, and make decisions in real-time to suggest users not to walk in some area, especially if they have some known respiratory problem.
 
-Geo-distributed nodes represent a great idea to do any kinda monitoring and processing especially for natural phenomenons and do alert as soon as probes, sensors, or other things detect even the slightest changes. For applications like self-driving cars, delivery drones, or power balancing in electric grids require real-time processing for proper decision making or any other application that future developers may develop. Content delivery networks, content sharing could be implemented to serve content to the users faster than going over the cloud, since micro clouds should serve the local population that is nearby.
-}
+Geo-distributed nodes represent a great idea to do any kind of monitoring and processing, especially for natural phenomena and do alert as soon as probes, sensors, or other things detect even the slightest changes. Applications like self-driving cars, delivery drones, or power balancing in electric grids require real-time processing for proper decision making or any other application that future developers may develop. Content delivery networks, content sharing could be implemented to serve content to the users faster than going over the cloud, since micro clouds should serve the local population that is nearby.
 %
 %
 \section{COVID-19 MIlan area traffic control example}\label{sec:covid_example}
 %
-\new{
 Let us consider a use case that can benefit from our model. In the context of the recent COVID-19 outbreak, we can examine the city of Milan, Italy. Into nine municipalities, numbered from 1 to 9 the city is split. Let us follow the natural subdivision having Milan \emph{topology} where municipalities have one or more \emph{regions}. Population density implemented applications and needs dictate the number of \emph{clusters} per region serving the population nearby. 
 
 If city subdivision changes in the future, reorganization of \emph{regions} and \emph{clusters} is easy to be done dynamically, using \emph{cluster formation protocol}. A prerequisite for this to be done: there must be EC nodes deployed on the territory, and nodes are connected to the system using \emph{health check protocol}.
@@ -48,6 +43,5 @@ Figure~\ref{fig:fig25} depicts previously described example, trough conceptual a
 	\caption{Conceptual architecture model for COVID-19 area traffic control example}
 	\label{fig:fig25}
 \end{figure}
-}
 %
 %
