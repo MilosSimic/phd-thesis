@@ -497,7 +497,7 @@ Idempotency key could be stored in any kind of storage, it is not uncommon that 
 Another option that is commonly used is hashing user specified actions. It is useful to know which part of the action set is already done and which is not. This strategy is used in scenarios where we must preserve the order of actions.
 %
 %
-\subsubsection{Distributed Queries}
+\subsubsection{Distributed Queries}~\label{sec:distributed_queries}
 %
 Applications built using microservices architecture propose different strategies for data storage. One common and recommended technique is \emph{database per service} patter~\cite{richardson2018microservices}.
 
@@ -829,7 +829,7 @@ With the introduction of \textit{LinuxKit}, Linux subsystems are based around ve
 
 This is important not only from the security point of view but also for infrastructure deployment as well. Specific OSs can be created, based on the containers for a different purpose. They can be updated, changed, and adapted for every machine or purpose needed.
 
-Deployment is based on changing parts of the OS, and services that run inside the containers. As a result, everything can be removed or replaced. It's highly portable and can work on desktops, servers, IoT, mainframes, bare metal, micro data centers at the edge, and virtualized systems.
+Deployment is based on changing parts of the OS, and services that run inside the containers. As a result, everything can be removed or replaced. It's highly portable and can work on desktops, servers, IoT, mainframes, bare metal, $\upmu$DCs at the edge, and virtualized systems.
 
 \section{Infrastructure as software}~\label{sec:ias}
 %

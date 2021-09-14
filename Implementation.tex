@@ -3,7 +3,7 @@
 %
 In this chapter, more details are going to be given about the framework implemented based on the formal model and architecture specification given in the previous chapter.
 
-Section~\ref{sec:framework} discusses framework architecture, and system implementation details, and framework limits. Section~\ref{sec:framework_operations} presents implementation details about framework operations. Section~\ref{sec:app} describes few possible senarios and applications that could utilize micro-clouds platform. In Section~\ref{sec:results} presents results of our experiments.
+Section~\ref{sec:framework} discusses framework architecture, and system implementation details, and framework limits. Section~\ref{sec:framework_operations} presents implementation details about framework operations. Section~\ref{sec:app} describes few possible senarios and applications that could utilize $\upmu$Cs platform. In Section~\ref{sec:results} presents results of our experiments.
 %
 %
 \section{Platform implementation}\label{sec:framework}
@@ -116,7 +116,7 @@ On every health-check, the node will send labels, names, IDs, and metrics to the
 At the first start of the daemon, when the node is free, the user can specify whatever node id he/she wants. Once, the node is a part of the cluster, the node id will be updated to match that. Node id update will happen on the cluster formation process.
 %
 %
-\subsection{Separation of concerns}\label{sec:framework_SoC}
+\subsection{Separation of concerns details}\label{sec:framework_SoC}
 %
 IThe implemented framework follow the clear SoC model, presented in~\ref{sec:separation_of_concerns}. Since the presented model consists of three components, the implemented framework is deals only with \textbf{resources}~\ref{soc:resources} part of the SoC. 
 
@@ -125,7 +125,7 @@ Its job is to organize nodes into clusters, regions, and topologies, to make the
 The upper layer must have set up the infrastructure to do any processing or storage. This middle layer is the binding element between the layers.
 %
 %
-\subsection{Long-lived transactions}\label{sec:transaction}
+\subsection{Long-lived transactions details}\label{sec:transaction}
 %
 Current implementation follows the sagas pattern (cf.~page~\pageref{sec:sagas}) for transactions, and isolation is added using semantic lock by adding states to the task. The task can be in one of following states: \textbf{(1)} \emph{PENDING}, \textbf{(2)} \emph{IN PROGRESS}, \textbf{(3)} \emph{CREATED}, and \textbf{(4)} \emph{FAILED}. 
 
@@ -136,7 +136,7 @@ The cluster formation transaction is split into a few sub-transactions: \textbf{
 The rollback mechanism is implemented using \emph{choreography}, and communication between the various services is done asynchronously using message queues.
 %
 %
-\subsection{Garbage collection}\label{sec:gc}
+\subsection{Garbage collection details}\label{sec:gc}
 %
 The current garbage collection process is pretty trivial since there is no complicated graph of items connected to the cluster information details.
 
@@ -151,9 +151,9 @@ The framework at the current state has some limitations that we \textbf{must add
 
 For monitoring, a tool with UI would be a better solution and it can show more details. For a small amount of data, when topologies are relatively small, CLI could be used. But for some real-world applications, desktop, and/or web-based UI will be a much better solution, and CLI can be used for fast lookup on specific pieces of information about clusters and nodes, for example.
 
-The current implementation of the queueing system is \textbf{limiting} because if we want to extend the system with new queues we need to shut down the whole service, and that is not the best solution. But since the goal of this thesis is not queue management, but micro-cloud formation, protocols, and formal modeling.
+The current implementation of the queueing system is \textbf{limiting} because if we want to extend the system with new queues we need to shut down the whole service, and that is not the best solution. But since the goal of this thesis is not queue management, but $\upmu$C formation, protocols, and formal modeling.
 
-Since the goal of this thesis is not queue management, and the purpose of this thesis is not Human-computer interaction, but micro-cloud formation, protocols, and formal modeling, mentioned limitations should be the topic of the future work~\ref{sec:future_work} section.
+Since the goal of this thesis is not queue management, and the purpose of this thesis is not Human-computer interaction, but $\upmu$C formation, protocols, and formal modeling, mentioned limitations should be the topic of the future work~\ref{sec:future_work} section.
 
 The current implementation do not include garbage collection of connected dependent items, and users cannot influence garbage collection decisions. This should be one of the topic of the future work~\ref{sec:future_work} section as well.
 %
@@ -297,16 +297,16 @@ The last test was to test health-check protocol once again - we disconnected one
 %
 \section{The existing solutions enhancement}~\label{enhancement_of_the_existing_solutions}
 %
-The protocols defined in this thesis could serve as a base layer for the system developed from scratch. On top of such a solution, other services and features can be added like scheduling, storage, applications, management, monitoring, etc. The protocols described in this thesis ensure proper node registration into the system, organization, and reorganization of node resources into clusters, regions, and topologies, bringing disposable micro clouds closer to the users at the network edge, allowing that requests are served from the local micro cloud.
+The protocols defined in this thesis could serve as a base layer for the system developed from scratch. On top of such a solution, other services and features can be added like scheduling, storage, applications, management, monitoring, etc. The protocols described in this thesis ensure proper node registration into the system, organization, and reorganization of node resources into clusters, regions, and topologies, bringing disposable $\upmu$Cs closer to the users at the network edge, allowing that requests are served from the local $\upmu$Cs.
 
 The existing orchestrator engines (e.g., Kubernetes, Apache Mesos, Docker Swarm, etc.) operate one cluster level~\cite{BurnsGOBW16, VermaPKOTW15, RossiCPN20, KubeEdge, KubeMulti}. The single cluster could span over multiple availability zones in the cloud, minimizing the chance that a failure in one zone impairs services in other zones~\cite{KubeMulti}. Kubernetes allow extension in terms of multi-cluster deployments~{\cite{KubeMulti}}. In such a scenario, Kubernetes is handling these clusters as disposable --- "treating \textbf{clusters} as cattle, not pets" (i.e., numerous servers/clusters built using automated tools designed for failure, where no servers/clusters are irreplaceable~\cite{CERN}).
 
-The model proposed in this thesis goes one step further, allowing the creation of disposable micro clouds. Such an extension allows infrastructure optimization in more dimensions~\cite{ForestieroMMPS14}. The users are allowed to build numerous micro clouds designed for failure using automated tools where no micro cloud is irreplaceable --- "treating \textbf{micro clouds} as cattle, not pets."
+The model proposed in this thesis goes one step further, allowing the creation of disposable $\upmu$Cs. Such an extension allows infrastructure optimization in more dimensions~\cite{ForestieroMMPS14}. The users are allowed to build numerous $\upmu$Cs designed for failure using automated tools where no $\upmu$C is irreplaceable --- "treating \textbf{$\upmu$Cs} as cattle, not pets."
 
-The existing solutions can integrate the model proposed in this thesis to serve as a node register. Such integration allows the registration of new nodes into the system, allowing the existing orchestration engines to use new nodes, and expand their available resource pool. In form of specification, the users can provide a list of which available EC nodes need to be part of some micro cloud. The system will communicate with the existing orchestrator agent to register/unregister them with the existing cluster. In such a scenario, we can hook on the existing orchestrator health-check mechanism informing our system that a node in some cluster is alive. Unused nodes still use the health-check protocol defined in this thesis informing the system that they are still available for utilization.
+The existing solutions can integrate the model proposed in this thesis to serve as a node register. Such integration allows the registration of new nodes into the system, allowing the existing orchestration engines to use new nodes, and expand their available resource pool. In form of specification, the users can provide a list of which available EC nodes need to be part of some $\upmu$C. The system will communicate with the existing orchestrator agent to register/unregister them with the existing cluster. In such a scenario, we can hook on the existing orchestrator health-check mechanism informing our system that a node in some cluster is alive. Unused nodes still use the health-check protocol defined in this thesis informing the system that they are still available for utilization.
 
-The proposed model preserves the node's topology allowing cloud providers and orchestrator engines to treat micro clouds disposable, abstracting infrastructure to the level of software --- infrastructure as software~{\cite{Fitzgerald}}. This approach benefits from the already available tools, principles, and techniques (e.g., reuse, testing, modeling, and evaluation). The already available tools can be used for the disposable micro cloud infrastructure definitions.
+The proposed model preserves the node's topology allowing cloud providers and orchestrator engines to treat $\upmu$Cs disposable, abstracting infrastructure to the level of software --- infrastructure as software~{\cite{Fitzgerald}}. This approach benefits from the already available tools, principles, and techniques (e.g., reuse, testing, modeling, and evaluation). The already available tools can be used for the disposable $\upmu$C infrastructure definitions.
 
-The model developed in this thesis is not competing with the existing orchestrator tools. It is not orchestrating applications, but it is a free nodes register and micro clouds infrastructure descriptor allowed to be offered as a stand-alone service bringing disposable micro clouds model to the users. The model allows integration with the existing orchestration tools, leveraging existing mechanisms and best practices. Cloud providers can create an operator for various orchestration engines. This allows them to offer dynamically created, disposable micro clouds as a service to their users, using infrastructure as software principles.
+The model developed in this thesis is not competing with the existing orchestrator tools. It is not orchestrating applications, but it is a free nodes register and $\upmu$Cs infrastructure descriptor allowed to be offered as a stand-alone service bringing disposable $\upmu$Cs model to the users. The model allows integration with the existing orchestration tools, leveraging existing mechanisms and best practices. Cloud providers can create an operator for various orchestration engines. This allows them to offer dynamically created, disposable $\upmu$Cs as a service to their users, using infrastructure as software principles.
 %
 %

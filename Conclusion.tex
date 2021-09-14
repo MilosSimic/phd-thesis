@@ -6,11 +6,11 @@ This chapter gives the summary of contributions for this thesis in Section~\ref{
 %
 \section{Summary of contributions}\label{sec:summary_of_contributions}
 %
-This thesis presents a possible solution to how to organize geo-distributed EC nodes into micro-clouds that will be able to serve the requests of the nearby population. We have introduced an extension of MDCs based on proven abstractions from cloud computing like zones and regions but adapted for different usage scenarios.
+This thesis presents a possible solution to how to organize geo-distributed EC nodes into $\upmu$Cs that will be able to serve the requests of the nearby population. We have introduced an extension of $\upmu$DCs based on proven abstractions from cloud computing like zones and regions but adapted for different usage scenarios.
 
-These easy to understand, yet powerful abstractions with slight adaptations, allowed us to cover any arbitrary vast geographic area, and yield a more available and reliable system forming the micro-cloud model. These abstractions are easy to organize and reorganize, and micro-cloud size is determined by the population needs descriptively. 
+These easy to understand, yet powerful abstractions with slight adaptations, allowed us to cover any arbitrary vast geographic area, and yield a more available and reliable system forming the $\upmu$C model. These abstractions are easy to organize and reorganize, and $\upmu$C size is determined by the population needs descriptively. 
 
-We have also presented the cloud to ECC mapping, showing differences between two architecture models. Furthermore, we have given a formal model of the system and its protocols used to form such a system, with clear SoC and native application model for future micro-clouds infrastructure and service development. The thesis also presents a proof of concept implementation and discusses integration into existing solutions, limitation of such a system with a few applications that could be used in.
+We have also presented the cloud to ECC mapping, showing differences between two architecture models. Furthermore, we have given a formal model of the system and its protocols used to form such a system, with clear SoC and native application model for future $\upmu$Cs infrastructure and service development. The thesis also presents a proof of concept implementation and discusses integration into existing solutions, limitation of such a system with a few applications that could be used in.
 
 Chapter~\ref{chapter:Intro} presents the motivation for this thesis with problem are, hypothesis combined with goals and research questions this thesis is built on.
 
@@ -26,13 +26,13 @@ Chapter~\ref{chapter:Review} shows related work done by various other researcher
 
 We show different platform options, where people change the existing solutions like Kubernetes or OpenStack to made them work in areas like edge computing and mobile computing. Implementations of a few new platforms to use volunteer nodes to do some computation and storage on them with drop computing and systems like Nebula are shown further.
 
-It is show how nodes can be organized to split some geographic area into zones, and show how MDCs can help CC to serve requests from the local population. Different offloading techniques are used today, how to offload tasks from mobile devices closer to fog or edge nodes, but also various application models that could harness these offloading techniques and nodes organizations.
+It is show how nodes can be organized to split some geographic area into zones, and show how $\upmu$DCs can help CC to serve requests from the local population. Different offloading techniques are used today, how to offload tasks from mobile devices closer to fog or edge nodes, but also various application models that could harness these offloading techniques and nodes organizations.
 
 In the end, the position of this thesis, compared to other similar models, is presented.
 
 Chapter~\ref{chapter:Micro_clouds} presents the heart and soul of this thesis. We dissect all important aspects that we need to have to help CC with latency issues, Big Data with huge volumes of data especially in the age of mobile devices and IoT.
 
-Our model is based around MDCs that are zonally organized, that will serve local population and population nearby. We present a model that is based on CC but adapted for different scenarios and use cases.
+Our model is based around $\upmu$DCs that are zonally organized, that will serve local population and population nearby. We present a model that is based on CC but adapted for different scenarios and use cases.
 
 We show how we can dynamically form new clusters, regions, and topologies and how we can use them in the new age of mobile devices and IoT. These newly formed systems or system od systems will have clear the SoC, adopted from existing research to three-tier architecture. The formed model will serve as a pre-processing layer, firewall, or privacy layers, and it is adjustable in various dimensions.
 
@@ -51,7 +51,7 @@ The thesis is concluded in this last chapter with what  is done, what can be don
 %
 \section{Future work}\label{sec:future_work}
 %
-The work on the micro-clouds is at an early stage and leaves many open questions. As a part of our current and future work, we are planning to extend the proposed model in different directions. Future work might be separated into three options:
+The work on the $\upmu$Cs is at an early stage and leaves many open questions. As a part of our current and future work, we are planning to extend the proposed model in different directions. Future work might be separated into three options:
  
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item features that operations people (eg. DevOps and SREs) users can benefit from;
@@ -71,7 +71,7 @@ strategies of communication with other topologies.
 
 Queueing system mentioned in section~\ref{sec:queueing} should be extended so that users and/or operations people can easily add new queues and possibly assign a role for them.
 
-We should extend the access pattern so that users can issue commands to micro-clouds directly instead of going over the cloud master process only. Here we need to implement synchronization in multi-cloud deployment.
+We should extend the access pattern so that users can issue commands to $\upmu$Cs directly instead of going over the cloud master process only. Here we need to implement synchronization in multi-cloud deployment.
 
 For the last part in this operations section, we should also think about continuous integration, deployment, and delivery of services onto the infrastructure, and as well as various UI dashboards that can be customized to present different aspects of the system.
 
@@ -82,7 +82,7 @@ Users can develop their applications with different models:
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{mPaaS}, where the platform is doing all the management and offers a simple interface for developers to deploy their applications;
 	\item \textbf{mCaaS}, if users require more control over resources requirements, deployment and orchestration decisions;
-	\item \textbf{mSaaS}, users can develop their solutions only using micro-clouds, but this is not advised at the moment;
+	\item \textbf{mSaaS}, users can develop their solutions only using $\upmu$Cs, but this is not advised at the moment;
 \end{enumerate}
 
 \noindent
