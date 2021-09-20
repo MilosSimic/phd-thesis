@@ -84,7 +84,7 @@ The organization of these concepts should be fully optional. So for example, we 
 \noindent
 If we go a little bit further, we can represent the city as one region, where parts of the city are organized into clusters. A city topology can even be formed by splitting the city into multiple regions containing multiple clusters, and ultimately a country topology can be formed by splitting the country into regions, with cities being clusters.\\
 
-Nodes that belong to the same cluster should run some form of membership protocol presented in~\ref{sec:memership_protocol}. Gossip style protocols, like SWIM~\cite{DasGM02} (cf. page~\pageref{swim}), are standard in the cloud environment. The same strategy could be applied here, used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16, CRDTS_Nuno} making the whole system more resilient. 
+Nodes that belong to the same cluster should run some form of membership protocol presented in~\ref{sec:memership_protocol}. Gossip style protocols, like SWIM~\cite{DasGM02} (cf. page~\pageref{swim}), are standard in the cloud environment. The same strategy could be applied here, used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16, CRDTS_Nuno} making the whole system more resilient. It could be upgraded to better reflect current network conditions~\cite{HayashibaraDYK04}, or to enable \textbf{self-healing} properties in the system~\cite{SatzgerPTU07}.
 
 Replication could be used not only in nodes inside the cluster, but data can also be replicated in clusters inside the region and even in regions inside topology. This property should exist, but it should be controlled by users depending on how resilient and available the system he/she wants and needs. In~\cite{inproceedingsSimic2} Simi\' c et al. take a look from a theoretical point of view on CRDTs usage, to achieve SEC in EC. The authors conclude that CRDTs could be a natural fit to EC as long as we are aware of the potential pitfalls of CRDTs.
 
@@ -1206,15 +1206,13 @@ To operate $\upmu$Cs properly, such a system needs to be scalable. Architecture 
 
 That being said, one of the problems we have to deal with are transactions that appear in such distributed system --- distributed transactions (cf. page~\ref{sec:distributed_transactions}). Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. page~\ref{sec:sagas}).
 
-\new{
 When a user submits new \emph{cluster creation message}, the message will be accepted by the system, and the new task with \emph{PENDING} state will be registered. If for whatever reason (e.g., no available resources or nodes, etc.), the system cannot proceed further, that task is terminated. It goes to \emph{FAILED} state, concluding the transaction. Otherwise, no errors occured, and the system can proceed with the cluster formation protocol, changing the task state to \emph{IN PROGRESS}.
 
 In this state, the system needs to do several things: \textbf{(1)} save newly formed cluster information, \textbf{(2)} prepare metrics service, \textbf{(3)} add watchers for the cluster nodes health-check, etc. This spans multiple services, creating a few sub-transactions in the process. The \emph{task state} prevents the users to apply other tasks (e.g., configurations, actions, autoscaling, etc.) on a not yet fully formed cluster.
 
 Separation on sub-transactions allow us to invoke the rollback mechanism, if the process yields any errors. Other strategy would be to start some of the retry strategies in order to fix the occurred issue.
 
-If no errors occured during the process, the \emph{cluster formation transaction} finishes, and the task state is changed to \emph{CREATED}. Otherwise, the \emph{cluster formation transaction} ends, \emph{without creating the cluster}. The task state will be changed to \emph{FAILED} state, concluding the transaction.
-}
+If no errors occur during the process, the \emph{cluster formation transaction} finishes, and the task state is changed to \emph{CREATED}. Otherwise, the \emph{cluster formation transaction} ends, \emph{without creating the cluster}. The task state will be changed to \emph{FAILED} state, concluding the transaction.
 
 Figure~\ref{fig:fig19} shows state diagram for cluster formation message.
 
@@ -1292,22 +1290,35 @@ The model presented in this chapter, has three possible execution repercussions:
 \end{enumerate} 
 %
 %
+\subsection{Auto Scaling}\label{sec:Auto Scaling}
+%
+Configurable model structure bring any additional benefit to proposed $\upmu$Cs model --- infrastructure \textbf{auto scaling}. 
+
+The purpose of this process is to automatically scale up or down existing clusters, regions even topologies, adapting the number of nodes in the cluster, clusters per region, and even regions per topology to match newly workload increase.
+
+The users can create a scaling plan via scaling policies, where they should be able to define: \textbf{(1)} how resources should be added (e.g., grow clusters, regions topologies) and at which rate, \textbf{(2)} what specific type of resources are desired (e.g., prefered values for CPU, disk, memory etc.), and \textbf{(3)} boundaries for both resource addition and resource types.
+
+The third item is increasingly important, because it directly affect the costs of the applications running inside $\upmu$Cs. As such, it should never be underlooked.
+
+Based on the given policies the autoscaler dynamically adjusts the amount of resources according to user demands~\cite{TamiruTEP20}. This elasticity allows accommodation of fluctuations in the workloads, that vary over time.
+
+Auto scaling strategy could be applied to both applications and infrastructure, and $\upmu$C provider should decide should they depend on each other, or should they be regulated separately. The proposed model could accomodate both options.
+%
+%
 \section{User data flow in micro clouds}\label{sec:user_data}
 %
-\new{
-One of the benefits of having $\upmu$C in near proximity is that user data can be processed and stored locally, and users are able to control to which extend data can be shared with the cloud~\cite{SatyanarayananK19} (see section~\ref{sec:problem_statement}). User data would be relatively easy to replicate inside region using CRDTs for example (see~\ref{crdts}), to eliminate expensive coordination~\cite{inproceedingsSimic2}. On top this, we can build distributed file system, distributed databases, processing frameworks specially designed for $\upmu$C environment.
+One of the benefits of having $\upmu$C in near proximity is that user data can be processed and stored locally, and users are able to control to which extent data can be shared with the cloud~\cite{SatyanarayananK19} (see section~\ref{sec:problem_statement}). User data would be relatively easy to replicate inside a region using CRDTs for example (see~\ref{crdts}), to eliminate expensive coordination~\cite{inproceedingsSimic2}. On top of this, distributed file system can be built, distributed databases, processing frameworks specially designed for $\upmu$C environment.
 
 But since $\upmu$Cs storage capacity is less than traditional cloud, they should store most recently used data. The storage capacity is determined by the $\upmu$C size given by the equation~\ref{size:eq1}.
 
 Data locality in $\upmu$Cs creates two challenges, that must be addressed:
 
 \begin{enumerate}
-	\item user leaves a place, where the copy of his data exists, is data stationary, or follows him using some pattern? The decision should be left to users, $\upmu$C providers, and developers to decide. The proposed model allows the creation of different \textbf{data plans} that could be represented via \textbf{different policies} for every individual user or group of users. If data needs to follow the user, as a data transfer medium we could use the cloud as a backbone, to transfer data to the $\upmu$C in user proximity. The process is similar to the content delivery networks on the edge~\cite{inbookKurniawan}. In such a scenario, we must pay attention to the network pressure and transfer only the requested data. As an alternative option, we can serve data directly from the cloud and do not transfer anything.
+	\item a user leaves a place, where the copy of his data exists, is data stationary, or follows him using some pattern? The decision should be left to users, $\upmu$C providers, and developers to decide. The proposed model allows the creation of different \textbf{data plans} that could be represented via \textbf{different policies} for every individual user or group of users. If data needs to follow the user, as a data transfer medium the cloud could be used as a backbone, to transfer data to the $\upmu$C in user proximity. The process is similar to the content delivery networks on the edge~\cite{inbookKurniawan}. In such a scenario, we must pay attention to the network pressure and transfer only the requested data. As an alternative option, we can serve data directly from the cloud and do not transfer anything.
 	\item how long, the user data should be stored in the $\upmu$C, if we assume that locally existing $\upmu$C will serve many users? The proposed model does not restrict how long the data should be stored and it is \textbf{policy-based}. Depending on the $\upmu$C size given by equation~\ref{size:eq1}, $\upmu$C providers may determine \textbf{different policies} --- Time to live (TTL)~\cite{CohenHK05} and offer to users. This process is somewhat similar to the leases mechanism in cache systems~\cite{GrayC89}. 
 \end{enumerate}
 
-The data retention and size in the $\upmu$C are decided and optimized with~\ref{size:eq1} and~\ref{size:eq2}, for the single user or group of users. This is giving developers, and miro cloud providers more room to optimize their policies offered to the users. While users may choose different options based on their needs.
-}
+The data retention and size in the $\upmu$C are decided and optimized with~\ref{size:eq1} and~\ref{size:eq2}, for the single user or group of users. This gives developers, and miro cloud providers more room to optimize their policies offered to the users, while users may choose different options based on their needs.
 %
 %
 \section{Limitations}\label{sec:limitations}
