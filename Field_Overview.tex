@@ -32,7 +32,7 @@ When talking about DS, we usually think about computing systems that are connect
 
 Distributed systems (in computer science) consist of various algorithms, techniques, and trade-offs to create an illusion that a set of nodes act as one. Algorithms and techniques used in the DS may include the following: \textbf{(1)} replication, \textbf{(2)} consensus, \textbf{(3)} communication, \textbf{(4)} storage,\textbf{(5)} processing, \textbf{(6)} membership, \textbf{(7)} scheduling etc.
 
-DS are hard to implement because of their asinchroninis and faulty nature. James Gosling and Peter Deutsch both fellows at Sun Microsystems at the time created a list of problems for network applications known as \textit{8 fallacies of Distributed Systems}:\label{enum:fallacies}
+DS are hard to implement because of their asinchroninis and faulty nature. James Gosling and Peter Deutsch both fellows at Sun Microsystems at the time created a list of problems for network applications known as \textit{8 fallacies of Distributed Systems}~\cite{articleRotem}:\label{enum:fallacies}
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]\label{ds:8_fallacies}
 	\item \textbf{The network is reliable}; there will always be something that goes wrong with the network --- power failure, a cut cable, environmental disasters, etc.
@@ -369,7 +369,7 @@ Processing in big data systems can be represented as~\cite{phdthesis, KiranMMDB1
 \begin{itemize}
 	\item \textbf{Batch processing} represents a data processing technique that is done on a huge quantity of the stored data. This type of processing is usually slow and requires time.
 	\item \textbf{Stream processing} represents a data processing technique that is done as data get into the system. This type of processing is usually done on a smaller quantity of the data \textbf{at the time}, and it is faster.
-	\item \textbf{Lambda architectures} represents a processing technique where stream processing and handling of massive data volumes in a batch are combined in a uniform manner, reducing costs in the process~\cite{KiranMMDB15}.
+	\item \textbf{Lambda architectures} represents a processing technique where \emph{stream processing} and handling of massive data volumes in a \emph{batch} are combined in a uniform manner, reducing costs in the process~\cite{KiranMMDB15}.
 \end{itemize}
 
 \noindent
@@ -852,7 +852,26 @@ IaC has grown in popularity in recent years because it applies the same kind of 
 
 IaC is a continuation of earlier works of Osterweil et al.~\cite{Osterweil}, and Fitzgerald et al.~\cite{Fitzgerald}, trying to move infrastructure to level of software, keeping existing tools, best practices and techniques. It relys on the \textbf{reconciler pattern}~\cite{luksa2018kubernetes}, widely used in scheduling systems like Kubernetes.
 
-This pattern enables tracking of resources using two simple states: \textbf{(1)} expected state, and \textbf{(2)} current state. The expected state represents the desired state, while the current state refers to the actual system state. The reconciler pattern runs a \textbf{reconciliation loop} that ensures that the current state remains the same as the expected state.
+This pattern enables tracking of resources using two simple states: 
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item \textbf{expected state} represents the desired state provided by the user. This is the state that must be (if possible) achieved at any give point in time;
+	\item \textbf{current state} refers to the actual system state. This state must be refreshed periodically, so that system know should it be corrected or not.
+\end{enumerate}
+
+\noindent
+The reconciler pattern runs a \textbf{reconciliation loop} that ensures that the \emph{current state} remains the same as the \emph{expected state}. 
+
+Figure~\ref{fig:fig26} presents reconciliation loop diagram.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics{images/Figure26}
+	\end{center}
+	\vspace{-0.6cm}
+	\caption{Reconciliation loop diagram.}
+	\label{fig:fig26}
+\end{figure}
 
 Every node must provide its current state regularly, and when some state is divergent from the desired state, the system must act to ensure that this situation is corrected automatically. The node can send its state over existing channels e.g., \textbf{health-check} pings to minimize load and data transferred over the network, or a dedicated channel just for this purpose may exist.
 %
@@ -874,7 +893,7 @@ Table~\ref{tab:table10} sums the differences between the DevOps and SREs.
 
 \begin{table}[H]
 	\begin{center}
-		\begin{tabular}{l|l|l}
+		\begin{tabular}{l|ll}
 			\textbf{Feature} & \textbf{DevOps} & \textbf{SREs}\\
 			\hline
 			\textbf{Task} & \multirow{2}{10em}{Scaling, uptime, robustness} & \multirow{2}{10em}{Development pipeline} \\
@@ -886,7 +905,7 @@ Table~\ref{tab:table10} sums the differences between the DevOps and SREs.
 			\textbf{Focus} & \multirow{2}{10em}{Development and delivery continuity} & \multirow{2}{10em}{System availability and reliability} \\
 			&  &  \\
 			\hline
-			\textbf{Goal} & \multicolumn{2}{c}{\multirow{2}{15em}{Bridge the gap between development and operation}} \\
+			\textbf{Goal} & \multicolumn{2}{c}{\multirow{2}{12em}{Bridge the gap between development and operation}} \\
 			&  &  \\
 		\end{tabular}
 	\end{center}
@@ -924,9 +943,9 @@ Table~\ref{tab:table6} gives differences between an actor model and CSP.
 		\begin{tabular}{l|l|l}
 			\textbf{Feature} & \textbf{CSP} & \textbf{Actor model}\\
 			\hline
-			\textbf{Fault tolerance} & Distributed Queue &  Supervisors hierarchy \\
+			\textbf{Fault tolerance} & Distributed queue &  Supervisors hierarchy \\
 			\textbf{Process identity} & Anonymus & Concrete \\
-			\textbf{Composition} & NA & Applicable \\
+			\textbf{Composition} & Not applicable & Applicable \\
 			\textbf{Communication} & Queue & Direct \\
 			\textbf{Message passing} & Sync & Async\\
 		\end{tabular}

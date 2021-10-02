@@ -9,9 +9,13 @@ Various software systems have changed the way people communicate, share informat
 
 New age applications that might include augmented reality, massive online gaming, face recognition, autonomous drones and vehicles, or the Internet of Things (IoT) produce enormous amounts of different kinds of data. 
 
-Such workloads require that latency is below a few tens of milliseconds~\cite{ChiangZ16}, or even less. These requirements fall just right outside of what a standard centralized model like cloud computing (CC), for example, could offer~\cite{ChiangZ16}. Even the smallest problems can contribute to largely unplanned downtime of applications and services people and other services may depend on. A most recent example is yet another outage that happened to the Amazon Web Services (AWS), and as a result, a large amount of internet becomes unavailable.
+Such workloads require that latency is below a few tens of milliseconds~\cite{ChiangZ16}, or even less. These requirements fall just right outside of what a standard centralized model like cloud computing (CC), for example, could offer~\cite{ChiangZ16}. Even the smallest problems can contribute to largely unplanned downtime of applications and services people and other services may depend on. A most recent example is yet another outage that happened to the Amazon Web Services (AWS), and as a result, a large amount of internet becomes unavailable~\cite{GunawiHSLSAE16}.
 
-This thesis aims to provide formal models based on which we can model and implement distributed systems (DS) for organizing cloud-like geo-distributed environments for users or CC providers. We can look at the whole system as a micro clouds ($\upmu$Cs) or pre-processing layer. The responsibility of such a system is sending only necessary and data to the cloud. This strategy reduces cost for users and ensures the availability of CC services. Such a system could lead to lowering the downtime of critical services.
+This thesis aims to provide formal models based on which we can model and implement distributed systems (DS) for organizing cloud-like geo-distributed environments for users or CC providers. We can look at the whole system as a micro clouds ($\upmu$Cs) or pre-processing layer. The responsibility of such a system is sending only necessary and data to the cloud. This strategy reduces cost for users and ensures the availability of CC services. Such a system could lead to lowering the downtime of critical services. Here w can give a formal definitino of geo-distributed environments like:
+
+\begin{definition}
+	geo-distribution represent organizing processing and storage resources in proximity to some large populations, where $\upmu$Cs are formed dynamically, serving users requests \textbf{locally first}. 
+\end{definition}
 
 It starts by describing the general problem area that our work addresses in Section~\ref{sec:problem_area}. Section~\ref{sec:problem_statement}, specifies the exact problem that our work addresses, and Section~\ref{sec:research_hyphotesis_and_golas} describes our hypothesis and research goals. Section~\ref{sec:structure_of_thesis} presents the structure of the thesis.
 %
@@ -94,10 +98,12 @@ Chapter~\ref{chapter:Field_overview} presents the necessary background details, 
 
 Chapter~\ref{chapter:Review} presents the literature review, where different aspects of existing systems and methods important for the thesis are examined. Existing organizational abilities for nodes in both industry and academia frameworks are analyzed, as well as solutions to address the first research question. Platform models from industry and academia tools and frameworks are examined further to address the second research question. And last but not least, current strategies to offload tasks from the cloud are examined. All three parts address the third research question.
 
-Chapter~\ref{chapter:Micro_clouds} details the model, how it is related to other research and where it connects to other existing models and solutions. The solution, as well as protocols required for such a system to be implemented formally are further described. There are also examples of how existing infrastructure could be used, as well as familiar application model for developers. 
+Chapter~\ref{chapter:Micro_clouds} details the model, how it is related to other research and where it connects to other existing models and solutions. The solution, as well as protocols required for such a system to be implemented formally are further described. 
 
-Chapter~\ref{chapter:Implementation} presents implementation details of a framework developed to test hypotheses defined earlier in this chapter, but also a model and formally defined protocols defined in~\ref{chapter:Micro_clouds}. This chapter also shows results after conducting experiments, current limitations of the implemented system, and possible applications that could benefit from such a system.
+Chapter~\ref{chapter:Implementation} presents implementation details of a framework implemented to test defined hypotheses, and answer research questions. The framework is implemented based on the protocols formally described in chapter~\ref{chapter:Micro_clouds}. This chapter also shows results after conducting experiments.
 
-Chapter~\ref{chapter:Conclusion} is the final chapter, and it concludes the work of this thesis, outlines the opportunities and directions for further research and development in this area.
+Chapter~\ref{chapter:Model usability} presents usability of the proposed model, and possible applications that could benefit from such a system. There are also examples of how existing infrastructure could be used, as well as familiar application model for developers.
+
+Chapter~\ref{chapter:Conclusion} is the final chapter, and it concludes the work of this thesis. It summarizing the contributions of this thesis, presenting the limitations of the proposed model, and outlines the opportunities and directions for further research and development in this area.
 %
 %

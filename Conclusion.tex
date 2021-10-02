@@ -1,10 +1,10 @@
 %!TEX root =  main.tex
 \chapter{Conclusion}\label{chapter:Conclusion}
 %
-This chapter gives the summary of contributions for this thesis in Section~\ref{sec:summary_of_contributions}, while Section~\ref{sec:future_work} presents future work.
+This chapter gives the summary of contributions for this thesis in Section~\ref{sec:summary_of_contributions}. Section~\ref{sec:limitations} presents limitations of our model, while Section~\ref{sec:future_work} presents future work.
 %
 %
-\section{Summary of contributions}\label{sec:summary_of_contributions}
+\section{Contributions of the thesis}\label{sec:summary_of_contributions}
 %
 This thesis presents a possible solution to how to organize geo-distributed EC nodes into $\upmu$Cs that will be able to serve the requests of the nearby population. We have introduced an extension of $\upmu$DCs based on proven abstractions from cloud computing like zones and regions but adapted for different usage scenarios.
 
@@ -47,6 +47,31 @@ Chapter~\ref{chapter:Implementation} presents an implemented framework that is b
 It further presents the results of our experiments in a controlled environment, what, the limitations of the framework at the current stage, and possible applications, and where this model could be used and beneficial.
 
 The thesis is concluded in this last chapter with what  is done, what can be done in the future in form of future work.
+%
+%
+\section{Limitations}\label{sec:limitations}
+%
+The model proposed in this thesis has some llimitations that we must be aware of, either to work on improvements or use the model as is. When talking about small-scale servers and $\upmu$Cs, we must be aware of a few things.
+
+\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
+	\item We must be aware that not all organizations will be able to deploy $\upmu$Cs, due to the high initial investments required~\cite{MonsalveCC18}. We can rely on government authorities, large cloud providers, or other big companies to build the initial infrastructure for their own needs, and lease it to others similar to the cloud. The general public can use them, similarly to the cloud -- pay as you go, model.
+	\item There is no guarantee that existing public cloud providers will allow nodes that are not built, resigned, or deployed by them. If we are building a private cloud, then  we can make a different decision. One way to resolve this issue is that the whole platform becomes open-source so that public cloud providers can engage in the development, and eventually use them as a solution.
+	\item These small-scale servers must be out of reach of people and protected in some way so that not everyone has access to them. Some degree of physical security must be implemented.
+	\item The places where these small scale servers will be deployed must have a stable internet connection, and the ability to integrate SDN or other similar technologies, so that complex network topologies could be implemented properly.
+	\item These servers can have some open architecture or could be custom built by other providers. In both cases, they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
+	\item Splitting the processing into two parts and the possibility that users can be responsible for $\upmu$Cs may raise some legal concerns. Either to develop interesting applications, use them as a firewall or simply use them as a privacy level for data, there must be a legal agreement that might not be that easy to achieve.
+\end{enumerate}
+%
+%
+\subsection{Discussion}
+%
+The specialized infrastructure in models like~\cite{BaccarelliNSSA17, GuoRG20, JeonK19, BCAK19, ChiariniRAMG13} is required to solve a single problem. The model proposed in this thesis is more oriented towards a wider specter of applications, without the need for specialized hardware or software. Users should build applications, similarly as they build them for the cloud. Even existing applications models (e.g., microservices, serverless functions) could be transferred from cloud to $\upmu$C.
+
+One advantage is that specialized models are developed and optimized for a specific use case taking the maximum out of existing hardware and software. Compared to the presented model (in terms of speed), in some situations, they might outperform the proposed model. On the other hand, the proposed model offers much more freedom for development (in terms of agility and applicability). This development freedom gives the users a new platform for creating interesting human-centered applications spanning over CC and $\upmu$Cs~\cite{VillariCF17}.
+
+Specialized platforms usually require special types of applications, while the proposed model does not limit users (in terms of development tools and techniques), as long as their application could be virtualized in some way (e.g., using virtual machines, containers, or unikernels). The developers may reuse existing knowledge to develop their applications.
+
+The proposed model allows the organization of storage and processing resources according to priority if a catastrophic event (e.g., COVID-19 see section~\ref{sec:covid_example}) hits the human population. Humanity can organize its resources and manage its digital infrastructure, where developers make applications that will help its citizens in those tough times.
 %
 %
 \section{Future work}\label{sec:future_work}
