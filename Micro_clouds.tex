@@ -281,7 +281,7 @@ It is important to note that every action in the system should be logged and tra
 At the same time, actions should be traced by the company that offers these $\upmu$Cs. For security reason, any of these logs and traces should not be visible to others \textbf{but} responsible individuals, and the level of details and personal pieces of information should be different.
 %
 %
-\subsection{Deployment in micro clouds}
+\subsection{Deployment in micro clouds}~\label{sec:dep_mc}
 %
 As described in section~\ref{sec:deployment}, there are a few options when it comes to setup and deployment of infrastructure and/or applications. Let us explore interesting options how both \textbf{(1)} infrastructure, and \textbf{(2)} services could be deployd in $\upmu$Cs.
 
@@ -299,7 +299,7 @@ Figure~\ref{fig:fig24} shows flow chart for \emph{rolling update} in $\upmu$Cs f
 \end{figure}
 
 \noindent
-On the other side of the spectrum, the users should be able to choose the \emph{recreation} strategy as well. This strategy will causes higher downtime, but it will do updates quickly. 
+On the other side of the spectrum, the users should be able to choose the \emph{recreation} strategy as well. This strategy will causes higher downtime, but it will do updates quickly.~\label{sec:recreation} 
 
 Figure~\ref{fig:fig27} shows flow chart for \emph{recreation strategy} in $\upmu$Cs for both services and infrastructure.
 
@@ -1355,7 +1355,7 @@ The data retention and size in the $\upmu$C are decided and optimized with~\ref{
 %
 \section{Repercussion}\label{sec:repercussion}
 %
-The model presented in this chapter, has three possible execution repercussions:
+The model presented in this chapter, has four possible model repercussions:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be a viable option in the CC.

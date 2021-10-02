@@ -192,7 +192,7 @@ Query operation is implemented using \emph{api composition} pattern (cf.~page~\p
 %
 \subsection{Mutate}\label{sec:mutate} 
 %
-Mutate operation (orange arrows in Figure~\ref{fig:fig11}.) changes the system state by creating, editing, or deleting clusters, regions, and topologies. When a user wants to perform a mutation over the system, the desired state needs to be specified \textbf{declaratively} using a YAML file and submitted to the system. When the state is submitted, the system will do the rest of the job to ensure that the state desired by the user is reached.
+Mutate operation (orange arrows in Figure~\ref{fig:fig11}.) changes the system state by creating, editing, or deleting clusters, regions, and topologies. When a user wants to perform a mutation over the system, the desired state needs to be specified \textbf{declaratively} using a \emph{YAML} file and submitted to the system. When the state is submitted, the system will do the rest of the job to ensure that the state desired by the user is reached. As a deployment strategy, we used \emph{recreation} strategy (cf. section~\ref{sec:dep_mc}), for simplistic implementation reason.
 
 The users specify which nodes are forming the cluster. Optionally, users can also specify labels and names on the node level, and retention period on the cluster level. The retention period is used to describe how long metrics are going to be kept. When the retention period expires, the metrics data will be deleted or moved to another location. 
 

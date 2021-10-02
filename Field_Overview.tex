@@ -874,6 +874,8 @@ Figure~\ref{fig:fig26} presents reconciliation loop diagram.
 \end{figure}
 
 Every node must provide its current state regularly, and when some state is divergent from the desired state, the system must act to ensure that this situation is corrected automatically. The node can send its state over existing channels e.g., \textbf{health-check} pings to minimize load and data transferred over the network, or a dedicated channel just for this purpose may exist.
+
+Extension of such system can be done just by writing new \emph{controller} that will react on changes for newly added kind of workload.
 %
 %
 \section{Development roles}\label{sec:dev_roles}
