@@ -368,7 +368,7 @@ Processing in big data systems can be represented as~\cite{phdthesis, KiranMMDB1
 
 \begin{itemize}
 	\item \textbf{Batch processing} represents a data processing technique that is done on a huge quantity of the stored data. This type of processing is usually slow and requires time.
-	\item \textbf{Stream processing} represents a data processing technique that is done as data get into the system. This type of processing is usually done on a smaller quantity of the data \textbf{at the time}, and it is faster.
+	\item \textbf{Stream processing} represents a data processing technique that is done as data get into the system. This type of processing is usually done on a smaller quantity of the data \textbf{at the time}~\cite{medjedovic2022algorithms}, and it is faster.
 	\item \textbf{Lambda architectures} represents a processing technique where \emph{stream processing} and handling of massive data volumes in a \emph{batch} are combined in a uniform manner, reducing costs in the process~\cite{KiranMMDB15}.
 \end{itemize}
 
@@ -852,7 +852,7 @@ IaC has grown in popularity in recent years because it applies the same kind of 
 
 IaC is a continuation of earlier works of Osterweil et al.~\cite{Osterweil}, and Fitzgerald et al.~\cite{Fitzgerald}, trying to move infrastructure to level of software, keeping existing tools, best practices and techniques. It relys on the \textbf{reconciler pattern}~\cite{luksa2018kubernetes}, widely used in scheduling systems like Kubernetes.
 
-This pattern enables tracking of resources using two simple states: 
+This pattern enables tracking of resources using two simple states:~\label{loop_pattenr} 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{expected state} represents the desired state provided by the user. This is the state that must be (if possible) achieved at any give point in time;
@@ -860,7 +860,7 @@ This pattern enables tracking of resources using two simple states:
 \end{enumerate}
 
 \noindent
-The reconciler pattern runs a \textbf{reconciliation loop} that ensures that the \emph{current state} remains the same as the \emph{expected state}. 
+The reconciler pattern runs a \textbf{reconciliation loop} that ensures that the \emph{current state} remains the same as the \emph{expected state}.~\label{reconcile_loop} 
 
 Figure~\ref{fig:fig26} presents reconciliation loop diagram.
 

@@ -19,7 +19,7 @@ To extend the system in a new direction, we can look for some inspiration in exi
 
 The first building block of CC architecture is a cluster, and a cluster can be defined as a set of nodes or servers that operate as a single unit to achieve some goal. This is where resources are, and this is where user applications are running on. The next building block that consists of multiple clusters is called Regions (or DCs). Regions are isolated and independent from each other, and they contain resource application needs. These resources come in form of clusters. Regions are usually composed of a few availability zones~\cite{SouzaMFAK19}. These zones are the defense against the fail. If for whatever reason, one zone fails or goes offline, there are still more of them to serve user requests, there is a better availability, scalability, and resilience.
 
-If we now observe $\upmu$Cs as geo-distributed systems, we can use a similar model with some adaptations. Rely on a similar proven strategy, do not build the entire model, but adapt the existing one for the different use-case.
+If we now observe $\upmu$Cs as geo-distributed systems with dispersed users~\cite{hal-01067888}, we can use a similar model with some adaptations. Rely on a similar proven strategy, do not build the entire model, but adapt the existing one for the different use-case.
 
 Table~\ref{tab:table5} presents similar concepts between CC and edge-centric computing (ECC) concepts. The accent is here put on the difference between the physical logical concepts in the two models.
 
@@ -172,7 +172,16 @@ When we introduced SoC for the $\upmu$C model (cf. page~\pageref{services}), we 
 
 To satisfy the previously defined SoC model (cf. page~\pageref{services}), existing applications can be split into the \textbf{front} and \textbf{back} processing services. The front processing service is an edge-native application running inside some previously formed cluster to minimize latency, while the back service runs in the traditional cloud as a cloud-native application to leverage greater resources.
 
-The front processing service will handle user requests coming to the nearby cluster, and communicate with the back processing services when needed to synchronize the pieces of information, cache data, or pass filtered or pre-processed data. Separation like that gives developers better flexibility and large design space when creating and optimizing their workloads.
+The front processing service will handle user requests coming to the nearby cluster, and communicate with the back processing services when needed to synchronize the pieces of information, cache data, or pass filtered or pre-processed data. Separation like that gives developers better flexibility and large design space when creating and optimizing their workloads. At the same time, it ties together the traditional clouds and edge comuting into one coherent system. Figure~\ref{fig:fig29} shows $\upmu$C applications model that tides edge and traditional cloud applicatoins.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.85]{images/Figure29}
+	\end{center}
+	\vspace{-0.7cm}
+	\caption{$\upmu$C applications model tides traditional clouds and edge computing applications}
+	\label{fig:fig29}
+\end{figure}
 
 With this model, we venture even deeper into understanding and applying the concept of \textbf{data locality} (cf. page~\pageref{ds:data_locality}). Since we have front and back processing services, we are committed to doing processing data closer to their source, instead of moving data to the cloud. This reduces latency and saves some users money on storing and processing unnecessary data.
 %
@@ -254,7 +263,7 @@ Both options, \textbf{mCaaS} and \textbf{mPaaS}, could be included, and a part o
 %
 This thesis proposes a DS model that is built with a three-tier architecture that should operate in the geo-distributed environment. 
 
-We believe that \textbf{immutable deployment} model would be a good fit for such environnment. It will simplify the deployment process, since we want to rely on \emph{atomic operations} and do not want to leave the misconfigured system at any level. If something like that happens, there will be a problem that would be hard to properly track, address and resolve.
+We believe that \textbf{immutable deployment} model would be a good fit for such environnment. It will simplify the deployment process, since we want to rely on \emph{atomic operations} and do not want to leave the misconfigured system at any level~\cite{SimicSensors}. If something like that happens, there will be a problem that would be hard to properly track, address and resolve.
 
 Geo-distributed $\upmu$Cs model that is described in this chapter should operate in two levels of deployment that are built one on top of the other:
 
@@ -313,7 +322,11 @@ Figure~\ref{fig:fig27} shows flow chart for \emph{recreation strategy} in $\upmu
 \end{figure}
 
 \noindent
-The third strategy is the \emph{canary update} strategy. This strategy offers a partial update process allowing to test new environment version , without a commitment to a full rollout. In this strategy, the deployment creates a few new artifacts while keeping most artifacts on the previous version. The ration between new and previous version should be provided by the user. 
+The third strategy is the \emph{canary update} strategy. This strategy offers a partial update process allowing to test new environment version , without a commitment to a full rollout. 
+
+This strategy comes handy when we want to test how your services perform in real-life scenarios with production data and users, allowing the revert to previous version fast.
+
+In this strategy, the deployment creates a few new artifacts while keeping most artifacts on the previous version. The ration between new and previous version should be provided by the user. After the test, we can go either direction: \textbf{(1)} full rollout, \textbf{(2)} revert to previous version. Both directions are predicated by the results of the test.
 
 Figure~\ref{fig:fig28} shows chart for the \emph{canary update} strategy deployment.
 
@@ -929,7 +942,8 @@ If we have cached idempotency data for user requests, and if a user tries to sen
 \noindent
 If we have stored user request on cluster formation protocol, and we receive a new request with the same name, \textbf{then} we can take the intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
 
-This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}.  We can go even a little bit further and use CRDTs and SEC to store and replicate data on copidres of the services that are required for the idempotency test. Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
+This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}, and use Bloom filter~\cite{TarkomaRL12} for key filtering.  We can go even a little bit further and use CRDTs and SEC to store and replicate data on copidres of the services that are required for the idempotency test. Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
+
 \begin{figure}[H]
 	\begin{center}
 		\includegraphics[scale=0.6]{images/Figure13}
@@ -1341,7 +1355,7 @@ One of the benefits of having $\upmu$C in near proximity is that user data can b
 
 User data would be relatively easy to replicate inside a region using CRDTs for example (see~\ref{crdts}), to eliminate expensive coordination~\cite{inproceedingsSimic2}. On top of this, distributed file system can be built, distributed databases, processing frameworks specially designed for $\upmu$C environment.
 
-But since $\upmu$Cs storage capacity is less than traditional cloud, they should store most recently used data. The storage capacity is determined by the $\upmu$C size given by the equation~\ref{size:eq1}.
+But since $\upmu$Cs storage capacity is less than traditional cloud, they should store most recently used data~\cite{SimicSensors}. The storage capacity is determined by the $\upmu$C size given by the equation~\ref{size:eq1}.
 
 Data locality in $\upmu$Cs creates two challenges, that must be addressed:
 
@@ -1350,7 +1364,29 @@ Data locality in $\upmu$Cs creates two challenges, that must be addressed:
 	\item how long, the user data should be stored in the $\upmu$C, if we assume that locally existing $\upmu$C will serve many users? The proposed model does not restrict how long the data should be stored and it is \textbf{policy-based}. Depending on the $\upmu$C size given by equation~\ref{size:eq1}, $\upmu$C providers may determine \textbf{different policies} --- Time to live (TTL)~\cite{CohenHK05} and offer to users. This process is somewhat similar to the leases mechanism in cache systems~\cite{GrayC89}. 
 \end{enumerate}
 
-The data retention and size in the $\upmu$C are decided and optimized with~\ref{size:eq1} and~\ref{size:eq2}, for the single user or group of users. This gives developers, and miro cloud providers more room to optimize their policies offered to the users, while users may choose different options based on their needs.
+The data retention and size in the $\upmu$C are decided and optimized with~\ref{size:eq1} and~\ref{size:eq2}, for the single user or group of users. This gives developers, and $\upmu$C providers more room to optimize their policies offered to the users, while users may choose different options based on their needs~\cite{SimicSensors}.
+%
+%
+\section{Extendability}\label{sec:extendability}
+%
+The proposed system allow extension, and could be used for addition of various configurations and artifacts to \emph{nodes, clusters, regions} and even \emph{topologies} --- $\upmu$Cs, all done remotely. 
+
+As the direct implication of \emph{reconcile pattern} (cf. page~\pageref{loop_pattenr}), extension is as easy as adding the new worker to the system. This new worker, will deal with a specific resource type when that kind of file is submitted to the system.
+
+On the other hand, a \emph{reconcile loop} (cf. page~\pageref{reconcile_loop}) will provide the observed resource informations that this worker can act on. This mean that specific worker (controller) will deal with just one resouce type at any given point in time knowing what is specified, and what is returned from reconcile loop. 
+
+When registering new worker, user should provide \emph{unique} name of the worker so that reconcile loop can send informations to the right place. As a unique name we can use for examle worker name and resource type name.
+
+Figure~\ref{fig:fig30} show high overview of adding a new worker to the system, with reconcile loop.
+
+\begin{figure}[H]
+	\begin{center}
+		\includegraphics[scale=0.7]{images/Figure30}
+	\end{center}
+	\vspace{-0.7cm}
+	\caption{New worker addition to the system, with reconcile loop.}
+	\label{fig:fig30}
+\end{figure}
 %
 %
 \section{Repercussion}\label{sec:repercussion}
