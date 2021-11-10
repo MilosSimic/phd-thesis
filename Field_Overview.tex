@@ -186,7 +186,7 @@ Figure~\ref{fig:fig1} shows the difference in control and management of resource
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.75]{images/Figure1}
+		\includegraphics[scale=0.80]{images/Figure1}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Difference between cloud options and on-premises solution.}
@@ -563,7 +563,7 @@ Figure~\ref{fig:fig18} shows the simple example of \textit{RequestX} path throug
 	\begin{center}
 		\includegraphics[scale=0.8]{images/Figure18}
 	\end{center}
-	\vspace{-0.9cm}
+	\vspace{-0.75cm}
 	\caption{\textit{RequestX} path through the processes in a distributed system.}
 	\label{fig:fig18}
 \end{figure}
@@ -632,6 +632,17 @@ Figure~\ref{fig:fig16} shows difference between mater-slave $(left)$ and peer-to
 
 \noindent
 Using the right distribution model usually depends on the business requirements. High availability requires a P2P network because of no SPOF. If we could manage data using batch jobs that run in off-hours, then the simpler master-slave model might be the solution.
+%
+%
+\subsection{Replication}\label{sec:replication_protocol}
+%
+Replication is a technique used to ensure the availability of redundant resources closer to the place where it is accessed, with a goal to improve reliability, fault-tolerance, or accessibility~\cite{SteenT16, 0019513}.
+
+On the other hand, replication leads to better performance by balancing the load between components~\cite{SteenT16}. This is of importance, especially in geo-distributed systems, because it can lower down the communication latency. Users can access a copy of data nearby~\cite{0019513}.
+
+Replication requires information about \textbf{replication factor}. The replication factor tells us the number of nodes to replicate the data. Replication could be implemented inside a single cluster or multiple regions, increasing the overall availability of the system further.
+
+Storing data in several places requires that system deals with the \textbf{consistency} of stored data. The users can access different replicas at different times, leading the data to an inconsistent state. Consistency is tunable parameter, and user can choose between \textbf{strong} and \textbf{eventual} consistency.
 %
 %
 \section{Similar computing models}\label{sec:similar_models}
@@ -707,7 +718,7 @@ Figure~\ref{fig:fig20} shows an example of one transaction separated into multip
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.9]{images/Figure20}
+		\includegraphics[scale=0.8]{images/Figure20}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Saga transactions separated in sub-transactions.}
@@ -756,7 +767,7 @@ Figure~\ref{fig:fig5} represents architectural differences between VMs, containe
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[width=\linewidth]{images/Figure5}
+		\includegraphics[scale=0.80]{images/Figure5}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Architectural differences between VMs, containers and unikernels.}
@@ -817,7 +828,7 @@ Figure~\ref{fig:fig12} summarizes the difference between mutable and immutable d
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics{images/Figure12}
+		\includegraphics[scale=0.80]{images/Figure12}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Difference between mutable and immutable deployment models.}
@@ -866,7 +877,7 @@ Figure~\ref{fig:fig26} presents reconciliation loop diagram.
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics{images/Figure26}
+		\includegraphics[scale=0.80]{images/Figure26}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{Reconciliation loop diagram.}
