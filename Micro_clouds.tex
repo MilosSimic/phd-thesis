@@ -663,7 +663,7 @@ If a user wants to get a list of free nodes in the system, he must create a quer
 	\Input{query}
 	Initialize: nodes $\leftarrow$ []\\
 	\ForEach{node $\in$ freeNodes()}{
-		\If{len(node.labels) == len(query) $\land$ node.haveAll(query)}{
+		\If{len(node.labels) $==$ len(query) $\land$ node.haveAll(query)}{
 			nodes.append(node)\\
 		}
 	}
@@ -921,15 +921,23 @@ Since we follow the approach of~\cite{HuY17} with explicit connections, projecti
 %
 Mutate operation should be atomic, immutable, and idempotent. The user can specify the same topology details but in a different order, for example. We must ensure that the new cluster formation protocol should \textbf{not} be initiated, if the user changes order of regions, clusters, nodes, or labels in one or more node/s. 
 
-If mutate operation fails, for whatever possible reason, but the infrastructure is created, or the same infrastructure already exists, the user should get a message that infrastructure is formed. If the user changes the number of labels per node, nodes per cluster, clusters per region \textbf{only} in that case a new protocol should be started.
+If mutate operation fails, for whatever possible reason, or the same infrastructure already exists, the user should get a message that infrastructure is formed. If the user changes the number of labels per node, nodes per cluster, clusters per region, regions per topology \textbf{only} in those cases a new protocol should be started.
 
 But since we have a different scenario than standard write to storage, and we do not specify steps on how operations should be done, to implement idempotency correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
 
-The idempotent structure can be represented as a tuple of topology name and set of data like $S=(Name, Data)$. $Name$ could be used for faster lookup, while $Data$ can be represented as a set, because most of the set operations are idempotent, as described in SEC. $Data$ set could be represented in two ways:
+The idempotent structure $I_S$ can be represented as a tuple of \emph{topology name} and \emph{data set} like: 
+
+\begin{center}
+	$I_S=(Name, DataSet)$ 
+	\myequations{Idempotency structure}
+\end{center}
+
+\noindent
+$Name$ could be used for faster lookup, while $DataSet$ can be represented as a set, because most of the set operations are idempotent, as described in SEC. $DataSet$ could be represented in two ways:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{flat keyspace}, with this option all data could be part of the same set, and distinguishment could be achieved usnig \textit{prefix} identity, for example: region1\_cluster1, cluster1\_node1, \\node1\_label1 etc.
-	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements, for example set of regions, where every region is a set of clusters, where every cluster is a set of nodes, etc. We can go deep as long as we want, but the restriction is that every structure \textbf{must} be idempotent. So we can use a set of sets and so on. With this option, we must test that idempotency is not violated throughout the hierarchy.
+	\item \textbf{flat keyspace}, with this option all data could be part of the same set, and distinguishment could be achieved using \textit{prefix} identity, for example: region1\_cluster1\_node1\_labels, region1\_cluster1\_node1\_name etc.
+	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements, for example set of regions, where every region is a set of clusters, where every cluster is a set of nodes, etc. We can go deep as long as we want, but the restriction is that every structure \textbf{must} be idempotent. So we can use a set of sets or \emph{N-ary trees}. With this option, we must test that idempotency is not violated throughout the hierarchy.
 \end{enumerate}
 
 \noindent
@@ -940,9 +948,9 @@ If we have cached idempotency data for user requests, and if a user tries to sen
 \end{proof}
 
 \noindent
-If we have stored user request on cluster formation protocol, and we receive a new request with the same name, \textbf{then} we can take the intersection of two sets. If we get the same set, that means that this action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
+If we have stored the cluster formation protocol request in some \emph{idempotent storage}, and we receive a new request with the same name, \textbf{then} we can take the intersection of two sets. If we get the same set, that action is already done because of the definition~\ref{def:intersection_idempotent}. Otherwise, the request represents the new action, and new cluster formation protocol. 
 
-This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}, and use Bloom filter~\cite{TarkomaRL12} for key filtering.  We can go even a little bit further and use CRDTs and SEC to store and replicate data on copidres of the services that are required for the idempotency test. Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
+This can be made a little bit faster, by choosing the proper storage structure. If we first do (the same) topology, the name is already present in the idempotency store, and this lookup will spare us unnecessary comparison on sets. For example, data structures like \emph{Hash tables} store element as pair of $key-value$ and offers time and space complexity for lookups $\mathcal{O}(1)$, \textit{on average}~\cite{0023376}, and use Bloom filter~\cite{TarkomaRL12} for key filtering.  We can go even a little bit further and use CRDTs and SEC to store and replicate data required for the idempotency test. Figure~\ref{fig:fig13} shows zoomed view in the $State$ participant from figure~\ref{fig:fig7}, and idempotency check communication.
 
 \begin{figure}[H]
 	\begin{center}
@@ -968,35 +976,43 @@ The participants follow the communication that we now describe informally: \labe
 \end{enumerate}
 
 \noindent
-When testing idempotency, we must have in mind that stored structure could be: \textbf{(1)} flat keyspace, and \textbf{(2)} hierarchical keyspace. The both options are valid, as long as the \textbf{structure is idempotent}, and we can do \textbf{idempotent operations} over that structure. For example, $set$ as a data structure and $intersection$ are good candidates. The algorithm that will test structure idempotency must be able to test both options. 
+When testing idempotency, we must have in mind that stored structure could be: \textbf{(1)} flat keyspace, and \textbf{(2)} hierarchical keyspace. The both options are valid, as long as the \textbf{structure is idempotent}, and we can do \textbf{idempotent operations} over that structure. For example, $set$ as a data structure and $intersection$ are good candidates. It is worth noticing that the flat keyspace is a special case of the hierarchical keyspace.%For the purpose of this thesis, to bypass complex graph similarity algorithms, the hierarchical structure is translated into a flat keyspace structure, and the elements of that set are compared. %The algorithm that will test structure idempotency must be able to test both options. 
+%For the future work, the algorithm should be designed in such a way that will be able to test structure idempotency must be able to test both options.
+The algorithm that will test structure idempotency must be able to test both options.
 
 Algorithm~\ref{alg:alg6} describes steps required to test if the operation is done before.
 
 \begin{algorithm}[H]
-	\SetKwFunction{idempotent}{idempotent}
+	\SetKwFunction{equals}{equals}
 	\SetKwProg{Fn}{function}{:}{}
-	\Fn{\idempotent{$stored$, $topology$}}{
-		\ForEach{data $\in$ topology}{
-			\If{isNotSet(data)}{
-				\uIf{stored.intersection(data) = stored}{
-					\KwRet{true}
-				}
+	\tcp{children are sorted in both trees}
+	\Fn{\equals{stored, topology}}{
+		sChildren $\leftarrow$ stored.children\\
+		tChildren $\leftarrow$ topology.children\\
+		%\If{topology $==$ \textsc{null} $\lor$ topology.children.size $\neq$ stored.children.size $\lor$ stored.data $\neq$ topology.data}{
+		\If{topology $==$ \textsc{null} $\lor$ tChildren.size $\neq$ sChildren.size \\ $\lor$ $\neg$ stored.isIdempotent(topology.data)}{
+			\KwRet{false}
+		}
+	
+		%sIter $\leftarrow$ sChildren.iterator\\
+		%tIter $\leftarrow$ tChildren.iterator\\
+		\While{sChildren.hasNext $\land$ tChildren.hasNext}{
+			\If{$\neg$ equals(sChildren.next, tChildren.next)}{
 				\KwRet{false}
 			}
-			\Else{\idempotent{$stored, data$}}
 		}
+		\KwRet{true}
 	}
 	
 	\SetAlgoLined
 	\SetKwInOut{Input}{input}
 	\Input{request}
-	id $\leftarrow$ seenBefore(request.payload.name)\\
-	\uIf{id = null}{
-		return true;
+	stored $\leftarrow$ storage.findRequest(request.payload.name)\\
+	\uIf{stored $\neq$ \textsc{null}}{
+		\KwRet{false}
 	}\Else{
-		stored $\leftarrow$ storage.findRequest(id)\\
 		topology $\leftarrow$ request.payload.topology\\
-		\KwRet{\idempotent{$stored, topology$}}
+		\KwRet{$\neg$ equals(stored, topology)}
 	}
 	\caption{Mutate idempotency check}
 	\label{alg:alg6}
