@@ -11,13 +11,13 @@ New age applications that might include augmented reality, massive online gaming
 
 Such workloads require that latency is below a few tens of milliseconds~\cite{ChiangZ16}, or even less. These requirements fall just right outside of what a standard centralized model like cloud computing (CC), for example, could offer~\cite{ChiangZ16}. Even the smallest problems can contribute to largely unplanned downtime of applications and services people and other services may depend on. A most recent example is yet another outage that happened to the Amazon Web Services (AWS), and as a result, a large amount of internet becomes unavailable~\cite{GunawiHSLSAE16}.
 
-This thesis aims to provide formal models based on which we can model and implement distributed systems (DS) for organizing cloud-like geo-distributed environments for users or CC providers. We can look at the whole system as a micro clouds ($\upmu$Cs) or pre-processing layer. The responsibility of such a system is sending only necessary and data to the cloud. This strategy reduces cost for users and ensures the availability of CC services. Such a system could lead to lowering the downtime of critical services. Here w can give a formal definitino of geo-distributed environments like:
+This thesis aims to provide formal models based on which we can model and implement distributed systems (DS) for organizing cloud-like geo-distributed environments for users or CC providers. We can look at the whole system as a micro clouds ($\upmu$Cs) or pre-processing layer. The responsibility of such a system is sending only necessary and data to the cloud. This strategy reduces cost for users and ensures the availability of CC services. Such a system could lead to lowering the downtime of critical services. Here we can give a formal definitin of geo-distributed environments like:
 
 \begin{definition}
-	geo-distribution represent organizing processing and storage resources in proximity to some large populations, where $\upmu$Cs are formed dynamically, serving users requests \textbf{locally first}. 
+	Geo-distribution represent organizing processing and storage resources in proximity to some large populations, where $\upmu$Cs are formed dynamically, serving users requests \textbf{locally first}. 
 \end{definition}
 
-It starts by describing the general problem area that our work addresses in Section~\ref{sec:problem_area}. Section~\ref{sec:problem_statement}, specifies the exact problem that our work addresses, and Section~\ref{sec:research_hyphotesis_and_golas} describes our hypothesis and research goals. Section~\ref{sec:structure_of_thesis} presents the structure of the thesis.
+The section starts by describing the general problem area that our work addresses in Section~\ref{sec:problem_area}. Section~\ref{sec:problem_statement}, specifies the exact problem that our work addresses, and Section~\ref{sec:research_hyphotesis_and_golas} describes our hypothesis and research goals. Section~\ref{sec:structure_of_thesis} presents the structure of the thesis.
 %
 %
 %
@@ -27,7 +27,7 @@ To lower the administration cost, cloud providers create an effective economy of
 
 Despite all the benefits that centralization can provide, it is inevitable for the CC services to suffer from serious problems~\cite{KarimIWGSYO16}. Over time, and due to the high bandwidth and latency, these services face degradation that we cannot overlook. This serious services degradation can have an enormous consequence on the human business and potentially lives as well~\cite{El-SayedSPPGML18}. 
 
-To avoid large investments~\cite{MonsalveCC18}, like creating and maintaining their own DCs, organizations use cloud services created by others~\cite{Satyanarayanan17}. They consume resources and pay for their usage time. This model is known as -- pay as you go model.
+To avoid large investments~\cite{MonsalveCC18}, like creating and maintaining their own DCs, organizations use cloud services created by others~\cite{Satyanarayanan17}. They consume resources and pay for their usage time. This model is known as --- \emph{pay as you go model}.
 
 CC requires data transfer to the DCs from data sources. This operation is problematic because it creates a high latency in the system~\cite{HossainRH18}. We can observe some examples like data collection from planes and autonomous cars. Boeing 787s per single flight generates half a terabyte of data, while a self-driving car generates two petabytes of data per single drive. On the other hand, bandwidth is not large enough to support such requirements~\cite{CaoZS18}. 
 
@@ -65,12 +65,12 @@ Based on this, the problem this thesis is trying to solve is defined by the thre
 \end{enumerate}
 
 \noindent
-This $\upmu$C model makes both system and applications more available and reliable, while resources are extended further beyond the single node or even $\upmu$DCs. In his work~\cite{SatyanarayananK19} Satyanarayanan et al. shows that $\upmu$DCs can serve as firewalls, while users get a unique ability to dynamically and selectively control their information that will be uploaded to the cloud.  Simi\' c et al., in~\cite{inproceedingsSimic1} uses a similar idea as a pre-processing tier for the cloud. Years after its inception, EC is no longer just an idea~\cite{SatyanarayananK19} but a must-have tool for novel applications to come. 
+This $\upmu$C model makes both system and applications more available and reliable, while resources are extended further beyond the single node or even $\upmu$DCs. In their work~\cite{SatyanarayananK19} Satyanarayanan et al. shows that $\upmu$DCs can serve as firewalls, while users get a unique ability to dynamically and selectively control their information that will be uploaded to the cloud.  Simi\' c et al., in~\cite{inproceedingsSimic1} uses a similar idea as a pre-processing tier for the cloud. Years after its inception, EC is no longer just an idea~\cite{SatyanarayananK19} but a must-have tool for novel applications to come. 
 %
 %
 \section{Research Hypotheses, and Goals}\label{sec:research_hyphotesis_and_golas}
 %
-Based on research questions presented on page~\pageref{questions}, and motivation presented in section~\ref{sec:problem_statement}, the hypothesis around which this thesis is based, is derived. They can be summarized as follows:
+Based on research questions presented on the page~\pageref{questions}, and the motivation presented in section~\ref{sec:problem_statement}, the hypothesis around which this thesis is based, is derived. They can be summarized as follows:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textbf{Hypothesis:} \textit{It is possible to organize EC nodes in a standard way based on cloud architecture, adapted for EC geo-distributed environment -- \textbf{$\upmu$Cs}. Giving users the unique ability to organize nodes, descriptively, in the best possible way to serve the population nearby.}
@@ -85,8 +85,8 @@ From the previously defined hypotheses, the primary goals of this thesis can be 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item \textit{The construction of a model with a clear separation of concerns for the model influenced by cloud organization, with adaptations for a different environment, and with a model for EC applications utilizing these adaptations. This addresses the first research question and is the topic of Chapter~\ref{chapter:Micro_clouds}.}
-	\item \textit{The constructed model is more available, resilient with less latency, and as such it can be offered to the general public as a service like any other service in the cloud. This addresses the second research question and is the topic of Chapter~\ref{chapter:Micro_clouds}.}
-	\item \textit{The constructed model is described formally well, using solid mathematical theory, but also easy to extend both formally and technically, easy to understand and reason about. This addresses the third research question and is the topic of Chapter~\ref{chapter:Micro_clouds}.}
+	\item \textit{The constructed model is more available, resilient with less latency, and as such it can be offered to the general public as a service like any other service in the cloud. This addresses the second research question and is the topic of Chapters~\ref{chapter:Micro_clouds} and~\ref{chapter:Model usability}.}
+	\item \textit{The constructed model is described formally well, using solid mathematical theory, but also easy to extend both formally and technically, easy to understand and reason about. This addresses the third research question and is the topic of Chapters~\ref{chapter:Micro_clouds} and~\ref{chapter:Implementation}.}
 \end{enumerate}
 %
 %

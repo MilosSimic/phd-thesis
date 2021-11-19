@@ -16,9 +16,7 @@ Chapter~\ref{chapter:Intro} presents the motivation for this thesis with problem
 
 A short introduction to the topic of distributed system is given in Chapter~\ref{chapter:Field_overview}, with a short introduction to the topic of distributed systems, with a focus only on the areas that are important for the understanding of this thesis. 
 
-It is shown what distributed systems are, or, at least consensus how some systems can be described as distributed. We present problems these systems create, and why they are so hard to implement and maintain. 
-
-It also presents a few distributed computing applications, that we can use to employ nodes in the distributed system. Further on it is shown what scalability is and why it is important for distributed systems, with few organizational ideas like peer-to-peer and membership that protocol that is important in a distributed environment for various reasons.
+It is shown what distributed systems are. We present problems these systems create, and why they are so hard to implement and maintain. It also presents a few distributed computing applications, that we can use to employ nodes in the distributed system. Further on it is shown what scalability is and why it is important for distributed systems, with few organizational ideas like peer-to-peer and membership that protocol that is important in a distributed environment for various reasons.
 
 Virtualization techniques are then described that can be used to pack and deploy applications and infrastructure, how to implement various deployment techniques especially in the CC environment, but also the difference between DS and few models that are usually confused as distributed like parallel computing and decentralized computing.
 
@@ -28,19 +26,19 @@ We show different platform options, where people change the existing solutions l
 
 It is show how nodes can be organized to split some geographic area into zones, and show how $\upmu$DCs can help CC to serve requests from the local population. Different offloading techniques are used today, how to offload tasks from mobile devices closer to fog or edge nodes, but also various application models that could harness these offloading techniques and nodes organizations.
 
-In the end, the position of this thesis, compared to other similar models, is presented.
+In the end, the position of this thesis, compared to other similar researches, is presented.
 
-Chapter~\ref{chapter:Micro_clouds} presents the heart and soul of this thesis. We dissect all important aspects that we need to have to help CC with latency issues, Big Data with huge volumes of data especially in the age of mobile devices and IoT.
+Chapter~\ref{chapter:Micro_clouds} presents the main contribution of this thesis. We dissect all important aspects that we need to have to help CC with latency issues, Big Data with huge volumes of data especially in the age of mobile devices and IoT.
 
 Our model is based around $\upmu$DCs that are zonally organized, that will serve local population and population nearby. We present a model that is based on CC but adapted for different scenarios and use cases.
 
-We show how we can dynamically form new clusters, regions, and topologies and how we can use them in the new age of mobile devices and IoT. These newly formed systems or system od systems will have clear the SoC, adopted from existing research to three-tier architecture. The formed model will serve as a pre-processing layer, firewall, or privacy layers, and it is adjustable in various dimensions.
+We show how we can dynamically form new clusters, regions, and topologies and how we can use them in the new age of mobile devices and IoT. These newly formed systems will have clear the SoC, adopted from existing research to three-tier architecture. The formed model will serve as a pre-processing layer, firewall, or privacy layers, and it is adjustable in various dimensions.
 
-The presented model can be as huge as the whole state, as small as a single household and all in between. This is a matter of agreement and a matter of choice. We present how developers can use this new infrastructure and what possible models of applications could exist, and how operations can deploy developed services onto existing infrastructure.
+The presented model can be formed in such a way to serve larger or smaller geographic areas, where users are located. This is a matter of agreement and a matter of choice. We present how developers can use this new infrastructure and what possible models of applications could exist, and how operations can deploy developed services onto existing infrastructure.
 
 In the end, we present the repercussions of this model, and how it can be used as an integral part of existing systems to serve as topology storage or as a new model on top of which new subsystems and applications can be developed. We present protocols for the creation of such a system and model them using asynchronous session types. The system follows a formal model, and it is easy to extend.
 
-Finally, we give limitations of such a system and things we must be aware of, \textbf{if} such technology is going to be used in real-life scenarios.
+Finally, we give limitations of such a system and things we must be aware of.
 
 Chapter~\ref{chapter:Implementation} presents an implemented framework that is based on knowledge compiled from previous chapters. We also present in detail operations that could be done in the framework, where it fits in the presented SoC model.
 
@@ -51,14 +49,14 @@ The thesis is concluded in this last chapter with what  is done, what can be don
 %
 \section{Limitations}\label{sec:limitations}
 %
-The model proposed in this thesis has some llimitations that we must be aware of, either to work on improvements or use the model as is. When talking about small-scale servers and $\upmu$Cs, we must be aware of a few things.
+The model proposed in this thesis has some llimitations that we must be aware of. When talking about small-scale servers and $\upmu$Cs, we must be aware of a few things.
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item We must be aware that not all organizations will be able to deploy $\upmu$Cs, due to the high initial investments required~\cite{MonsalveCC18}. We can rely on government authorities, large cloud providers, or other big companies to build the initial infrastructure for their own needs, and lease it to others similar to the cloud. The general public can use them, similarly to the cloud -- pay as you go, model.
-	\item There is no guarantee that existing public cloud providers will allow nodes that are not built, resigned, or deployed by them. If we are building a private cloud, then  we can make a different decision. One way to resolve this issue is that the whole platform becomes open-source so that public cloud providers can engage in the development, and eventually use them as a solution.
-	\item These small-scale servers must be out of reach of people and protected in some way so that not everyone has access to them. Some degree of physical security must be implemented.
-	\item The places where these small scale servers will be deployed must have a stable internet connection, and the ability to integrate SDN or other similar technologies, so that complex network topologies could be implemented properly.
-	\item These servers can have some open architecture or could be custom built by other providers. In both cases, they must be able to satisfy rules that are presented in~\ref{sec:separation_of_concerns}.
+	\item Not all organizations will be able to deploy $\upmu$Cs, due to the high initial investments required~\cite{MonsalveCC18}. We can rely on government authorities, large cloud providers, or other big companies to build the initial infrastructure for their own needs, and lease it to others similar to the cloud. The general public can use them, similarly to the cloud -- pay as you go, model;
+	\item There is no guarantee that existing public cloud providers will allow nodes that are not built, resigned, or deployed by them. If we are building a private cloud, then  we can make a different decision. One way to resolve this issue is that the whole platform becomes open-source so that public cloud providers can engage in the development, and eventually use them as a solution;
+	\item These small-scale servers must be out of reach of people and protected in some way so that not everyone has access to them. Some degree of physical security must be implemented;
+	\item The places where these small scale servers will be deployed must have a stable internet connection, and the ability to integrate SDN or other similar technologies, so that complex network topologies could be implemented properly;
+	\item These servers can have some open architecture or could be custom built by other providers. In both cases, they must be able to satisfy rules that are presented in Section~\ref{sec:separation_of_concerns};
 	\item Splitting the processing into two parts and the possibility that users can be responsible for $\upmu$Cs may raise some legal concerns. Either to develop interesting applications, use them as a firewall or simply use them as a privacy level for data, there must be a legal agreement that might not be that easy to achieve.
 \end{enumerate}
 %
@@ -71,7 +69,7 @@ One advantage is that specialized models are developed and optimized for a speci
 
 Specialized platforms usually require special types of applications, while the proposed model does not limit users (in terms of development tools and techniques), as long as their application could be virtualized in some way (e.g., using virtual machines, containers, or unikernels). The developers may reuse existing knowledge to develop their applications.
 
-The proposed model allows the organization of storage and processing resources according to priority if a catastrophic event (e.g., COVID-19 see section~\ref{sec:covid_example}) hits the human population. Humanity can organize its resources and manage its digital infrastructure, where developers make applications that will help its citizens in those tough times.
+The proposed model allows the organization of storage and processing resources according to priority if a catastrophic event occurs (e.g., COVID-19 see section~\ref{sec:covid_example}). Providers can organize their resources and manage their digital infrastructure, where developers make applications that will help its citizens.
 %
 %
 \section{Future work}\label{sec:future_work}

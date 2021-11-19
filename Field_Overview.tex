@@ -10,7 +10,7 @@ Sections~\ref{sec:distributed_systems} and \ref{sec:distributed_computing} descr
 There are various definitions of DS, but we can think of DS as a system where multiple entities can communicate to one another in some way, but at the same time, they can perform some operations. In~\cite{SteenT16, 0019513} Tanenbaum et al. give two interesting assumptions about DS:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item  \say{A computing element, which we will generally refer to as a node, can be either a hardware device or a software process}.
+	\item  \say{A computing element, which we will generally refer to as a node, can be either a hardware device or a software process};
 	\item \say{A second element is that users (be they people or applications) believe they are dealing with a single system. This means that one way or another the autonomous nodes need to collaborate}.\label{ds:asumption_2}
 \end{enumerate}
 
@@ -20,9 +20,9 @@ These two assumptions are useful and powerful when talking about DS. As such, in
 Three significant characteristics of distributed systems are~\cite{0019513}: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{concurrency of components}, refers to the ability of the DS that multiple activities are executed at the same time. These activities take place on multiple nodes that are part of a DS.
-	\item \textbf{independent failure of components}, this property refers to a nasty feature of DS that nodes fail independently. They can fail at the same time as well, but they usually fail independently for numerous reasons.
-	\item \textbf{lack of a global clock}, this is a consequence of dealing with independent nodes. Each node has its notion of time, and as such we cannot assume that there is something like a global clock.
+	\item \textbf{Concurrency of components}, refers to the ability of the DS that multiple activities are executed at the same time. These activities take place on multiple nodes that are part of a DS;
+	\item \textbf{Independent failure of components}, this property refers to a nasty feature of DS that nodes fail independently. They can fail at the same time as well, but they usually fail independently for numerous reasons;
+	\item \textbf{Lack of a global clock}, this is a consequence of dealing with independent nodes. Each node has its notion of time, and as such we cannot assume that there is something like a global clock.
 \end{enumerate} 
 
 \noindent
@@ -46,7 +46,7 @@ DS are hard to implement because of their asinchroninis and faulty nature. James
 \end{enumerate}
 
 \noindent
-These fallacies were introduced over a decade ago, and more than four decades since we started building DS, but the characteristics and underlying problems remain pretty the same. An interesting fact is that even designers, architects still assume that technology solves everything. This is not the case in DS, and these fallacies should not be forgotten. Because of these problems, DS are hard to implement correctly and they are hard to maintain and test properly.
+These fallacies were introduced over a decade ago, and more than four decades since we started building DS, but the characteristics and underlying problems remain pretty the same. Because of these problems, DS are hard to implement correctly and they are hard to maintain and test properly.
 %
 %
 \subsection{Scalability}\label{sec:scalability}
@@ -54,7 +54,7 @@ These fallacies were introduced over a decade ago, and more than four decades si
 Scalability is the property of a system to handle a growing amount of work by adding resources to the system~\cite{Bondi00}. When talking about computer systems, scalability can be represented in two ways:
 
 \begin{itemize}
-	\item \textbf{Scaling vertically} means upgrading the hardware that computer systems are running on --- adding mode CPU, RAM, storage. Vertical scaling can increase performance to what the latest hardware can offer, and here we are limited by the laws of physics and Moor's law \cite{Gustafson2011}. A typical example that requires this type of scaling is a relation database server. These capabilities are insufficient for moderate to big workloads.
+	\item \textbf{Scaling vertically} means upgrading the hardware that computer systems are running on --- adding mode CPU, RAM, storage. Vertical scaling can increase performance to what the latest hardware can offer, and here we are limited by the laws of physics and Moor's law \cite{Gustafson2011}. A typical example that requires this type of scaling is a relation database server. These capabilities are insufficient for moderate to big workloads;
 	\item \textbf{Scaling horizontally} means that we scale our system by adding more and more computers, rather than upgrading the hardware of a single one. With this approach, we are (almost) limitless on how much we can scale. Whenever performance degrades we can simply add more computers (or nodes). These nodes are not required to be some high-end machines.
 \end{itemize}
 
@@ -66,7 +66,7 @@ Figure~\ref{fig:fig23} show difference betweeen scaling vertically and horizonta
 		\includegraphics[scale=0.80]{images/Figure23}
 	\end{center}
 	\vspace{-0.6cm}
-	\caption{Difference betweeen scaling vertically and horizontally}
+	\caption{Difference betweeen scaling vertically (left) and horizontally (right)}
 	\label{fig:fig23}
 \end{figure}
 
@@ -92,16 +92,14 @@ Table~\ref{tab:table1} summarizes differences between horizontall and verticall 
 Scaling horizontally is a preferable way for scaling DS. Not because we can scale easier, or because it is significantly cheaper than vertical scaling (after a certain threshold)~\cite{Bondi00}, but because this approach comes with few more benefits that are especially important when talking about large-scale DS. Adding more nodes gives us two important properties: 
 
 \begin{itemize}
-	\item \textbf{Fault tolerance} means that applications running on multiple places at the same time are not bound to the fail of a node, cluster, or even DCs. As long as there is a copy of the application running somewhere, the user will get a response back. As a consequence of running multiple copies of a service and on multiple places, we have that service is more \textbf{available}, than running on a single node no matter how high-end that node is. Eventually, all nodes are going to break, and if we have multiple copies of the same service we have a more resilient and more available system to serve user requests.
+	\item \textbf{Fault tolerance} means that applications running on multiple places at the same time are not bound to the fail of a node, cluster, or even DCs. As long as there is a copy of the application running somewhere, the user will get a response back. As a consequence of running multiple copies of a service and on multiple places, we have that service is more \textbf{available}, than running on a single node no matter how high-end that node is. Eventually, all nodes are going to break, and if we have multiple copies of the same service we have a more resilient and more available system to serve user requests;
 	\item \textbf{Low latency} refers to the idea that the world is limited by the speed of light. If a node running application is too far away, the user will wait too long for the response to get back. If the same application is running in multiple places, the user request will hit the node that is closest to the user.
 \end{itemize}
 
 \noindent
 Nodes are usually organized into clusters of machines. Buyya et al. describes a cluster as a processing system, which consists of a collection of interconnected stand-alone computers cooperatively working together as a single, integrated computing resource.~\cite{Buyya}.
 
-But despite all the obvious benefits, for a DS to work properly, we need the writing software in such a way that is able to run on multiple nodes, as well as that it \textbf{accepts the failure and deals with it}. This turns out to be not an easy task.
-
-For example, users need to be aware when using DS which of them is related to distributed data storage systems. Storage implementations that rely on vertical scaling to ensure scalability and fault tolerance, have one nasty feature. 
+But despite all the obvious benefits, for a DS to work properly, we need the writing software in such a way that is able to run on multiple nodes, as well as that it \textbf{accepts the failure and deals with it}. This turns out to be not an easy task. For example, users need to be aware when using DS which of them is related to distributed data storage systems. Storage implementations that rely on vertical scaling to ensure scalability and fault tolerance, have one nasty feature. 
 
 This nasty feature is represented in theorem called \textbf{CAP theorem}~\label{lab:cap} presented by Eric Brewer~\cite{Brewer2000}, and proven after inspection by Gilbert et a.~\cite{GilbertL02}. The CAP theorem states that it is impossible for a distributed data store to simultaneously provide more than two out of three guarantees shown in Figure~\ref{fig:fig17}.
 
@@ -115,7 +113,7 @@ This nasty feature is represented in theorem called \textbf{CAP theorem}~\label{
 \end{figure}
 
 \begin{enumerate} [start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{C}onsistency, which means that all clients will see the same data at the same time, no matter which node they are connected to. Clients may not be connected to the same node since data could be replicated on many nodes in different locations.
+	\item \textbf{C}onsistency, which means that all clients will see the same data at the same time, no matter which node they are connected to. Clients may not be connected to the same node since data could be replicated on many nodes in different locations;
 	\item \textbf{A}vailability, which means that any client issued request will get a response back, even if one or more nodes are down. DS will not interpret this situation as an exception or error. Availability is represented in percentage, and it describes how much downtime is allowed per year. This can be calculated using formula:\\ 
 	
 	\begin{equation}\label{eq:Availability}
@@ -150,14 +148,14 @@ This nasty feature is represented in theorem called \textbf{CAP theorem}~\label{
 	e^{\log_{10} \frac{1}{ (1 - A)}} 
 	\end{equation}
 	\myequations{Availability class formula.}
-	It is important to notice that even a 99\% available system gives almost four days of downtime in a year, which is unacceptable for services like Facebook, Google, AWS, etc. And when the service is down, companies are losing customers.
+	It is important to notice that even a 99\% available system gives almost four days of downtime in a year, which is unacceptable for services like Facebook, Google, AWS, etc. And when the service is down, companies are losing customers;
 	\item \textbf{P}artition tolerance, which means that the cluster must continue to work despite any number of communication breakdowns between nodes in the system. It is important to state that in a distributed system, partitions cannot be avoided.
 \end{enumerate}
 
 \noindent
 Years after CAP theorem inception, Shapiro et al. prove that we can alleviate CAP theorem problems, but only in some cases, and offers \textbf{Strong Eventual Consistency (SEC) model}~\cite{ShapiroPBZ11}. They prove that if we can represent our data structure to be: \label{crdts}
 
-\begin{itemize}
+\begin{itemize}\label{sec}
 	\item \textbf{Commutative} $a*b = b*a$ \myequations{Commutative formula.}
 	\item \textbf{Associative} $(a*b)*c = a*(b*c)$ \myequations{Associative formula.}
 	\item \textbf{Idempotent} $(a * a) = a$ \myequations{Idempotent formula.}
@@ -178,7 +176,7 @@ Services usually fall in one of three main categories:
 \begin{itemize}
 	\item \textbf{Infrastructure as a service (IaaS)} allows businesses to purchase resources on-demand and as-needed instead of buying and managing hardware themselves;
 	\item \textbf{Platform as a service (PaaS)} delivers a framework for developers to create, maintain and manage their applications. All resources are managed by the enterprise or a third-party vendor;
-	\item \textbf{Software as a service (SaaS)} delivers applications over the internet to its users. These applications are managed by a third-party vendor;
+	\item \textbf{Software as a service (SaaS)} delivers applications over the internet to its users. These applications are managed by a third-party vendor.
 \end{itemize}
 
 \noindent
@@ -229,11 +227,11 @@ Table~\ref{tab:table4} shows comparison of public, private and hybrid cloud capa
 \noindent
 In the rest of the thesis, if not stated differently when CC term is used it denotes public cloud.
 
-CC has been the dominating tool in the past decade in various applications~\cite{Satyanarayanan17}. It is changing, evolving, and offering new types of services. Resources such as container as a service (CaaS), database as a service (DBaaS)~\cite{Peter} are newly introduced. The CC model gives us a few benefits. Centralization relies on the economy of scale to lower the cost of administration of big DCs. Organizations using cloud services avoid huge investments, like creating and maintaining their own DCs. They consume resources usually created by others~\cite{Satyanarayanan17} and pay for usage time -- pay as you go model. 
+CC has been the dominating tool in the past decade in various applications~\cite{Satyanarayanan17}. It is changing, evolving, and offering new types of services. Resources such as container as a service (CaaS), database as a service (DBaaS)~\cite{Peter} are newly introduced. The CC model gives us a few benefits. Centralization relies on the economy of scale to lower the cost of administration of big DCs. Organizations using cloud services avoid huge investments, like creating and maintaining their own DCs. They consume resources usually created by others~\cite{Satyanarayanan17} and pay for usage time --- \emph{pay as you go model}. 
 
 Centralization gives us a few really hard problems to solve. As already stated in section~\ref{sec:problem_area} data is required to be moved to the cloud from data sources, which introduces a high latency in the system~\cite{HossainRH18}. 
 
-There are a few notable attempts to help data ingestion into the cloud. Remote Direct Memory Access (RDMA) protocol makes it possible to read data directly from the memory of one computer and write that data directly to the memory of another. This is done by using \textit{specialized hardware} interface cards and switches and software as well, and operations like read, write, send, receive, etc. do not go through the CPU. With these characteristics, RDMA has low latencies and overhead, and as such reaches better throughputs~\cite{CohenTKCKRCDG09}. This new hardware may not be cheap, and not every CC provider uses them for every use-case. This may not be enough, especially with the ever-growing amount of IoT devices and services.
+There are a few notable attempts to help data ingestion into the cloud. Remote Direct Memory Access (RDMA) protocol makes it possible to read data directly from the memory of one computer and write that data directly to the memory of another. This is done by using \textit{specialized hardware} interface cards, switches, and software as well, and operations like read, write, send, receive, etc. do not go through the CPU. With these characteristics, RDMA has low latencies and overhead, and as such reaches better throughputs~\cite{CohenTKCKRCDG09}. This new hardware may not be cheap, and not every CC provider uses them for every use-case. This may not be enough, especially with the ever-growing amount of IoT devices and services.
 
 Over the years there are more service options available, forming \textbf{everything as a service (XaaS)} model~\cite{DuanFZSNH15}. This model proposes that any hardware or software resource can be offered as a service to the users over the internet.
 
@@ -260,7 +258,7 @@ In recent years there has been one extension of CC from a series standpoint call
 
 It is such an environment where an enterprise uses more than one cloud platform, with at least two or more public cloud providers that each delivers a specific application or service. 
 
-A multi-cloud can be comprised of any model presented on page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
+A multi-cloud can be comprised of any model presented on the page~\pageref{sec_types}. This model relies on the possibility that if one cloud provider fails for whatever reason, the next one will be able to serve user requests.
 
 This strategy allows creation of a single heterogeneous architecture, allowing distribution of cloud assets and workloads across multiple providers (active-active), or deploy a single workload on one provider, with a backup on another (active-passive)~\cite{Multicloud2019}.
 
@@ -269,7 +267,7 @@ CC gives a user an illusion that he is using a single machine, while the backgro
 %
 \subsection{Membership protocol}\label{sec:memership_protocol}
 %
-At the beginning of this section DS were introduced, and two interesting assumptions by Tanenbaum et al. were presented~\cite{SteenT16, 0019513}. If one more look is taken at~\ref{ds:asumption_2} assumption, we will see that users of the DS whether they are users or applications perceive DS as a single unit. Inside this single unit, nodes need to collaborate, so that they are able to do various kinds of tasks.
+At the beginning of this section DS were introduced, and two interesting assumptions by Tanenbaum et al. were presented~\cite{SteenT16, 0019513}. If one more look is taken at~\textbf{\ref{ds:asumption_2}} assumption, we will see that users of the DS whether they are users or applications perceive DS as a single unit. Inside this single unit, nodes need to collaborate, so that they are able to do various kinds of tasks.
 
 The most basic of all these tasks is that nodes need to know which group they belong to, and who are their peers in the group they will collaborate with. This might sound like a trivial idea, but when we include 8 fallacies of the DS~\ref{ds:8_fallacies} into the equation, things start to be not so trivial after all. In the setup where nodes are connected over the local network or internet, and they need to communicate, things will go wrong for various reasons.
 
@@ -280,9 +278,9 @@ Processes in the group of nodes in a group will ping each other in different way
 Every membership protocol has some properties that will ensure efficiency and scalability:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}] \label{ds:features}
-	\item \textbf{Completeness}, this property must ensure that every failure in the system is detected.
-	\item \textbf{Accuracy}, in an ideal world, there should be no mistakes when detecting failures, but In a real-life scenario, we need to reduce false positives as much as we can.
-	\item \textbf{Failure detection speed}, all failures needs to be treated as fast as possible, in order to remove the node from the group and reschedule the tasks from the dead node to alive ones.
+	\item \textbf{Completeness}, this property must ensure that every failure in the system is detected;
+	\item \textbf{Accuracy}, in an ideal world, there should be no mistakes when detecting failures, but In a real-life scenario, we need to reduce false positives as much as we can;
+	\item \textbf{Failure detection speed}, all failures needs to be treated as fast as possible, in order to remove the node from the group and reschedule the tasks from the dead node to alive ones;
 	\item \textbf{Scale}, with this property we must ensure that the network load that is generated should be distributed equally between all processes in the group.
 \end{enumerate}
 
@@ -294,7 +292,7 @@ To resolve this problem, Das et al.~\cite{DasGM02} introduced \textbf{S}calable 
 This protocol divides the membership problem into two parts:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Failure detection}, this component works so that one node will select a random node in the group, and it will send it $ping$ message, expecting $ack$ message in return --- \textbf{direct ping}. If such message is not received, it will pick $n$ nodes to probe through a $ping-req$ message --- \textbf{indirect ping}. If this fails, the node will be marked as $suspected$, and it will be marked as $dead$ after some timeout. If the node gets alive, it will ping some other node and it will get back into the group. Figure~\ref{fig:fig15} show message passing in \textbf{direct} $(left)$, and \textbf{indirect} $(right)$ ping in SWIM protocol.
+	\item \textbf{Failure detection}, this component works so that one node will select a random node in the group, and it will send it $ping$ message, expecting $ack$ message in return --- \textbf{direct ping}. If such message is not received, it will pick $n$ nodes to probe through a $ping-req$ message --- \textbf{indirect ping}. If this fails, the node will be marked as $suspected$, and it will be marked as $dead$ after some timeout. If the node gets alive, it will ping some other node and it will get back into the group. Figure~\ref{fig:fig15} show message passing in \textbf{direct} $(left)$, and \textbf{indirect} $(right)$ ping in SWIM protocol;
 	\item \textbf{Information dissemination}, with previous strategy, information can be disseminated by \textbf{piggybacking} the data on multiple messages ($ping$, $ping-req$ and $ack$), and avoid using the multicast solution.
 \end{enumerate}
 
@@ -319,9 +317,9 @@ The cloud is usually far away from end devices because DCs are built on specific
 
 The development led to new computing areas like EC, osmotic computig~\cite{VillariFDRJR19, VillariCF17}, sky computing~\cite{StoicaS21}, etc. EC is a next-generation model where computing and storage resources are in proximity to data sources~\cite{Satyanarayanan17}. This idea might overcome cloud latency issues and known MCC problems. The main strength of the EC lays in the CC enhancements with new processing ideas, for the next-generation use-cases~\cite{NingLSY20}. 
 
-EC has brought a few different models over the years. Models like fog~\cite{BonomiMNZ14}, cloudlets~\cite{MonsalveCC18}, and mobile edge computing (MEC)~\cite{WangZZWYW17} emerged. This thesis will refer to all these models as edge nodes. Different EC models rely on the concept of data and computation offloading from the cloud closer to the ground~\cite{KhuneP19}. Only heavy computation remains in the cloud because of more available resources~\cite{NingLSY20}, compared to edge nodes. 
+EC has brought a few different models over the years. Models like fog~\cite{BonomiMNZ14}, cloudlets~\cite{MonsalveCC18}, and mobile edge computing (MEC)~\cite{WangZZWYW17} emerged. This thesis will refer to all these models as edge computing, and nodes used by them as edge nodes. Different EC models rely on the concept of data and computation offloading from the cloud closer to the ground~\cite{KhuneP19}. Only heavy computation remains in the cloud because of more available resources~\cite{NingLSY20}, compared to edge nodes. 
 
-EC models introduced small-scale servers that operate between data sources and the cloud. These small-scale servers have much fewer capabilities compared to the cloud servers~\cite{ChenHLLW15}. To avoid latency and huge bandwidth~\cite{MonsalveCC18}, EC nodes can be dispersed in various locations, for example, base stations~\cite{WangZZWYW17}, coffee shops, or over arbitrary geographic regions.
+EC models introduced small-scale servers that operate between data sources and the cloud. These small-scale servers have much fewer capabilities compared to the cloud servers~\cite{ChenHLLW15}. To avoid latency and huge bandwidth~\cite{MonsalveCC18}, EC nodes can be dispersed in various locations, for example, base stations~\cite{WangZZWYW17}, restaurants, or over arbitrary geographic regions.
 %
 %
 \section{Distributed programming}\label{sec:distributed_computing}
@@ -335,28 +333,24 @@ Similar to CC in Section~\ref{sec:cloud_computing}, to a normal user, DC systems
 %
 Term big data means that the data is unable to be handled, processed, or loaded into a single machine~\cite{FisherDCD12}. That means that traditional data mining methods or data analytics tools developed for centralized processing may not be able to be applied directly to big data~\cite{Tsai2015}. 
 
-New tools and methods that have been developed rely on DS and one specific feature \textbf{data locality}~\label{ds:data_locality}. Data locality can be described as a process of moving the computation closer to the data, instead of moving large data to computation~\cite{GuoFZ12}. This simple idea minimizes network congestion and increases the overall throughput of the system.
+New tools and methods that have been developed rely on DS and one specific feature \textbf{data locality}\label{ds:data_locality}. Data locality can be described as a process of moving the computation closer to the data, instead of moving large data to computation~\cite{GuoFZ12}. This simple idea minimizes network congestion and increases the overall throughput of the system.
 
 Two examples of how huge generated data could be have already been given in~\ref{sec:problem_area}, and when other IoT sensors and devices are included these numbers will just keep getting bigger and bigger~\cite{SarigiannidisLR20}.
 
 Contrary to relational databases that mostly deal with structured data, Big Data is dealing with various kinds of data~\cite{FisherDCD12, Tsai2015, GuoFZ12}:
 
 \begin{itemize}
-	\item \textbf{Structured} data is a kind of data that have some fixed structure and format. A typical example of this is data stored inside a table of some database. Organizations usually have no huge problem extracting some kind of value out of the data.
-	\item \textbf{Unstructured} data is a kind of data where there is not any kind of structure at all. These data sources are heterogeneous and may contain a combination of simple text files, images, videos, etc. This type of data is usually in raw format, and organizations have a hard time deriving the value out.
+	\item \textbf{Structured} data is a kind of data that have some fixed structure and format. A typical example of this is data stored inside a table of some database. Organizations usually have no huge problem extracting some kind of value out of the data;
+	\item \textbf{Unstructured} data is a kind of data where there is not any kind of structure at all. These data sources are heterogeneous and may contain a combination of simple text files, images, videos, etc. This type of data is usually in raw format, and organizations have a hard time deriving the value out;
 	\item \textbf{Semi-structured} data is the kind of data that can contain both previously mentioned types of data. An example of this type of data is XML files.
 \end{itemize}
 
 \noindent
-Along with the share size, big data have other instantly recognizable features called \textbf{V's} of big data~\cite{PatgiriA16}. 
-
-The name is derived from initial letters of the other features that are describing big data. 
-
-Image~\ref{fig:fig3} show 6 V's commonly used to represent the big data.
+Big Data have recognizable feature called \textbf{V's} of Big Data~\cite{PatgiriA16}, shown in Figure~\ref{fig:fig3}. Name is derived from initial letters of the big Data features.
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.7]{images/Figure3}
+		\includegraphics[scale=0.65]{images/Figure3}
 	\end{center}
 	\vspace{-0.6cm}
 	\caption{V's of Big Data.}
@@ -367,13 +361,13 @@ Image~\ref{fig:fig3} show 6 V's commonly used to represent the big data.
 Processing in big data systems can be represented as~\cite{phdthesis, KiranMMDB15}:
 
 \begin{itemize}
-	\item \textbf{Batch processing} represents a data processing technique that is done on a huge quantity of the stored data. This type of processing is usually slow and requires time.
-	\item \textbf{Stream processing} represents a data processing technique that is done as data get into the system. This type of processing is usually done on a smaller quantity of the data \textbf{at the time}~\cite{medjedovic2022algorithms}, and it is faster.
+	\item \textbf{Batch processing} represents a data processing technique that is done on a huge quantity of the stored data. This type of processing is usually slow and requires time;
+	\item \textbf{Stream processing} represents a data processing technique that is done as data get into the system. This type of processing is usually done on a smaller quantity of the data \textbf{at the time}~\cite{medjedovic2022algorithms}, and it is faster;
 	\item \textbf{Lambda architectures} represents a processing technique where \emph{stream processing} and handling of massive data volumes in a \emph{batch} are combined in a uniform manner, reducing costs in the process~\cite{KiranMMDB15}.
 \end{itemize}
 
 \noindent
-Big data systems, are not processing and value extracting systems. Big data systems can be separated into several categories: \textbf{(1)} data storage, \textbf{(2)}, data ingestion \textbf{(3)}, data processing, and analytics. All these systems aid to properly analyze ever-growing requirements~\cite{RaoMBG19},
+Big data systems, are not processing and value extracting systems. Big data systems can be separated into several categories: \textbf{(1)} data storage, \textbf{(2)} data ingestion, \textbf{(3)} data processing, and analytics. All these systems aid to properly analyze ever-growing requirements~\cite{RaoMBG19}.
 
 Despite a promise that big data offers to derive value out of the collected data, this task is not easy to do and requires a properly set up system filtering and removing data that contains no value. To aid this idea, data could be filtered and a little bit preprocessed on close to the source~\cite{inproceedingsSimic1}, and as such sent to data lakes~\cite{MarynowskiSP15}.
 %
@@ -383,14 +377,14 @@ Despite a promise that big data offers to derive value out of the collected data
 There is no single comprehensive definition of what a microservice is. Different people and organizations use different definitions to describe it. A working definition is offered in~\cite{DragoniGLMMMS16} as~\say{a microservice is a cohesive, independent process interacting via messages}. Despite the lack of a comprehensive definition, all agree on a few features that come with microservices:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item they are small computer programs that are independently deployable and developed.
-	\item they could be developed using different languages, principles, and using different databases.
-	\item they communicate over the network to achieve some goal.
-	\item they are organized around business capabilities~\cite{PautassoZALJ17}.
-	\item they are implemented and maintained by a small team.
+	\item They are small computer programs that are independently deployable and developed;
+	\item They could be developed using different languages, principles, and using different databases;
+	\item They communicate over the network to achieve some goal;
+	\item They are organized around business capabilities~\cite{PautassoZALJ17};
+	\item They are implemented and maintained by a small team.
 \end{enumerate}
 
-'\noindent
+\noindent
 The industry is migrating much of their applications to the cloud because CC offers to scale their computing resources per their usage~\cite{LiZJLZLGGS19}. Microservices are small loosely coupled services that follow UNIX philosophy~\say{do one thing and do it well}~\cite{krause2015microservices}, and they communicate over well defined API~\cite{DragoniGLMMMS16}.
 
 This architecture pattern is well aligned to the CC paradigm~\cite{LiZJLZLGGS19}, contrary to previous models like monolith whose modules cannot be executed independently~\cite{DragoniGLMMMS16, abs-1905-07997}, and are not well aligned with the CC paradigm~\cite{abs-1905-07997}. Table~\ref{tab:table3} summarizes differences between the monolith and microservices architecture.
@@ -415,8 +409,8 @@ This architecture pattern is well aligned to the CC paradigm~\cite{LiZJLZLGGS19}
 Since its inception, microservices architecture has gone through adaptations, and modern-day microservices are extended with two new models, each with its unique abilities and problems:
 
 \begin{itemize}
-	\item \textbf{Cloud-native applications} are specially designed applications for CC. They are distributed, elastic, and horizontally scalable systems by their nature, and composed of (micro)services that isolate state in a minimum of stateful components~\cite{KratzkeQ17}. These type of applications are self-contained, could be deployed independently, and they are composed of loosely coupled microservices that are packaged in lightweight containers. They have Improved resource utilization, and they are centered around APIs.
-	\item \textbf{Serverless applications} is a computing model, where the developers need to worry only about the logic for processing client requests~\cite{AdzicC17}. Logic is represented as an event handler that only runs when a client request is received, and billing is done only when these functions are being executed~\cite{AdzicC17}. \textbf{Cold start} is one of the features of serverless computing, and we can define it as user requests need to wait until a new container instance is up and running before it can do any processing at all. Most providers have 1–3 second cold starts, and this is important for certain types of applications where latency is a concern. Cold start is only happening when there are no \textit{warm} containers available for the request, meaning there is no single instance to server request. Other features include: \textbf{(1)} simplified services development, \textbf{(2)} faster time to market, \textbf{(3)} and lower costs.
+	\item \textbf{Cloud-native applications} are specially designed applications for CC. They are distributed, elastic, and horizontally scalable systems by their nature, and composed of (micro)services that isolate state in a minimum of stateful components~\cite{KratzkeQ17}. These type of applications are self-contained, could be deployed independently, and they are composed of loosely coupled microservices that are packaged in lightweight containers. They have Improved resource utilization, and they are centered around APIs;
+	\item \textbf{Serverless applications} is a computing model, where the developers need to worry only about the logic for processing client requests~\cite{AdzicC17}. Logic is represented as an event handler that only runs when a client request is received, and billing is done only when these functions are being executed~\cite{AdzicC17}. \textbf{Cold start} is one of the features of serverless computing, and we can define it as user requests need to wait until a new container instance is up and running before it can do any processing at all. Most providers have 1–3 second cold starts, and this is important for certain types of applications where latency is a concern. Cold start is only happening when there are no \textit{warm} containers available for the request, meaning there is no single instance to server request. Other features include: \textbf{(1)} simplified services development, \textbf{(2)} faster time to market, \textbf{(3)} and lower costs;
 	\item \textbf{Service Mesh} is designed to standardize the runtime operations of applications~\cite{LiLGZH19}. As a part of the microservices ecosystem, this dedicated communication layer can provide several benefits, such as: \textbf{(1)} observability, \textbf{(2)} providing secure connections, or \textbf{(3)} automating retries and backoff for failed requests. With these features, developers only focus on the implementation of business logic, while operators gain out-of-the-box traffic policies, observability, and insights from the services. Advocates of the microservice movement, nowadays recommend using service mesh architecture when running microservices in production environments.
 \end{itemize}
 
@@ -426,8 +420,8 @@ Previous models are not explicitly different, they all can be viewed as cloud-na
 Microservices communicate over a network to fulfill some goal using message passing techniques and technology-agnostic protocols such as HTTP. They can be implemented as:
 
 \begin{itemize}
-	\item Representational state transfer (REST) services~\cite{AdamczykSJH11}, is an architectural style with a set of constraints that users can create web services and interoperability between computer systems on the internet. It is based on HTTP routs to define resources and use HTTP verbs to represent operations over these resources. It relies on textual based communications, and payload could be represented using $JSON$, $XML$, $HTML$ etc.
-	\item Remote procedure calls (RPC) represent an architectural way to design services that can call subroutines that are located in different places, usually on another machine. The client calls these operations like they are located locally in his address space.
+	\item Representational state transfer (REST) services~\cite{AdamczykSJH11}, is an architectural style with a set of constraints that users can create web services and interoperability between computer systems on the internet. It is based on HTTP routs to define resources and use HTTP verbs to represent operations over these resources. It relies on textual based communications, and payload could be represented using $JSON$, $XML$, $HTML$, etc.;
+	\item Remote procedure calls (RPC) represent an architectural way to design services that can call subroutines that are located in different places, usually on another machine. The client calls these operations like they are located locally in his address space;
 	\item Event-driven services are services where communication between services is done using events. Events are sent on some channel and other read messages that are received on another channel. These channels could be implemented either like message queues or message topics. Services connect to message queue or subscribe to the specific topic, and when messages arrive, they can act according to the message type.
 \end{itemize}
 
@@ -439,7 +433,7 @@ Table~\ref{tab:table9} shows important difference between versions of HTTP proto
 \begin{table}[h!]
 	\begin{center}
 		\begin{tabular}{l|l|l|l}
-			\textbf{Feature} & \textbf{HTTP1} & \textbf{HTTP2} & \textbf{HTTP3}\\
+			\textbf{Feature} & \textbf{HTTP/1} & \textbf{HTTP/2} & \textbf{HTTP/3}\\
 			\hline
 			\textbf{Transport} & text & binary & binary\\
 			\textbf{Parallelism} & No & Yes & Yes\\
@@ -509,11 +503,7 @@ The complex queries will involve data available in multiple databases, and a cli
 In microservices archtiecture, there are two standard ways to solve this problem~\cite{richardson2018microservices}:
 
 \begin{enumerate}
-	\item \textbf{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs} separates responsibility for \emph{modifying} data (command), and \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the system~\cite{richardson2018microservices, 8101372}. This increases the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}. 
-	
-	When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. The service that will serve the queries will keep the \emph{read-only} replica of the data. 
-	
-	Figure~\ref{fig:fig21} shows an example diagram for CQRS pattern.
+	\item \textbf{Command Query Responsibility Segregation (CQRS)}\label{par:cqrs} separates responsibility for \emph{modifying} data (command), and \emph{reading} the data (query), making the logic clearer and easier to optimize different parts of the system~\cite{richardson2018microservices, 8101372}. This increases the complexity of entire system, but it supports multiple denormalized views that are scalable and performant~\cite{richardson2018microservices}. When the data in one service is modified, the service emits the event, which will change the service responsible for complex query. The service that will serve the queries will keep the \emph{read-only} replica of the data. Figure~\ref{fig:fig21} shows an example diagram for CQRS pattern;
 	
 	\begin{figure}[H]
 		\begin{center}
@@ -524,11 +514,7 @@ In microservices archtiecture, there are two standard ways to solve this problem
 		\label{fig:fig21}
 	\end{figure}
 
-	\item \textbf{API composition}\label{par:composition} is a simple way to query data in a microservice architecture~\cite{richardson2018microservices, 8890660}, alternative and more lightweight solution than CQRS. 
-	
-	The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns the combined result to client. Making it easier to implement, because database does not need to be refreshed every time when some change occurs in the system. On the other hand, it may yield a slower response, depending on how many services we need to contact for the information, their availability, and time to merge and prepare data in memory. 
-
-	Figure~\ref{fig:fig22} shows an example diagram for API Compossition pattern.
+	\item \textbf{API composition}\label{par:composition} is a simple way to query data in a microservice architecture~\cite{richardson2018microservices, 8890660}, alternative and more lightweight solution than CQRS. The main difference between CQRS is that this patterns does not have its own data storage. When a request comes in, it accesses every single microservice containing data, combines the results, and then returns the combined result to the client. Making it easier to implement, because database does not need to be refreshed every time when some change occurs in the system. On the other hand, it may yield a slower response, depending on how many services we need to contact for the information, their availability, and time to merge and prepare data in memory. Figure~\ref{fig:fig22} shows an example diagram for API Compossition pattern.
 
 	\begin{figure}[H]
 		\begin{center}
@@ -540,6 +526,7 @@ In microservices archtiecture, there are two standard ways to solve this problem
 	\end{figure}
 \end{enumerate}
 
+\noindent
 The best chance to succeed when implementing a microservices architecture is to simply follow existing patterns and use existing solutions with proven quality. 
 %
 %
@@ -555,13 +542,11 @@ In monolithic applications logging and monitoring is a little bit easier to impl
 
 The solution to this problem is to use a centralized logging service -- \textbf{logs aggregation}, that collects logs from each service~\cite{BeschastnikhWBE16}. This is beneficial because users can search and analyze the logs as a whole state of the system. To do this properly the log must be stored very reliably~\cite{DanielsST87}. Users can then configure the log server for some alerts that are triggered when certain messages appear in the logs. The log of DS usually does not contain enough information to regenerate the timeline of execution, and this is one reason that logs in DS are so hard to interpret~\cite{BeschastnikhWBE16}.
 
-To resolve this problem of DS execution timeline, Google develops a new technique called \textbf{tracing}~\cite{36356}. The trace represents a single execution timeline or execution of one request. Trace will create a tree, and the tree is used to establish order. Every node in the tree represents a unit of work and it is called span. A tree unites all the elements needed to carry out an originating request. In every span or unit of work, we can attach more details about that particular execution element. 
-
-Figure~\ref{fig:fig18} shows the simple example of \textit{RequestX} path through the processes in a distributed system, where each service \textbf{call} could be RPC, HTTP or some other request.
+To resolve this problem of DS execution timeline, Google developed a new technique called \textbf{tracing}~\cite{36356}. The trace represents a single execution timeline or execution of one request. Trace will create a tree, and the tree is used to establish order. Every node in the tree represents a unit of work and it is called span. A tree unites all the elements needed to carry out an originating request. In every span or unit of work, we can attach more details about that particular execution element. Figure~\ref{fig:fig18} shows the simple example of \textit{RequestX} path through the processes in a distributed system, where each service \textbf{call} could be RPC, HTTP or some other request.
 
 \begin{figure}[H]
 	\begin{center}
-		\includegraphics[scale=0.8]{images/Figure18}
+		\includegraphics[scale=0.7]{images/Figure18}
 	\end{center}
 	\vspace{-0.75cm}
 	\caption{\textit{RequestX} path through the processes in a distributed system.}
@@ -602,8 +587,8 @@ Peers are creating a sense of virtual community. This community of peers can res
 Based on how the nodes are linked to each other within the overlay network, and how resources are indexed and located, we can classify networks as~\cite{KamelSE07}:
 
 \begin{itemize}
-	\item \textbf{Unstructured} do not have a particular structure by design, but they are formed by nodes that randomly form connections~\cite{FilaliBHB11}. Their strength and weakness at the same time is the lack of structure. These networks are robust when peers join and leave the network. But when doing a query, they must find more possible peers that have the same piece of data. A typical example of this group is a Gossip-based protocol like~\cite{DasGM02}.
-	\item \textbf{Structured} peers are organized into a specific topology, and the protocol ensures that any node can efficiently search the network for a resource. The famous type of structured P2P network is a Distributed Hash Table (DHT). These networks maintain lists of neighbors to do a more efficient lookup, and as such, they are not so robust when nodes join or leave the network. DHT is commonly used in resource lookup systems~\cite{StoicaMKKB01}, and as efficient resource lookup management and scheduling of applications, or as an integral part of distributed storage systems and NoSQL\cite{Leavitt10} databases.
+	\item \textbf{Unstructured} do not have a particular structure by design, but they are formed by nodes that randomly form connections~\cite{FilaliBHB11}. Their strength and weakness at the same time is the lack of structure. These networks are robust when peers join and leave the network. But when doing a query, they must find more possible peers that have the same piece of data. A typical example of this group is a Gossip-based protocol like~\cite{DasGM02};
+	\item \textbf{Structured} peers are organized into a specific topology, and the protocol ensures that any node can efficiently search the network for a resource. The famous type of structured P2P network is a Distributed Hash Table (DHT). These networks maintain lists of neighbors to do a more efficient lookup, and as such, they are not so robust when nodes join or leave the network. DHT is commonly used in resource lookup systems~\cite{StoicaMKKB01}, and as efficient resource lookup management and scheduling of applications, or as an integral part of distributed storage systems and NoSQL\cite{Leavitt10} databases;
 	\item \textbf{Hybrid} combine the previous two models in various ways.
 \end{itemize}
 
@@ -675,7 +660,7 @@ Several tasks require parallel computing like simulations, computer graphics ren
 %
 \subsection{Decentralized systems}\label{sec:decentralized_systems}
 %
-Decentralized systems are similar to DS, in a technical sense, they are still DS. But if we take a closer look, these systems \textbf{should not} be owned by a single entity. CC, for example, is a perfect example of DS, but it is not decentralized by its nature. It is a centralized system by the owner like AWS, Google, Microsoft, or some other private company because all computation needs to be moved to big DCs~\cite{HossainRH18}.
+Decentralized systems are similar to DS. But if we take a closer look, these systems \textbf{should not} be owned by a single entity. CC, for example, is a perfect example of DS, but it is not decentralized by its nature. It is a centralized system by the owner like AWS, Google, Microsoft, or some other private company because all computation needs to be moved to big DCs~\cite{HossainRH18}.
 
 By modern standards, when we are talk about decentralized systems, we usually think of blockchain or blockchain-like technology~\cite{LeibleSSG19}, since here we have distributed nodes, that are scattered and there is no single entity that owns all these nodes. But even if this technology is run in the cloud, it is loses the decentralized feature. This is the caveat we need to be aware of. These systems are facing different issues because any participant in the system might be malicious and they need to handle this case. 
 
@@ -690,7 +675,7 @@ The main goal of transactions is to maintain system integrity in the consistent 
 
 In their book Gray et al. make a good parallel with the contract law, saying that transactions give us the ability to \emph{clean up the situation}, if something does not work right.~\cite{GrayR93}.
 
-Transactions guarantee following four properties: \textbf{(1)} atomicity, \textbf{(2)} consistency, \textbf{(3)} isolation, and \textbf{(4)} durability, also known as \emph{ACID} properties.
+Transactions guarantee following four properties: \textbf{(1)} atomicity, \textbf{(2)} consistency, \textbf{(3)} isolation, and \textbf{(4)} durability, also known as \emph{ACID} properties~\cite{Frank}.
 %
 %
 \subsection{Distributed transactions}\label{sec:distributed_transactions}
@@ -708,7 +693,7 @@ Avoiding distributed transactions allows a much simpler, more robust and efficie
 %
 In 1987, Molina et al. presented \emph{Sagas}~\cite{Garcia-MolinaS87} and their work in the area of \emph{long-lived transactions (LLTs)}, types of transactions that hold resources for long periods, and as such delay shorter and more common transactions. 
 
-These transactions are increasingly relevant and important, in the current technological landscape with the distribution of components and microservices architectures.
+These transactions are increasingly relevant and important in the current technological landscape with the distribution of components and microservices architectures.
 
 The saga transaction is composed of sub-transactions, executed in an atomic way so that either all or none of the sub-transactions take effect. However, no isolation is necessarily guaranteed between the sub-transactions of different sagas.
 
@@ -728,7 +713,7 @@ Figure~\ref{fig:fig20} shows an example of one transaction separated into multip
 \noindent
 Sagas can be implemented using two patterns: \textbf{(1)} orchestration where one centralized element is responsible for all the coordinating, or \textbf{(2)} choreography, where each service trigger local transactions in other services.
 
-This isolation can be added in the application layer~\cite{Frank}l for example using \emph{semantic lock}. This strategy will change state so that some data are in process and should be treated differently. 
+This isolation can be added in the application layer~\cite{Frank} i.e. \emph{semantic lock}. This strategy will change state so that some data are in process and should be treated differently. 
 
 For example, an order can be in one of the following states: \textbf{(1)} \emph{PENDING}, \textbf{(2)} \emph{COMPLETED}, or \textbf{(3)} \emph{CANCELED} state. Other transactions will not make use the data if status is not set to \emph{COMPLETED}.
 %
@@ -812,11 +797,11 @@ Immutable infrastructure deployment offers several benefits on how to deploy cha
 With mutable infrastructure, these strategies would be hard to implement, and maybe it is not possible at all. Besides infrastructure deployment, there is another side that we must be considered, and that is how to describe these deployments. Two different strategies can be considered here:
 
 \begin{itemize}\label{lab:dep_types}
-	\item \textbf{Imperatively}, with this option users have to write code or specific instructions step by step what the specific tool needs to do so that the application or infrastructure is properly set up. In this approach, we have a \textit{smart} user who describes \textit{dumb} machine what is needed to be done and in what order to achieve the desired state.
+	\item \textbf{Imperatively}, with this option users have to write code or specific instructions step by step what the specific tool needs to do so that the application or infrastructure is properly set up. In this approach, we have a \textit{smart} user who describes \textit{dumb} machine what is needed to be done and in what order to achieve the desired state;
 	\item \textbf{Declaratively}, with this option a user has to describe the end state or what is his desired state, and the tool needs to figure out the way how to do this. Here we have a \textit{smart system} that will find a way how to achieve the \textbf{desired state}, and we have a user who\textit{does not care} in what order actions need to be done --- that is what the system needs to do. Users do not need to worry about timing, this simplifies the whole process and the code always represents the latest state. With this type of deployment, we can offer users, two different models:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-		\item using existing platform independent formats that users are familiar with, like \textit{JSON, YAML, XML}, etc.
+		\item using existing platform independent formats that users are familiar with, like \textit{JSON, YAML, XML}, etc.;
 		\item using a domain-specific language (DSL) that users need to learn, but we might be able to optimize description.
 	\end{enumerate}
 \end{itemize}
@@ -894,8 +879,8 @@ Extension of such system can be done just by writing new \emph{controller} that 
 In our modern internet-connected world of applications, we have several distinctive development roles. Each of them plays an important role so that modern software runs smoothly, and with less downtime. These development roles could be separated into a few categories (focus is on the technical roles):
 
 \begin{itemize}
-	\item \textbf{A developer} is usually a person responsible for developing software for the user. A developer is responsible for maintaining existing, and/or developing new features. There could be different sub-roles, dealing with specific parts of the complex software systems.
-	\item \textbf{DevOps} role represents a multidisciplinary organizational effort to automate application deployments through continuous delivery of new software updates~\cite{LeiteRKMM20}. It combines software development with technology operations~\cite{JabbariAPT16} to shorten the development life cycle.
+	\item \textbf{A developer} is usually a person responsible for developing software for the user. A developer is responsible for maintaining existing, and/or developing new features. There could be different sub-roles, dealing with specific parts of the complex software systems;
+	\item \textbf{DevOps} role represents a multidisciplinary organizational effort to automate application deployments through continuous delivery of new software updates~\cite{LeiteRKMM20}. It combines software development with technology operations~\cite{JabbariAPT16} to shorten the development life cycle;
 	\item \textbf{Site Reliability Engineer (SRE)} role is responsible for availability, latency, performance, efficiency, change management, monitoring, emergency response, and capacity planning~\cite{beyer2016site}. It is a software engineering role and needs to have an understanding of the fundamentals of computing~\cite{JonesUN15}, applied to the infrastructure and operations problems.
 \end{itemize}
 
@@ -933,12 +918,12 @@ In modern complex software development, SREs should keep things running smoothly
 So it is not either/or, but it seems that a combination of approaches may provide the best results. However, in some smaller organizations, these roles can overlap.
 %
 %
-\section{Concurrency and parallelism}\label{sec:concurency_parallelism}
+\section{Concurrency vs parallelism}\label{sec:concurency_parallelism}
 %
 People usually confuse these two concepts. Even though look similar, they are a different way of doing things. In his speech, Rob Pike~\cite{Pike} gives a great explanation and examples on this topic. He also gives great definitions of these concepts like:
 
 \begin{itemize}
-	\item \textbf{Concurrency} is composition of independently executing things. Concurrency is about dealing with a lot of things at once.
+	\item \textbf{Concurrency} is composition of independently executing things. Concurrency is about dealing with a lot of things at once;
 	\item \textbf{Parallelism} is the simultaneous execution of multiple things. Parallelism is about doing a lot of things at once. 
 \end{itemize}
 
@@ -969,10 +954,10 @@ Table~\ref{tab:table6} gives differences between an actor model and CSP.
 \end{table}
 
 \noindent
-Actors do not share a memory, and they are isolated by nature. An actor can create another actor/s and even watch on them in case they stop unexpectedly. When an actor finished its job, and it is not needed anymore, it disappears. These actors can create complicated networks that are easy to understand, model, and reason about, and everything is based on a simple message passing mechanism. 
+Actors do not share a memory, and they are isolated by a nature. An actor can create another actor/s and even watch on them in case they stop unexpectedly. When an actor finished its job, and it is not needed anymore, it disappears. These actors can create complicated networks that are easy to understand, model, and reason about, and everything is based on a simple message passing mechanism. 
 
 Every actor has a designated message box. When a message arrives, the actor will test the message type and do the job according to the message type he received. In this way, we are not dependent on lock-based synchronization that can be hard to understand, and it can cause serious problems.
 
-The actor model is fault-tolerant by design. It supports crush to happen because there is a \say{self-heal} mechanism that will monitor actor/s, and when the crash happens it will try to apply some strategy, in most cases just restart actor, but other strategies could be applied. This philosophy is useful because it is hard to think about every single failure option.
+The actor model is fault-tolerant by design. It supports crush to happen because there is a \say{self-heal} mechanism that will monitor actor(s), and when the crash happens it will try to apply some strategy, in most cases just restart actor, but other strategies could be applied. This philosophy is useful because it is hard to think about every single failure option.
 %
 %

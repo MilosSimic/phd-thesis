@@ -1,11 +1,11 @@
 %!TEX root =  main.tex
 \chapter{Micro clouds}\label{chapter:Micro_clouds}
 %
-In this section, the core idea of this thesis will be presented, from the point of view how such a model can be formed and described, and what is important so that such a system operates properly. A \textbf{$\upmu$Cs} model will be described, based on the CC organizational model.  The presented model will be able to support EC as a service, amongst other applications and use-cases. 
+In this section, the core idea of this thesis will be presented. We will introduce the model of distributed \textbf{$\upmu$Cs} and show how such a system could be dynamically formed and formally described. The \textbf{$\upmu$Cs} is based on the traditional CC organizational model but adapted for different environments, allowing the creation of distributed clouds.
 
-Throughout this section, we are going to rely on the research presented in chapters~\ref{chapter:Intro} and~\ref{chapter:Review}, and make a connection with the existing CC model.
+Throughout this section, we are going to rely on the research presented in Chapters~\ref{chapter:Intro} and~\ref{chapter:Review}, and make a connection with the existing CC model.
 
-In Section~\ref{sec:configurable_model_structure} we present a high overview of the system -- an architecture that is influenced by the standard CC model but adapted for a different environment. Section~\ref{sec:separation_of_concerns}introduces the separation of concerns model for previously defined system architecture. Section~\ref{sec:application_model} presents a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. How this system could be offered as a service, and which options can be offered to the potential users for developing their applications is discussed in Section~\ref{sec:as_a_service_model}. Section~\ref{sec:immutable_infrastructure} presents the desired option for infrastructure and application deployment, and why immutability is important in a $\upmu$C geo-distributed environment. Section~\ref{sec:formal_model} presents why formal models are important in computer science and DS in particular, as well as formal models of all protocols used in system formation and operation.  Section~\ref{sec:long_live_transactions} shows transactions that appear in such complex system, and garbage collection done on resources that are not used anymore. Section~\ref{sec:system_observability} shows system observability mechanisms important for geo-distributed environments like $\upmu$Cs. Section~\ref{sec:access_pattern} shows access patterns that could be used in $\upmu$Cs and geo-distributed environments. 
+In Section~\ref{sec:configurable_model_structure} we present a high overview of the system -- an architecture that is influenced by the standard CC model but adapted for a different environment. Section~\ref{sec:separation_of_concerns} introduces the separation of concerns model for previously defined system architecture. Section~\ref{sec:application_model} presents a possible application model and how users can utilize newly created architecture fully. Application models are based on existing development models, so that transition is fairly easy. Possibilities how this system could be offered as a service, and which options can be offered to the potential users for developing their applications is discussed in Section~\ref{sec:as_a_service_model}. Section~\ref{sec:immutable_infrastructure} presents the desired option for infrastructure and application deployment, and discusses why immutability is important in a $\upmu$C geo-distributed environment. Section~\ref{sec:formal_model} discusses the importance of formal models in computer science, and DS in particular. This Section also presents formal models for all protocols used for the proper system formation and operation. Section~\ref{sec:long_live_transactions} shows transactions that appear in such complex system, and garbage collection done on resources that are not used anymore. Section~\ref{sec:system_observability} shows system observability mechanisms important for geo-distributed environments like $\upmu$Cs. Section~\ref{sec:access_pattern} shows access patterns that could be used in $\upmu$Cs and geo-distributed environments. 
 Section~\ref{sec:Auto Scaling} presents the possibility how micro clouds could be scaled automaticaly, while Section~\ref{sec:user_data} presents flow of user data in micro clouds model. This chapter is concluded with Section~\ref{sec:repercussion} which presents repercussion of the proposed model, and how it can be used as a stand-alone model where other features could be implemented on top of that or used as service for other, existing, systems.
 %
 %
@@ -85,7 +85,7 @@ The organization of these concepts should be fully optional. So for example, we 
 \noindent
 If we go a little bit further, we can represent the city as one region, where parts of the city are organized into clusters. A city topology can even be formed by splitting the city into multiple regions containing multiple clusters, and ultimately a country topology can be formed by splitting the country into regions, with cities being clusters.\\
 
-Nodes that belong to the same cluster should run some form of membership protocol presented in~\ref{sec:memership_protocol}. Gossip style protocols, like SWIM~\cite{DasGM02} (cf. page~\pageref{swim}), are standard in the cloud environment. The same strategy could be applied here, used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16, CRDTS_Nuno} making the whole system more resilient. It could be upgraded to better reflect current network conditions~\cite{HayashibaraDYK04}, or to enable \textbf{self-healing} properties in the system~\cite{SatzgerPTU07}.
+Nodes that belong to the same cluster should run some form of membership protocol presented in~\ref{sec:memership_protocol}. Gossip style protocols, like SWIM~\cite{DasGM02} (see page~\pageref{swim}), are standard in the cloud environment. The same strategy could be applied here, used in conjunction with replication mechanisms~\cite{LiBCL20, CauCBFCEB16, CRDTS_Nuno} making the whole system more resilient. It could be upgraded to better reflect current network conditions~\cite{HayashibaraDYK04}, or to enable \textbf{self-healing} properties in the system~\cite{SatzgerPTU07}.
 
 Replication could be used not only in nodes inside the cluster, but data can also be replicated in clusters inside the region and even in regions inside topology. This property should exist, but it should be controlled by users depending on how resilient and available the system he/she wants and needs. In~\cite{inproceedingsSimic2} Simi\' c et al. take a look from a theoretical point of view on CRDTs usage, to achieve SEC in EC. The authors conclude that CRDTs could be a natural fit to EC as long as we are aware of the potential pitfalls of CRDTs.
 
@@ -128,24 +128,24 @@ In his work, Jin et al.~\cite{JinCJL14} introduces three core concepts to fully 
 
 One of the most important part of every system, is the SoC model. This is especially important if a platform to be offered as a service is going to be created. With some adaptations, our SoC model can be based on concepts proposed by Jin et al.~\cite{JinCJL14} in three layers, as depicted in Figure~\ref{fig:fig10}. 
 
-The layer on the very bottom of the three-tier architecture (cf.~Figure~\ref{fig:fig10}) consists of various devices. These devices are important because they represent main \textit{data creators} but at the same time, they are main \textit{services consumers}. 
+The layer on the very bottom of the three-tier architecture (see~Figure~\ref{fig:fig10}) consists of various devices. These devices are important because they represent main \textit{data creators} but at the same time, they are main \textit{services consumers}. 
 
-The layer in the middle (cf.~Figure~\ref{fig:fig10}) represents resources or EC nodes. These resources have a very important spatial feature, and as such, they indicate the range of their hosting devices~\cite{JinCJL14}. This means that the developers at any given time must know the topology of the system, the resource spread, and utilization across clusters. Besides that main information, users must know the state and health of every application~\label{soc:resources}. If some EC node desires to be a part of the system, a node must obey four simple rules:
+The layer in the middle (see~Figure~\ref{fig:fig10}) represents resources or EC nodes. These resources have a very important spatial feature, and as such, they indicate the range of their hosting devices~\cite{JinCJL14}. This means that the developers at any given time must know the topology of the system, the resource spread, and utilization across clusters. Besides that main information, users must know the state and health of every application\label{soc:resources}. If some EC node desires to be a part of the system, a node must obey four simple rules:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-\item a node must run an operating system with a usable file system;
-\item a node must be able to run some isolation engine for applications, for example, containers or unikernels;
-\item a node must have available resources for utilization so that applications can be run or data stored;
-\item a node must have a stable internet connection;
+\item A node must run an operating system with a usable file system;
+\item A node must be able to run some isolation engine for applications, for example, containers or unikernels;
+\item A node must have available resources for utilization so that applications can be run or data stored;
+\item A node must have internet connection;
 \end{enumerate}
 
 \noindent
 One thing that is important to notice, is that all nodes in clusters, regions, and topologies are \textbf{equal} and there are \textbf{no special nodes}. Every node that joins the system must be able to store and process information.
 
-Last but certainly not least layer represents services. These services expose resources through some interface and make them available over the internet~\cite{JinCJL14}. These services respond to the client requests immediately, if possible, or cache information~\cite{SatyanarayananBCD09,YaoXWYZP20} for future use. Unlike the previous two layers, services have one specific feature and span over two tiers of the system (cf.~Figure~\ref{fig:fig10}):
+Last but certainly not least layer represents services. These services expose resources through some interface and make them available over the internet~\cite{JinCJL14}. These services respond to the client requests immediately, if possible, or cache information~\cite{SatyanarayananBCD09,YaoXWYZP20} for future use. Unlike the previous two layers, services have one specific feature and span over two tiers of the system (see~Figure~\ref{fig:fig10}):
 
 \begin{enumerate}[start=1,label={(\bfseries \roman*)}]\label{services}
-	\item Services that exist in the $\upmu$C, and they are responsible for filtering and data pre-processing before sending it to the cloud. Or cache information that was not available on a previous user request for some future use.
+	\item Services that exist in the $\upmu$C, and they are responsible for filtering and data pre-processing before sending it to the cloud. Or cache information that was not available on a previous user request for some future use;
 	\item Services in the standard cloud that should be able to accept pre-processed data, and they are responsible for computation and storage that is beyond the capabilities of ECC nodes. Services in the cloud should be able to take direct requests from the clients in a case when something catastrophic happens to the $\upmu$C that is close to the user, and it is not able anymore to accept user requests.
 \end{enumerate}
 
@@ -168,9 +168,9 @@ Modern-day applications that should run in the cloud are advised to follow the c
 
 Satyanarayanan et al. present the edge-native applications model~\cite{SatyanarayananK19} that should use the full potential of EC infrastructure, and keep good features of their cloud counterparts. 
 
-When we introduced SoC for the $\upmu$C model (cf. page~\pageref{services}), we described services that have one specific feature, and that is that these services span over two tiers of the system. This information is crucial for application development because we want to use the full potential of formed infrastructure, and keep good features of their cloud counterparts.
+When we introduced SoC for the $\upmu$C model (see page~\pageref{services}), we described services that have one specific feature, and that is that these services span over two tiers of the system. This information is crucial for application development because we want to use the full potential of formed infrastructure, and keep good features of their cloud counterparts.
 
-To satisfy the previously defined SoC model (cf. page~\pageref{services}), existing applications can be split into the \textbf{front} and \textbf{back} processing services. The front processing service is an edge-native application running inside some previously formed cluster to minimize latency, while the back service runs in the traditional cloud as a cloud-native application to leverage greater resources.
+To satisfy the previously defined SoC model (see page~\pageref{services}), existing applications can be split into the \textbf{front} and \textbf{back} processing services. The front processing service is an edge-native application running inside some previously formed cluster to minimize latency, while the back service runs in the traditional cloud as a cloud-native application to leverage greater resources.
 
 The front processing service will handle user requests coming to the nearby cluster, and communicate with the back processing services when needed to synchronize the pieces of information, cache data, or pass filtered or pre-processed data. Separation like that gives developers better flexibility and large design space when creating and optimizing their workloads. At the same time, it ties together the traditional clouds and edge comuting into one coherent system. Figure~\ref{fig:fig29} shows $\upmu$C applications model that tides edge and traditional cloud applicatoins.
 
@@ -183,7 +183,7 @@ The front processing service will handle user requests coming to the nearby clus
 	\label{fig:fig29}
 \end{figure}
 
-With this model, we venture even deeper into understanding and applying the concept of \textbf{data locality} (cf. page~\pageref{ds:data_locality}). Since we have front and back processing services, we are committed to doing processing data closer to their source, instead of moving data to the cloud. This reduces latency and saves some users money on storing and processing unnecessary data.
+With this model, we venture even deeper into understanding and applying the concept of \textbf{data locality} (see page~\pageref{ds:data_locality}). Since we have front and back processing services, we are committed to doing processing data closer to their source, instead of moving data to the cloud. This reduces latency and saves some users money on storing and processing unnecessary data.
 %
 %
 \subsection{Execution models}\label{sec:execution_models}
@@ -193,7 +193,7 @@ Frontend services model should be packed in some standard way~\ref{sec:virtualiz
 If a service is subscribed to some stream using a topic, for example, it is natural that events appear in their stream. There are two strategies for building a large-scale time-ordered event system:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Fan out on write}, with this strategy, every service has some form of inbox, and when an event appears for some topic, that data is copied to every service that is subscribed to that topic. With these options, reads are fast, but writes are not. The more subscribers to the topic, the longer it takes to persist all updates. 
+	\item \textbf{Fan out on write}, with this strategy, every service has some form of inbox, and when an event appears for some topic, that data is copied to every service that is subscribed to that topic. With these options, reads are fast, but writes are not. The more subscribers to the topic, the longer it takes to persist all updates; 
 	\item \textbf{Fan in on read}, with this strategy, every topic has a sort of outbox where it can store data. When services read their streams, the system will read the recent data from the outboxes. Writes are fast, and used storage is minimal, but reads are difficult because to do this properly on a request-response deadline is not a trivial task to do.
 \end{enumerate}
 
@@ -203,20 +203,20 @@ To implement those ideas without complicated synchronization, CRDTs could be use
 Some examples of applications may include:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{events} that notify users if some value is above or below some defined threshold; 
-	\item \textbf{stream} or processing data as it comes to the system;
-	\item \textbf{micro-batch} processing delivers data more slowly than real-time data processing but faster than typical batch processing. It is performed in smaller batches, than traditional batch processing. This type of processing is for applications that require high-throughput processing over large data streams~\cite{AbdelhamidMDA20};
-	\item \textbf{batch} does processing in predefined times over some bigger collection of data;
+	\item \textbf{Events} that notify users if some value is above or below some defined threshold; 
+	\item \textbf{Stream} or processing data as it comes to the system;
+	\item \textbf{Micro-batch} processing delivers data more slowly than real-time data processing but faster than typical batch processing. It is performed in smaller batches, than traditional batch processing. This type of processing is for applications that require high-throughput processing over large data streams~\cite{AbdelhamidMDA20};
+	\item \textbf{Batch} does processing in predefined times over some bigger collection of data;
 	\item \textbf{daemons} or processing that are that do some tasks or executions in the background without explicit user intervention, usually their execution could be time defined but it is not mandatory;
-	\item \textbf{services} or applications that would operate over standard request-response model or some variation of that protocol. For example, the NATS messaging system has a request-reply form implemented over topics;
-	\item \textbf{other}, something that falls outside these models, or it is a composition of multiple operations at once. This can be represented as a function composition in mathematics:
+	\item \textbf{Services} or applications that would operate over standard request-response model or some variation of that protocol. For example, the NATS messaging system has a request-reply form implemented over topics;
+	\item \textbf{Other}, something that falls outside these models, or it is a composition of multiple operations at once. This can be represented as a function composition in mathematics:
 	
-	\begin{center}
-		\( (f \circ g)(x) = f(g(x))\) 
-	\end{center}
-	\myequations{Function composition}
+	\begin{equation}~\label{size:eq3}
+		(f \circ g)(x) = f(g(x))
+	\end{equation}
+	\myequations{Function composition.}
 	
-	This type should get events from some topic as they arrive, and a user can define his strategy what needs to be done and how it needs to be processed. Users can contact other existing services, and the user is responsible for optimization;
+	This type should get events from some topic as they arrive, and a user can define his strategy what needs to be done and how it needs to be processed. Users can contact other existing services or combine them (eq.~\ref{size:eq3}), and the user is responsible for optimization;
 \end{enumerate}
 
 \noindent
@@ -248,15 +248,15 @@ Like any other system, users can create variants of the systems and different fl
 Users should be able to develop their applications using familiar models, depending on their needs. Depending on how much control a user requires over the process of service scheduling, resource selection, etc. three models can be distinguished:
  
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{microPaaS or $\upmu$PaaS}, where the platform does all the management and offers a simple interface for developers to deploy their applications. This model is similar to PaaS, and the only difference is that this runs in $\upmu$C and should synchronize with CC.
-	\item \textbf{microCaaS or $\upmu$CaaS}, if users require more control over resource requirements, deployment, and orchestration decisions. This model is similar to CaaS (or even IaaS), and the only difference is that this runs in $\upmu$C and should synchronize with CC.
-	\item \textbf{microSaaS or $\upmu$SaaS}, with this option, data is not synchronized with the CC, but all processing and storage is done in the $\upmu$C. As such, this option should be used vigilantly.
+	\item \textbf{Micro PaaS or $\upmu$PaaS}, where the platform does all the management and offers a simple interface for developers to deploy their applications. This model is similar to PaaS, and the only difference is that this runs in $\upmu$C and should synchronize with CC;
+	\item \textbf{Micro CaaS or $\upmu$CaaS}, if users require more control over resource requirements, deployment, and orchestration decisions. This model is similar to CaaS (or even IaaS), and the only difference is that this runs in $\upmu$C and should synchronize with CC;
+	\item \textbf{Micro SaaS or $\upmu$SaaS}, with this option, data is not synchronized with the CC, but all processing and storage is done in the $\upmu$C. As such, this option should be used vigilantly.
 \end{enumerate}
 
 \noindent
 It is important to note, that both variants, \textbf{mCaaS} and \textbf{mPaaS}, should \textbf{not} stand alone, at least not for now. Using \textbf{mSaaS} is not being advised for now, since that would require that the whole application be running \textbf{only} in the $\upmu$Cs. In the future, when EC nodes gain more power and storage, this might change. \textbf{mSaaS} as an option should more investigated in the future.
 
-Both options, \textbf{mCaaS} and \textbf{mPaaS}, could be included, and a part of any cloud model (cf. section~\ref{sec:cloud_computing}), multi-cloud or offered separately.
+Both options, \textbf{mCaaS} and \textbf{mPaaS}, could be included, and a part of any cloud model (se Section~\ref{sec:cloud_computing}), multi-cloud or offered separately.
 %
 %
 \section{Immutable infrastructure}\label{sec:immutable_infrastructure}
@@ -268,7 +268,7 @@ We believe that \textbf{immutable deployment} model would be a good fit for such
 Geo-distributed $\upmu$Cs model that is described in this chapter should operate in two levels of deployment that are built one on top of the other:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Infrastructure deployement}, update and change should be atomic and immutable. Users should do changes declaratively -- mutations of the system, by telling the system what the new state should be, and let the system figure out the best way how to do user-specified changes. In this category, we can account for any change that is doing on the cluster, region, or topology that user/s operate on. For example create the new cluster, region, topology, or doing configurations of the setup system. The only change that could be done by imperative strategy updates on the nodes themselves. But even for this strategy, it would be beneficial if we could use declarative way \textbf{if possible}. It is important to notice that \textbf{mutation} does not mean in place change, but just the name of the operation. This deployment strategy is reserved for operations people or (eg. DevOps or SREs), but if the company or team is small any developer could do this. Developers should not be dealing with this part of the deployment.
+	\item \textbf{Infrastructure deployement}, update and change should be atomic and immutable. Users should do changes declaratively -- mutations of the system, by telling the system what the new state should be, and let the system figure out the best way how to do user-specified changes. In this category, we can account for any change that is doing on the cluster, region, or topology that user(s) operate on. For example create the new cluster, region, topology, or doing configurations of the setup system. The only change that could be done by imperative strategy updates on the nodes themselves. But even for this strategy, it would be beneficial if we could use declarative way \textbf{if possible}. It is important to notice that \textbf{mutation} does not mean in place change, but just the name of the operation. This deployment strategy is reserved for operations people or (eg. DevOps or SREs), but if the company or team is small any developer could do this. Developers should not be dealing with this part of the deployment;
 	\item \textbf{Services deployment}, makes sense only if the previous action is taken. We must have infrastructure already set up, to put any sort of services (applications) into the system. Like the previous model, this should be done declaratively as well, and all changes should be done immutably without an in-place change. The user should specify his new state or \say{view of the word} declaratively and let the system do all the changes he wants. All user services should be packed as described in section~\ref{sec:packaging} because this simplifies the way services are put to the nodes. When done properly, this allows operations people to do faster changes with almost zero downtime deployments with all strategies already discussed in section~\ref{sec:deployment}. This part of the deployment should be done by developers since they did implementation and testing. They know how many resources they need for their service, what type of service they had developed. This deployment could be done in collaboration between operations and developers if a company is big or time is properly separated.
 \end{enumerate}
 
@@ -278,8 +278,8 @@ It is important to notice, that both deployments should be closely followed, for
 Separation like this simplifies deployment and usage for both application development spectrums: 
 
 \begin{enumerate}[start=1,label={(\bfseries \roman*)}]
-	\item \textbf{operations} who should be dealing with infrastructure deployment, tooling set up, applications deployment, monitoring, and in the general health of applications and infrastructure.
-	\item \textbf{developers} who should be dealing with the development of the services, their interactions, and cloud to $\upmu$C and vice-versa synchronization.
+	\item \textbf{Operations} who should be dealing with infrastructure deployment, tooling set up, applications deployment, monitoring, and in the general health of applications and infrastructure;
+	\item \textbf{Developers} who should be dealing with the development of the services, their interactions, and cloud to $\upmu$C and vice-versa synchronization.
 \end{enumerate}
 
 \noindent
@@ -352,10 +352,10 @@ Infrastructure deployment will not happen overnight, and it might take years. It
 In such a complex environment, formal models are of great help if we can model and prove that protocols that the system relies on are correct. The system we propose tackles this issue using remote configuration and it relies on four formally modeled protocols:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{health-check protocol} informs the system about state of every node (cf. Section~\ref{sec:health_check_protocol})
-	\item \textbf{cluster formation protocol} forms new clusters dinamicaly (cf. Section~\ref{sec:cluster_formation_protocol})
-	\item \textbf{idempotency check protocol} prevents system from creating existing infrastructure (cf. Section~\ref{sec:idempotency_protocol})
-	\item \textbf{list detail protocol} shows the current state of the system to the user (cf. Section~\ref{sec:list_detail_protocol})
+	\item \textbf{Health-check protocol} informs the system about state of every node (see Section~\ref{sec:health_check_protocol});
+	\item \textbf{Cluster formation protocol} forms new clusters dinamicaly (see Section~\ref{sec:cluster_formation_protocol});
+	\item \textbf{Idempotency check protocol} prevents system from creating existing infrastructure (see Section~\ref{sec:idempotency_protocol});
+	\item \textbf{List detail protocol} shows the current state of the system to the user (see Section~\ref{sec:list_detail_protocol});
 \end{enumerate}
 
 \noindent
@@ -515,7 +515,7 @@ We described in algorithm~\ref{alg:alg1} how the system stores the node data, bu
 \begin{itemize}
 	%
 	%
-	\item $L$ is a set of ordered key-value pairs, i.e., $L = \{(k_1,v_1),\ldots ,(k_m,v_m)\}$ where $k_i \not= k_j$, for each $i,j\in \{1, \ldots , m\}$ such that $i\not= j$. $L$ represents node labels or server-specific features.  
+	\item $L$ is a set of ordered key-value pairs: $L = \{(k_1,v_1),\ldots ,(k_m,v_m)\}$ where $k_i \not= k_j$, for each $i,j\in \{1, \ldots , m\}$ such that $i\not= j$. $L$ represents node labels or server-specific features.  
 	Labels were based on Kubernetes~\cite{RossiCPN20} labels concept, which is used as an elegant binding mechanism for its components.
 	%
 	%
@@ -561,11 +561,11 @@ Since labels are an important part of the system (more in future sections), they
 Labels should stick out some distinctive features of the node, that might be valuable for developers or administrators to target. For example, server resources, server features (e.g., SSD drive), geolocation, etc. They can be created as follows:
 
 \begin{definition}
-	Labels are created using arbitrary long alphanumeric text, for both keys and values, separated by colon sign. For example os:linux, arch:arm, model:rpi, cpu:$2$, memory:$16$GB, disk:$300$GB, etc.
+	Labels are created using arbitrary long alphanumeric text, for both keys and values, separated by colon sign. For example os:linux, arch:arm, model:rpi, cpu:$2$, memory:$16$GB, disk:$300$GB.
 \end{definition}
 
 \noindent
-Following all things presented above, we can now give a formal description for the low-level health-check communication protocol (cf. Figure~\ref{fig:fig6}). The global protocol $\G_1$ (given bellow) conforms the informal description given at page~\pageref{informal_description_health-check}: $\mathtt{node}$ connects $\mathtt{nodes}$ with $\mathit{health{\_}check}$ message and a payload of type $\T_1$ required by the system to properly register node into the system. 
+Following all things presented above, we can now give a formal description for the low-level health-check communication protocol (see Figure~\ref{fig:fig6}). The global protocol $\G_1$ (given bellow) conforms the informal description given at page~\pageref{informal_description_health-check}: $\mathtt{node}$ connects $\mathtt{nodes}$ with $\mathit{health{\_}check}$ message and a payload of type $\T_1$ required by the system to properly register node into the system. 
 
 Based on the received information, $\mathtt{nodes}$ {\bf either} connect $\mathtt{state}$ with $\mathit{active}$ message, informing the node status alongside payload typed with $\T_2$ (containing informations required by the system to properly register active health-check sender), and then also connect $\mathtt{log}$ with the same message, {\bf or} directly connect $\mathtt{log}$ informing the node is $\mathit{free}$.
 \begin{align*}
@@ -750,7 +750,7 @@ In the Algorithm~\ref{alg:alg4} describes the required steps after nodes receive
 \end{algorithm}
 
 \noindent
-In the following, a low-level cluster formation communication protocol (cf. Figure \ref{fig:fig3}) is described. We are using the same extension of MPSTs~\cite{HuY17} used for the health-check protocol.
+In the following, a low-level cluster formation communication protocol (see Figure~\ref{fig:fig3}) is described. We are using the same extension of MPSTs~\cite{HuY17} used for the health-check protocol.
 
 Global protocol $\G_2$ (given below) conforms the informal description of the cluster formation protocol given on page~\pageref{cluster_formation_informal_description}. 
 The protocol starts with $\mathtt{user}$ connecting $\mathtt{state}$ by message $\mathit{query}$ and a payload typed with $\T_1$ that contains user query data, and  then $\mathtt{state}$ forwards the message by connecting $\mathtt{nodes}$. 
@@ -919,26 +919,27 @@ Since we follow the approach of~\cite{HuY17} with explicit connections, projecti
 %
 \subsection{Idempotency check protocol}\label{sec:idempotency_protocol}
 %
-Mutate operation should be atomic, immutable, and idempotent. The user can specify the same topology details but in a different order, for example. We must ensure that the new cluster formation protocol should \textbf{not} be initiated, if the user changes order of regions, clusters, nodes, or labels in one or more node/s. 
+Mutate operation should be \emph{atomic, immutable,} and \emph{idempotent}. The user can specify the same topology details but in a different order, for example. We must ensure that the new cluster formation protocol should \textbf{not} be initiated, if the user changes order of regions, clusters, nodes, or labels in one or more node(s). 
 
-If mutate operation fails, for whatever possible reason, or the same infrastructure already exists, the user should get a message that infrastructure is formed. If the user changes the number of labels per node, nodes per cluster, clusters per region, regions per topology \textbf{only} in those cases a new protocol should be started.
+If \emph{mutate} operation fails, \textbf{i.e.}, the same infrastructure already exists, the user should get a message that infrastructure is \textbf{already} formed, but the new formation protocol would \textbf{not} be initiated. If the user changes the number of labels per node, nodes per cluster, or similar, a new protocol \textbf{should} be initiated.
+% \textbf{only} in those cases a new protocol \textbf{should} be initiated.
 
-But since we have a different scenario than standard write to storage, and we do not specify steps on how operations should be done, to implement idempotency correctly we have to do it a little bit differently. First of all, we must ensure that structure and operation that we are going to do over that structure are idempotent.
+But since we have a different scenario than standard write to storage, and we do not specify steps on how operations should be done, to implement idempotency correctly we have to do it a little bit differently. First of all, we must use proper structure, and ensure that operation done over that structure is idempotent.
 
 The idempotent structure $I_S$ can be represented as a tuple of \emph{topology name} and \emph{data set} like: 
 
-\begin{center}
-	$I_S=(Name, DataSet)$ 
-	\myequations{Idempotency structure}
-\end{center}
+\begin{equation}~\label{idem:eq1}
+	I_S=(Name, DataSet)
+\end{equation}
+\myequations{Idempotency structure.}
 
 \noindent
-$Name$ could be used for faster lookup, while $DataSet$ can be represented as a set, because most of the set operations are idempotent, as described in SEC. $DataSet$ could be represented in two ways:
+$Name$ could be used for faster lookup, while $DataSet$ represents the set of data, because most set operations are idempotent, as described in SEC (see page~\pageref{sec}). $DataSet$ could be represented in two ways:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{flat keyspace}, with this option all data could be part of the same set, and distinguishment could be achieved using \textit{prefix} identity, for example: region1\_cluster1\_node1\_labels, region1\_cluster1\_node1\_name etc.
-	\item \textbf{hierarhical keyspace}, with this option we can create nested data-structures of elements, for example set of regions, where every region is a set of clusters, where every cluster is a set of nodes, etc. We can go deep as long as we want, but the restriction is that every structure \textbf{must} be idempotent. So we can use a set of sets or \emph{N-ary trees}. With this option, we must test that idempotency is not violated throughout the hierarchy.
-\end{enumerate}
+	\item \textbf{Flat keyspace}, with this option all data could be part of the same set, and distinguishment could be achieved using \textit{prefix} identity, for example: region1\_cluster1\_node1\_labels, region1\_cluster1\_node1\_name etc.;
+	\item \textbf{Hierarhical keyspace}, with this option we can create nested data-structures of elements, for example set of regions, where every region is a set of clusters, etc. We can go deep as long as we want, but we \textbf{must not} violate idempotency throughout the hierarchy --- every (sub)structure \textbf{must} be idempotent. So we can use a set of sets or \emph{N-ary trees}.
+\end{enumerate}%the restriction is that every structure \textbf{must} be idempotent
 
 \noindent
 If we have cached idempotency data for user requests, and if a user tries to send the same request again, we can then test idempotency using set operation \textbf{intersection} because the intersection is an idempotent operation following the next proof.
@@ -1019,7 +1020,7 @@ Algorithm~\ref{alg:alg6} describes steps required to test if the operation is do
 \end{algorithm}
 
 \noindent
-A formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig13}) by using~\cite{HuY17} is presented next. The global protocol $\G_3$ (given below) conforms the informal description given at page~\pageref{informal_description_idempotency}. At this point, the $\mathtt{user}$ can choose one of two possible messages: 
+A formal description of the idempotency check protocol (see Figure~\ref{fig:fig13}) by using~\cite{HuY17} is presented next. The global protocol $\G_3$ (given below) conforms the informal description given at page~\pageref{informal_description_idempotency}. At this point, the $\mathtt{user}$ can choose one of two possible messages: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 \item $\mathit{quit}$, in which case the protocol terminates; or, 
@@ -1038,7 +1039,7 @@ A formal description of the idempotency check protocol (cf. Figure~\ref{fig:fig1
 
 The mutate protocol $\G'$, activated in the first branch in $\G_3$, starts with $\mathtt{user}$ sending 
 $\mathtt{create}$ message to $\mathtt{state}$, specifying also information about the new user desired state typed with $\T_3$, 
-and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same as cluster formation protocol (cf. section~\ref{cluster_formation_informal_description}). Now we start specific communication protocol for idempotency check so $\mathtt{service}$ sends payload $T_3$ to $\mathtt{istorage}$ to test if this request is $seen$ before. The $\mathtt{istorage}$ responds with payload $T_6$ to $\mathtt{service}$, and based on $Boolean$ response $\mathtt{service}$ can do one of two things:
+and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same as cluster formation protocol (see Section~\ref{cluster_formation_informal_description}). Now we start specific communication protocol for idempotency check so $\mathtt{service}$ sends payload $T_3$ to $\mathtt{istorage}$ to test if this request is $seen$ before. The $\mathtt{istorage}$ responds with payload $T_6$ to $\mathtt{service}$, and based on $Boolean$ response $\mathtt{service}$ can do one of two things:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
 	\item $\mathtt{service}$ sends message to $\mathtt{log}$ and this process terminates; or,
@@ -1046,7 +1047,7 @@ and $\mathtt{state}$ replies back with $\mathit{ok}$. This process is the same a
 \end{enumerate}
 
 \noindent
-same as cluster formation protocol (cf. section~\ref{cluster_formation_informal_description}). For simplification, we can assume that all nodes are reserved, and now idempotency data store global protocol $\G''$, starts;
+same as cluster formation protocol (see Section~\ref{cluster_formation_informal_description}). For simplification, we can assume that all nodes are reserved, and now idempotency data store global protocol $\G''$, starts;
 \begin{align*}
 G' & = 
 \mathtt{service} \twoheadrightarrow \mathtt{istorage}{:}\mathit{try}(\T_3). \\
@@ -1144,7 +1145,7 @@ Similarly, as for $G_2$, we remark $\G_3$ could also be modeled using standard M
 %
 The final communication protocol in our system appears in the information retrieval process. Using labels, the user can specify what part of the system he wants to retrieve, namely, on formed topologies. This protocol could be useful, for example, if the user wants to visualize his topologies, regions, or clusters on some dashboard and monitor for some changes, alerts, etc. 
 
-This operation may span over multiple services to retreive complete informations about the clusters and/or nodes. For this purpose some of the distributed queries methods (cf.~\ref{sec:distributed_queries}) can be used. For some patterns api composition may be more suited, while for others CQRS may be the better solution to optimize queries.
+This operation may span over multiple services to retreive complete informations about the clusters and/or nodes. For this purpose some of the distributed queries methods (see Section~\ref{sec:distributed_queries}) can be used. For some patterns api composition may be more suited, while for others CQRS may be the better solution to optimize queries.
 
 This protocol comes with two available options: 
 
@@ -1198,7 +1199,7 @@ Algorithm~\ref{alg:alg5} describes steps that are required after the state recei
 \end{algorithm}
 
 \noindent
-A formal description of the list communication protocol (cf. Figure \ref{fig:fig4}) by using~\cite{HuY17} is presented next. Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
+A formal description of the list communication protocol (see Figure \ref{fig:fig4}) by using~\cite{HuY17} is presented next. Global type $\G_4$ (given below) starts with $\mathtt{user}$ connecting $\mathtt{state}$ with one of the two possible messages: 
 \textbf{(1)} $\mathit{list}$, specifying a request for a detailed view, where sort $\T_1$ identifies which parts of the system the user wants to view in details, after which $\mathtt{state}$ connects $\mathtt{nodes}$ with $\mathit{query}$ message, with a payload of sort $\T_2$  containing specification of which nodes need to show their metrics data, and then protocol proceeds as prescribed with $\G'$; 
 \textbf{(2)} $\mathit{list^*}$, specifies no need for a detailed view is specified, where a payload of sort $\T_4$ denotes user specified parts of the system the user wants to view, but without greater details. In the latter case protocol follows global type $\G''$.
 \begin{align*}
@@ -1273,11 +1274,11 @@ Similarly as for $\G_2$ and $\G_3$ we remark $\G_4$ could also be modeled using 
 %
 \section{Long-lived transactions in micro clouds}\label{sec:long_live_transactions}
 %
-To operate $\upmu$Cs properly, such a system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offer (cf.~section~\ref{sec:microservices}). But still, we must be aware of all problems that come along with them.
+To operate $\upmu$Cs properly, such a system needs to be scalable. Architecture composed of loosely coupled services can be a way to go, because of all benefits such systems offer (see Section~\ref{sec:microservices}). But still, we must be aware of all problems that come along with them.
 
-That being said, one of the problems we have to deal with are transactions that appear in such distributed system --- distributed transactions (cf. section~\ref{sec:distributed_transactions}). Because of the nature of the system \emph{sagas} seems like a better pattern to use (cf. section~\ref{sec:sagas}).
+That being said, one of the problems we have to deal with are transactions that appear in such distributed system --- distributed transactions (see Section~\ref{sec:distributed_transactions}). Because of the nature of the system \emph{sagas} seems like a better pattern to use (see Section~\ref{sec:sagas}).
 
-When a user submits new \emph{cluster creation message} (cf.~section~\ref{sec:cluster_formation_protocol}), the message will be accepted by the system, and the new task with \emph{PENDING} state will be registered. If for whatever reason (e.g., no available resources or nodes, etc.), the system cannot proceed further, that task is terminated. It goes to \emph{FAILED} state, concluding the transaction. Otherwise, no errors occured, and the system can proceed with the cluster formation protocol, changing the task state to \emph{IN PROGRESS}.
+When a user submits new \emph{cluster creation message} (see Section~\ref{sec:cluster_formation_protocol}), the message will be accepted by the system, and the new task with \emph{PENDING} state will be registered. If for whatever reason (e.g., no available resources or nodes, etc.), the system cannot proceed further, that task is terminated. It goes to \emph{FAILED} state, concluding the transaction. Otherwise, no errors occured, and the system can proceed with the cluster formation protocol, changing the task state to \emph{IN PROGRESS}.
 
 In this state, the system needs to do several things: \textbf{(1)} save newly formed cluster information, \textbf{(2)} prepare metrics service, \textbf{(3)} add watchers for the cluster nodes health-check, etc. This spans multiple services, creating a few sub-transactions in the process. The \emph{task state} prevents the users to apply other tasks (e.g., configurations, actions, autoscaling, etc.) on a not yet fully formed cluster.
 
@@ -1312,17 +1313,17 @@ It makes sense that users can influence garbage collection by submitting their p
 %
 \section{System observability}\label{sec:system_observability}
 %
-Observability is an importatnt part of any real-world computing system (cf. page~\pageref{sec:log_aggregation}). It is an important part of any platform that strives to be offered as a service to large groups of different users. 
+Observability is an importatnt part of any real-world computing system (see page~\pageref{sec:log_aggregation}). It is an important part of any platform that strives to be offered as a service to large groups of different users. 
 
 At every moment, we must know what is happening in the system, where bottlenecks are, and how we can resolve problems. This is of significant importance in DS, where state and calculations are scattered across multiple nodes, clusters and even DCs.
 
-In the $\upmu$Cs environment that involves multiple layers (cf. page~\pageref{lab:three-tier}), this technique is even more important to give us insight what is happening in the system, and how we can optimize different layers of the system. On the other hand, users who use such a system need to know what is happening with their services.
+In the $\upmu$Cs environment that involves multiple layers (see page~\pageref{lab:three-tier}), this technique is even more important to give us insight what is happening in the system, and how we can optimize different layers of the system. On the other hand, users who use such a system need to know what is happening with their services.
 
 Because of these two really important parameters, observability must be implemented on two levels:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{system level}, contains data that is generated by the system. This data should be avalible to the administrators and providers of the system \textbf{only}. Operations people in the team (eg. DevOps or SREs), and developers cannot see it.
-	\item \textbf{user level} contains information about user requests that \textbf{only} operations people in the team (eg. DevOps or SREs) should be able see. This type of data should not be visible to the system providers, and for privacy reasons.
+	\item \textbf{System level} contains data that is generated by the system. This data should be avalible to the administrators and providers of the system \textbf{only}. Operations people in the team (eg. DevOps or SREs), and developers cannot see it;
+	\item \textbf{User level} contains information about user requests that \textbf{only} operations people in the team (eg. DevOps or SREs) should be able see it. This type of data should not be visible to the system providers, for privacy reasons.
 \end{enumerate}
 
 \noindent
@@ -1335,11 +1336,11 @@ Log storage could be searched to see the general state of the system, and pieces
 %
 In section~\ref{sec:application_model}, we already discussed system access patterns from the applications point of view, using streams and topics. In this section, we are going to venture into the dashboard and system access described in~\ref{sec:distribution_models}. 
 
-To access the system, requests are going over some \textit{master process}. This process is not responsible for any sort of synchronization, agreement, or something like that, but just to show dashboards and various system details since the cloud is available anywhere in the world, while $\upmu$C should serve the local population. 
+To access the system, requests are going over the \textit{master process}. This process is not responsible for any sort of synchronization, agreement, or something like that, but just to show dashboards and various system details since the cloud is available anywhere in the world, while $\upmu$C should serve the local population. 
 
 One question that could come to mind is, what if some cloud provider offering $\upmu$C functionality, or running our master process, goes down, should the rest of the $\upmu$Cs go to \textit{read-only} mode and only accept \textbf{read} requests?
 
-All communication is not exclusive to go over that master process, but if the user is nearby to $\upmu$C he/she should be able to initiate commands directly to clusters, regions, and topologies. But for dashboards and full pieces of information about his $\upmu$Cs, cloud would be a better solution, just because of more available resources.
+All communication is not exclusive to go over that master process, but if the user is nearby to $\upmu$C he/she should be able to initiate commands directly to clusters, regions, and topologies. However, for dashboards and full pieces of information about his $\upmu$Cs, cloud would be a better solution, because of more available resources.
 
 If some cloud provider goes down for whatever reason, we should foresee this, and to resolve it, we could use multiple cloud providers using \textit{Multi-Cloud Computing}~\cite{HongDSH19, Ardagna15} so that one cloud provider is a master process and many others are backup in case the whole cloud provider goes down.
 
@@ -1373,11 +1374,11 @@ User data would be relatively easy to replicate inside a region using CRDTs for 
 
 But since $\upmu$Cs storage capacity is less than traditional cloud, they should store most recently used data~\cite{SimicSensors}. The storage capacity is determined by the $\upmu$C size given by the equation~\ref{size:eq1}.
 
-Data locality in $\upmu$Cs creates two challenges, that must be addressed:
+\textbf{Data locality} in $\upmu$Cs creates two challenges, that must be addressed:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item a user leaves a place, where the copy of his data exists, is data stationary, or follows him using some pattern? The decision should be left to users, $\upmu$C providers, and developers to decide. The proposed model allows the creation of different \textbf{data plans} that could be represented via \textbf{different policies} for every individual user or group of users. If data needs to follow the user, as a data transfer medium the cloud could be used as a backbone, to transfer data to the $\upmu$C in user proximity. The process is similar to the content delivery networks on the edge~\cite{inbookKurniawan}. In such a scenario, we must pay attention to the network pressure and transfer only the requested data. As an alternative option, we can serve data directly from the cloud and do not transfer anything.
-	\item how long, the user data should be stored in the $\upmu$C, if we assume that locally existing $\upmu$C will serve many users? The proposed model does not restrict how long the data should be stored and it is \textbf{policy-based}. Depending on the $\upmu$C size given by equation~\ref{size:eq1}, $\upmu$C providers may determine \textbf{different policies} --- Time to live (TTL)~\cite{CohenHK05} and offer to users. This process is somewhat similar to the leases mechanism in cache systems~\cite{GrayC89}. 
+	\item A user leaves a place, is data stationary, or follows him using some pattern? The decision should be left to users, $\upmu$C providers, and developers to decide. The proposed model allows the creation of different \textbf{data plans} that could be represented via \textbf{different policies} for every individual user or group of users. If data needs to follow the user, as a data transfer medium the cloud could be used as a backbone, to transfer data to the $\upmu$C in user proximity. The process is similar to the content delivery networks on the edge~\cite{inbookKurniawan}. In such a scenario, we must pay attention to the network pressure and transfer only the requested data. As an alternative option, we can serve data directly from the cloud and do not transfer anything;
+	\item How long the user data should be stored in the $\upmu$C, if we assume that locally existing $\upmu$C will serve many users? The proposed model does not restrict how long the data should be stored and it is \textbf{policy-based}. Depending on the $\upmu$C size given by equation~\ref{size:eq1}, $\upmu$C providers may determine \textbf{different policies} --- Time to live (TTL)~\cite{CohenHK05} and offer to users. This process is somewhat similar to the leases mechanism in cache systems~\cite{GrayC89}. 
 \end{enumerate}
 
 The data retention and size in the $\upmu$C are decided and optimized with~\ref{size:eq1} and~\ref{size:eq2}, for the single user or group of users. This gives developers, and $\upmu$C providers more room to optimize their policies offered to the users, while users may choose different options based on their needs~\cite{SimicSensors}.
@@ -1387,11 +1388,11 @@ The data retention and size in the $\upmu$C are decided and optimized with~\ref{
 %
 The proposed system allow extension, and could be used for addition of various configurations and artifacts to \emph{nodes, clusters, regions} and even \emph{topologies} --- $\upmu$Cs, all done remotely. 
 
-As the direct implication of \emph{reconcile pattern} (cf. page~\pageref{loop_pattenr}), extension is as easy as adding the new worker to the system. This new worker, will deal with a specific resource type when that kind of file is submitted to the system.
+As the direct implication of \emph{reconcile pattern} (see page~\pageref{loop_pattenr}), extension is as easy as adding the new worker to the system. This new worker, will deal with a specific resource type when that kind of file is submitted to the system.
 
-On the other hand, a \emph{reconcile loop} (cf. page~\pageref{reconcile_loop}) will provide the observed resource informations that this worker can act on. This mean that specific worker (controller) will deal with just one resouce type at any given point in time knowing what is specified, and what is returned from reconcile loop. 
+On the other hand, a \emph{reconcile loop} (see page~\pageref{reconcile_loop}) will provide the observed resource informations that this worker can act on. This mean that specific worker (controller) will deal with just one resouce type at any given point in time knowing what is specified, and what is returned from reconcile loop. 
 
-When registering new worker, user should provide \emph{unique} name of the worker so that reconcile loop can send informations to the right place. As a unique name we can use for examle worker name and resource type name.
+When registering new worker, a user should provide \emph{unique} name of the worker so that reconcile loop can send informations to the right place. As a unique name we can use for examle worker name and resource type name.
 
 Figure~\ref{fig:fig30} show high overview of adding a new worker to the system, with reconcile loop.
 
@@ -1413,7 +1414,7 @@ The model presented in this chapter, has four possible model repercussions:
 	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be a viable option in the CC.
 	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because -- the communication should be implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an organization tool.
 	\item \textbf{Combination}, this approach can be done over multi-cloud principles. Some cloud tasks could be offloaded to the nearest $\upmu$C.
-	\item \textbf{Enhancement}, big data tools, esspecially lambda architecture (cf. section~\ref{sec:big_data}) could be enhanced using the proposed model creating \textbf{lambda++} architecture. Here we can reduce cost even more, by doing preprocessing and filtering of data closer to their source. After that we can send processed data to stream processing part of traitional lambda architecture, allowing it to process even more data than before.
+	\item \textbf{Enhancement}, big data tools, esspecially lambda architecture (see Section~\ref{sec:big_data}) could be enhanced using the proposed model creating \textbf{lambda++} architecture. Here we can reduce cost even more, by doing preprocessing and filtering of data closer to their source. After that we can send processed data to stream processing part of traitional lambda architecture, allowing it to process even more data than before.
 \end{enumerate} 
 %
 %

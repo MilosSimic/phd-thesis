@@ -6,20 +6,20 @@
 \contentsline {myequations}{\numberline {2.3}\hskip 1em\relax Idempotency law formula}{32}{equation.2.2.3}% 
 \contentsline {myequations}{\numberline {4.1}\hskip 1em\relax Cluster size limits}{75}{equation.4.1.1}% 
 \contentsline {myequations}{\numberline {4.2}\hskip 1em\relax Position od micro clouds.}{76}{equation.4.1.2}% 
-\contentsline {myequations}{\numberline {4.2}\hskip 1em\relax Function composition}{83}{Item.93}% 
-\contentsline {myequations}{\numberline {4.3}\hskip 1em\relax Global type construction}{92}{equation.4.6.3}% 
-\contentsline {myequations}{\numberline {4.4}\hskip 1em\relax Local type representation syntax.}{93}{equation.4.6.4}% 
-\contentsline {myequations}{\numberline {4.5}\hskip 1em\relax Extending free servers set.}{96}{equation.4.6.5}% 
-\contentsline {myequations}{\numberline {4.6}\hskip 1em\relax Extending label set.}{97}{equation.4.6.6}% 
-\contentsline {myequations}{\numberline {4.6}\hskip 1em\relax Health-check global protocol.}{98}{definition.4.6.4}% 
-\contentsline {myequations}{\numberline {4.6}\hskip 1em\relax Health-check global protocol projection.}{99}{definition.4.6.4}% 
-\contentsline {myequations}{\numberline {4.7}\hskip 1em\relax Query selector formation.}{102}{equation.4.6.7}% 
-\contentsline {myequations}{\numberline {4.10}\hskip 1em\relax Server selector.}{103}{equation.4.6.10}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax Extending task queue set.}{103}{equation.4.6.11}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax Cluster formation global protocol.}{105}{Item.126}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax Cluster formation global protocol projection.}{107}{Item.128}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax Idempotency structure}{108}{subsection.4.6.4}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax Idempotency check global protocol.}{112}{Item.140}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax Idempotency check global protocol projection.}{114}{Item.142}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax List detail global protocol.}{117}{algocf.6}% 
-\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax List detail global protocol projection.}{118}{algocf.6}% 
+\contentsline {myequations}{\numberline {4.3}\hskip 1em\relax Function composition.}{83}{equation.4.3.3}% 
+\contentsline {myequations}{\numberline {4.4}\hskip 1em\relax Global type construction}{92}{equation.4.6.4}% 
+\contentsline {myequations}{\numberline {4.5}\hskip 1em\relax Local type representation syntax.}{93}{equation.4.6.5}% 
+\contentsline {myequations}{\numberline {4.6}\hskip 1em\relax Extending free servers set.}{96}{equation.4.6.6}% 
+\contentsline {myequations}{\numberline {4.7}\hskip 1em\relax Extending label set.}{97}{equation.4.6.7}% 
+\contentsline {myequations}{\numberline {4.7}\hskip 1em\relax Health-check global protocol.}{98}{definition.4.6.4}% 
+\contentsline {myequations}{\numberline {4.7}\hskip 1em\relax Health-check global protocol projection.}{99}{definition.4.6.4}% 
+\contentsline {myequations}{\numberline {4.8}\hskip 1em\relax Query selector formation.}{102}{equation.4.6.8}% 
+\contentsline {myequations}{\numberline {4.11}\hskip 1em\relax Server selector.}{103}{equation.4.6.11}% 
+\contentsline {myequations}{\numberline {4.12}\hskip 1em\relax Extending task queue set.}{103}{equation.4.6.12}% 
+\contentsline {myequations}{\numberline {4.12}\hskip 1em\relax Cluster formation global protocol.}{105}{Item.126}% 
+\contentsline {myequations}{\numberline {4.12}\hskip 1em\relax Cluster formation global protocol projection.}{107}{Item.128}% 
+\contentsline {myequations}{\numberline {4.13}\hskip 1em\relax Idempotency structure.}{108}{equation.4.6.13}% 
+\contentsline {myequations}{\numberline {4.13}\hskip 1em\relax Idempotency check global protocol.}{112}{Item.140}% 
+\contentsline {myequations}{\numberline {4.13}\hskip 1em\relax Idempotency check global protocol projection.}{114}{Item.142}% 
+\contentsline {myequations}{\numberline {4.13}\hskip 1em\relax List detail global protocol.}{117}{algocf.6}% 
+\contentsline {myequations}{\numberline {4.13}\hskip 1em\relax List detail global protocol projection.}{118}{algocf.6}% 

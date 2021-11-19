@@ -8,20 +8,20 @@ Section~\ref{sec:framework} discusses framework architecture, and system impleme
 %
 \section{Platform implementation}\label{sec:framework}
 %
-In this section, we are going to introduce an implemented proof-of-concept framework based on the model proposed in the previous chapter~\ref{chapter:Micro_clouds}. The framework is called \textbf{Constellations} or \textbf{c12s}\footnote{https://github.com/c12s} for short because it is strongly influenced by nature and the neverending number of galaxies that the universe is (not only) composed of. Similarly, we are trying to create a universe of clusters that will serve humanity to help them with their day-to-day tasks. The framework is \textbf{open-source}, and it is implemented using the microservice architecture with services that have distinct role and purpose to the entire system. These services are:
+In this section, we are going to introduce an implemented proof-of-concept framework based on the model proposed in the previous chapter~\ref{chapter:Micro_clouds}. The framework is called \textbf{Constellations (c12s)}\footnote{https://github.com/c12s} because it is strongly influenced by nature and the neverending number of galaxies that the universe is (not only) composed of. Similarly, we are trying to create a universe of clusters that will serve humanity to help them with their day-to-day tasks. The framework is \textbf{open-source}, and it is implemented using the microservice architecture with services that have distinct role and purpose to the entire system. These services are:
 
 \begin{itemize}
-	\item \textbf{Gateway}, this purpose is to export services feature to the rest of the world. Gateway is designed as a REST service, accepting $JSON$ style messages, so that various clients can communicate to the system. When the request arrives at the gateway, if the request is valid it will pass the request to the rest of the system. It communicates to the rest of the services to check if the user exists, if he / she has proper rights for actions he / she sends, and if not, returns the proper message and and does not propagate it to the rest of the system.
-	\item \textbf{Authentification \& Authorization}, the sole purpose of this service is to store users and their credentials. This service will validate does user exists in the system, and does he have certain rights to perform some specific operation. Users that often use the system will be stored in the cache layer of the service so that on the next request his actions are done faster. Users that do not use the system that often will not be stored in the cache, until the first use. After that, if the user does not use the system for some time, he/she will expire from the cache.
-	\item \textbf{Queues}, the purpose of this service is to prevent huge request load to the system and to accept more user requests. When the user submits any \textbf{mutation} operation -- an operation that changes the state of the system, these operations will be put in the queue. User can create their queues, to prevent long lines for specific tasks. For example, users can create queues for specific tasks, and use them only for those tasks, while other queues could be general-purpose queues. On system start, every user will start with one queue --- \textbf{default}. When doing mutations on different parts of the system, the user can specify in metadata which queue he wants the task to go to. This service implements a token bucket rate-limiting algorithm~\cite{MathewsKG17} to prevent congestion of the system.
-	\item \textbf{Nodes}, this service stores and maintains pieces of information about registered nodes in the system. All node hardware and software details will be stored in this here. This service is also responsible for storing metrics data, accept health-check requests from nodes, and inform the rest of the system that the used node is alive.
-	\item \textbf{State}, is the heart of the system. This service stores all information about architecture, clusters, regions, and topologies. When a new cluster/region/topology is created, this service will setup watchers for nodes, so that if the node does not send the health-check signal for some time, that node will be declared dead. This is important so that at any moment we must know the state of the clusters and their utilization. This service as well will cache frequently used nodes data, so that on the next request node lookup is faster, since we can have a huge number of nodes, topologies, clusters and pieces of information about them. To prevent data loss, this service will first store a copy of the operation before attempting any mutation of the system.
-	\item \textbf{Log}, is responsible for storing all log and trace data from every service. Here a user can check whether all jobs are done, whether there is some error and possibly why the error happened to resolve it or fix it for the next time. From a user point of view, this is \textbf{read only} service and from a system view, this is \textbf{write only} service.
-	\item \textbf{Command push}, the purpose of this service is to push commands and operations to the nodes user desired. This service implements a token bucket rate-limiting algorithm~\cite{MathewsKG17} to prevent constant data push to the nodes. Similar to the state service, this service will store a copy of operation information locally before attempting any push to the nodes. This information will be deleted, once the operation reaches all decided nodes and all of the responses with the acknowledge (ACK) message.
+	\item \textbf{Gateway}, its purpose is to export services feature to the rest of the world. Gateway is designed as a REST service, accepting $JSON$ style messages, so that various clients can communicate to the system. When the request arrives at the gateway, if the request is valid it will pass the request to the rest of the system. It communicates to the rest of the services to check if the user exists, if he/she has proper rights for actions he/she sends, and if not, returns the proper message and and does not propagate it to the rest of the system;
+	\item \textbf{Authentification \& Authorization}, the sole purpose of this service is to store users and their credentials. This service will validate does user exists in the system, and does he have certain rights to perform some specific operation. Users that often use the system will be stored in the cache layer of the service so that on the next request his/here actions are done faster. Users that do not use the system that often will not be stored in the cache until the first use. After that, if the user does not use the system for some time, he/she will expire from the cache;
+	\item \textbf{Queues}, the purpose of this service is to prevent huge request load to the system and to accept more user requests. When the user submits any \textbf{mutation} operation -- an operation that changes the state of the system, these operations will be put in the queue. User can create their queues, to prevent long lines for specific tasks. For example, users can create queues for specific tasks, and use them only for those tasks, while other queues could be general-purpose queues. On system start, every user will start with one queue --- \textbf{default}. When doing mutations on different parts of the system, the user can specify in metadata which queue he wants the task to go to. This service implements a token bucket rate-limiting algorithm~\cite{MathewsKG17} to prevent congestion of the system;
+	\item \textbf{Nodes}, this service stores and maintains pieces of information about registered nodes in the system. All node hardware and software details will be stored in this here. This service is also responsible for storing metrics data, accept health-check requests from nodes, and inform the rest of the system that the used node is alive;
+	\item \textbf{State}, is the heart of the system. This service stores all information about architecture, clusters, regions, and topologies. When a new cluster/region/topology is created, this service will setup watchers for nodes, so that if the node does not send the health-check signal for some time, that node will be declared dead. This is important so that at any moment we must know the state of the clusters and their utilization. This service as well will cache frequently used nodes data, so that on the next request node lookup is faster, since we can have a huge number of nodes, topologies, clusters and pieces of information about them. To prevent data loss, this service will first store a copy of the operation before attempting any mutation of the system;
+	\item \textbf{Log}, is responsible for storing all log and trace data from every service. Here a user can check whether all jobs are done, whether there is some error and possibly why the error happened to resolve it or fix it for the next time. From a user point of view, this is \textbf{read only} service and from a system view, this is \textbf{write only} service;
+	\item \textbf{Command push}, the purpose of this service is to push commands and operations to the nodes user desired. This service implements a token bucket rate-limiting algorithm~\cite{MathewsKG17} to prevent constant data push to the nodes. Similar to the state service, this service will store a copy of operation information locally before attempting any push to the nodes. This information will be deleted, once the operation reaches all decided nodes and all of the responses with the acknowledge (ACK) message;
 \end{itemize}
 
 \noindent
-All services are highly customizable and all have their configuration file that could be changed and adopted. All these services are easy to extend to support new operations and pieces of information about nodes, regions, clusters, topologies, and latter on applications, configurations, namespaces, etc. 
+All services are highly customizable and all have their configuration file that could be changed and adopted. All these services are easy to extend to support new operations and pieces of information about nodes, regions, clusters, topologies, and latter on applications, configurations, namespaces.
 
 The system operates with four commands, where three of them follow formal models described in the previous chapter. The last command is a simple command to list logs for every user.
 
@@ -41,7 +41,7 @@ In the rest of this section, we will see details about all operations, as well a
 %
 \subsection{Technologies}\label{sec:technologies}
 %
-All services are implemented using the Go\footnote{https://golang.org/} programming language, because of its well-known tooling, support for developing system software, web-based applications, small binaries but also, great concurrency model, and ability to build binaries for almost any architecture without any code changes. All services rely on Go implicit \emph{interface} implementation mechanism. Every technology or component used in the system can be swapped for some other, as long as that component implements \emph{interface} fully. The framework is developed in such a way that is relatively easy to extend, or switch and use different components and technologies.
+All services are implemented using the Go\footnote{https://golang.org/} programming language, because of its well-known tooling, support for developing system software, web-based applications, small binaries, but also, great concurrency model, and ability to build binaries for almost any architecture without any code changes. All services rely on Go implicit \emph{interface} implementation mechanism. Every technology or component used in the system can be swapped for some other, as long as that component implements \emph{interface} fully. The framework is developed in such a way that is relatively easy to extend, or switch and use different components and technologies.
 
 As the main storage layer for our system, we used etcd\footnote{https://etcd.io/}, a popular open-source key-value database, that shows good performance, and it is mostly used for configuration data. Metrics data are stored in the open-source time-series database InfluxDB\footnote{https://www.influxdata.com/}. 
 
@@ -58,8 +58,8 @@ Every service will log details about its usage and calls, as well as traces how 
 Log data will be stored in the two levels:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{system level}, this data is generated by the system and could be viewed by administrators of the system \textbf{only}. Operations people in the team (eg. DevOps or SREs), and developers cannot see it, but providers can.
-	\item \textbf{user level} that stores information about user requests that \textbf{only} users can see. This type of data will not be visible to the developers of the system, and only users that created these logs will be able to see them.
+	\item \textbf{System level}, this data is generated by the system and could be viewed by administrators of the system \textbf{only}. Operations people in the team (eg. DevOps or SREs), and developers cannot see it, but providers can;
+	\item \textbf{User level} that stores information about user requests that \textbf{only} users can see. This type of data will not be visible to the developers of the system, and only users that created these logs will be able to see them.
 \end{enumerate}
 
 \noindent
@@ -68,7 +68,7 @@ Log storage could be searched to see the general state of the system, and pieces
 %
 \subsection{Node daemon}\label{sec:node_daemon}
 %
-Every node runs a simple daemon program implemented using the Go programming language, as an actor system (Ref. secion~\ref{sec:actor_model}). The actor system is developed for this purpose. When a message arrives, the proper actor will react based on the message type, or discard it if the type is not supported. 
+Every node runs a simple daemon program implemented using the Go programming language, as an actor system (see Secion~\ref{sec:actor_model}). The actor system is developed for this purpose. When a message arrives, the proper actor will react based on the message type, or discard it if the type is not supported. 
 
 Extending such a system is rather easy because users need to simply write a new actor and logic that goes with them and register it to the system.
 
@@ -94,11 +94,11 @@ Listing~\ref{lst:listing3} show the actor system hierarchy of existing actors.
 Before daemon starts, the user needs to specify some parameters for proper configuration like: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}] \label{imp:features}
-	\item \textbf{identifier}, represents unique identifier of the node. When a node is not a part of some cluster, this can be whatever the user wants. Once the node is a part of some cluster, the identifier will be updated, and it is not advised to change it manually afterwards.
-	\item \textbf{name}, represent name of the node. This property also can be changed when a node is part of the cluster, otherwise, it can be whatever we want.
-	\item \textbf{labels} represent the specific features of the node. Labels are used to query for free nodes, and there is no formal restriction of what they can or can not be. This property can be changed when the node is a part of some cluster. It is advised that as labels we put some specific features of the node that might be beneficial for the user who is looking for nodes to create new cluster/s.
-	\item \textbf{health-check details}, here we have pieces of information to control the health-check mechanism. Since nodes communicate with the rest of the system via publish-subscribe events, we must specify the address of the rest of the system and the topic name, where we publish our pieces of information.
-	\item \textbf{system information}, represents basic information for a node to know how to contact the rest of the system. We should specify the system address, so that node knows where to send messages, and where are messages are coming from. We can also specify the version of the system we are trying to contact. System version could be used to support \textbf{backward compatibility} if we have multiple API versions of the system running at the same time or some period.
+	\item \textbf{Identifier} represents unique identifier of the node. When a node is not a part of some cluster, this can be whatever the user wants. Once the node is a part of some cluster, the identifier will be updated, and it is not advised to change it manually afterwards.;
+	\item \textbf{Name}, represent name of the node. This property also can be changed when a node is part of the cluster, otherwise, it can be whatever we want.
+	\item \textbf{Labels} represent the specific features of the node. Labels are used to query for free nodes, and there is no formal restriction of what they can or can not be. This property can be changed when the node is a part of some cluster. It is advised that as labels we put some specific features of the node that might be beneficial for the user who is looking for nodes to create new cluster(s);
+	\item \textbf{Health-check details}, here we have pieces of information to control the health-check mechanism. Since nodes communicate with the rest of the system via publish-subscribe events, we must specify the address of the rest of the system and the topic name, where we publish our pieces of information;
+	\item \textbf{System information} represents basic information for a node to know how to contact the rest of the system. We should specify the system address, so that node knows where to send messages, and where are messages are coming from. We can also specify the version of the system we are trying to contact. System version could be used to support \textbf{backward compatibility} if we have multiple API versions of the system running at the same time or some period.
 \end{enumerate} 
 
 \noindent
@@ -118,16 +118,12 @@ At the first start of the daemon, when the node is free, the user can specify wh
 %
 \subsection{Separation of concerns details}\label{sec:framework_SoC}
 %
-IThe implemented framework follow the clear SoC model, presented in~\ref{sec:separation_of_concerns}. Since the presented model consists of three components, the implemented framework is deals only with \textbf{resources}~\ref{soc:resources} part of the SoC. 
-
-Its job is to organize nodes into clusters, regions, and topologies, to make them communicate and expose their resources to the upper layer of SoC for utilization. The upper layer will run services on these resources, to collect data from data creators and process them as requested.
-
-The upper layer must have set up the infrastructure to do any processing or storage. This middle layer is the binding element between the layers.
+The implemented framework follow the clear SoC model, presented in Section~\ref{sec:separation_of_concerns}. Since the presented model consists of three components, the implemented framework is deals only with \textbf{resources} (see page~\pageref{soc:resources}). Its job is to organize nodes into clusters, regions, and topologies, to make them communicate and expose their resources to the upper layer of SoC for utilization. The upper layer will run services on these resources, to collect data from data creators and process them as requested. It must have set up the infrastructure to do any processing or storage. This middle layer is the binding element between the layers.
 %
 %
 \subsection{Long-lived transactions details}\label{sec:transaction}
 %
-Current implementation follows the sagas pattern (cf.~page~\pageref{sec:sagas}) for transactions, and isolation is added using semantic lock by adding states to the task. The task can be in one of following states: \textbf{(1)} \emph{PENDING}, \textbf{(2)} \emph{IN PROGRESS}, \textbf{(3)} \emph{CREATED}, and \textbf{(4)} \emph{FAILED}. 
+Current implementation follows the sagas pattern (see page~\pageref{sec:sagas}) for transactions, and isolation is added using semantic lock by adding states to the task. The task can be in one of following states: \textbf{(1)} \emph{PENDING}, \textbf{(2)} \emph{IN PROGRESS}, \textbf{(3)} \emph{CREATED}, and \textbf{(4)} \emph{FAILED}. 
 
 Until the task reaches \emph{Created} state, no other operation can be done on that cluster configuration.
 
@@ -241,8 +237,8 @@ To view his/her infrastructures, the user can specify what part of the system he
 There are two levels of details that user can specify:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{global view}  of the syste, or all topologies he/she manages with just basic information like resource utilization, number of regions clusters and nodes.
-	\item \textbf{detail view}, or details about a single topology (i.e., regions, clusters, and nodes in a single topology). Users can specify a more detailed view of a single cluster, meaning the users will get information about what resources the cluster has, but also resource utilization over time (using stored metrics information) and so on.
+	\item \textbf{Global view}  of the syste, or all topologies he/she manages with just basic information like resource utilization, number of regions clusters and nodes;
+	\item \textbf{Detail view}, or details about a single topology (i.e., regions, clusters, and nodes in a single topology). Users can specify a more detailed view of a single cluster, meaning the users will get information about what resources the cluster has, but also resource utilization over time (using stored metrics information) and so on.
 \end{enumerate}
 
 \noindent
@@ -254,17 +250,17 @@ Both options can be useful if operations people need different details levels fo
 The logs operation shows stored logs and traces to the user (purple arrows in Figure~\ref{fig:fig11}.). Same as previous operations, the user needs to be registered and logged in to be able to perform this action. With this action, the user can see the state of his/her operations and actions. The user can choose between two options for querying his/her logs:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{get}, for this option a user needs to provide a unique task id that is given to the user when he/she creates a mutate operation. With this option, the user will get a full list of steps, traces, and logs collected over the time the system was setting up his/her desired state.  
-	\item \textbf{list}, with this option user can specify \textbf{selector} using list of key-value pairs in a similar way to query~\ref{sec:query} and mutate~\ref{sec:mutate} to filter only parts of the traces that contain the same labels as selector does.
+	\item \textbf{Get}, for this option a user needs to provide a unique task id that is given to the user when he/she creates a mutate operation. With this option, the user will get a full list of steps, traces, and logs collected over the time the system was setting up his/her desired state; 
+	\item \textbf{List}, with this option user can specify \textbf{selector} using list of key-value pairs in a similar way to query~\ref{sec:query} and mutate~\ref{sec:mutate} to filter only parts of the traces that contain the same labels as selector does.
 \end{enumerate}
 
 \noindent
 This action is implemented in some basic aspects, as this action can return a huge amount of data that require some better visualization than CLI.
 %
 %
-\section{Results}\label{sec:results}
+\section{Experimental Results}\label{sec:results}
 % 
-For the ease of testing, a few ARM-based nodes that are easy to move from place to place have been used. The test should be conducted on the heterogeneous nodes, to see how the system will react to different architectures and resources. In our tests, we have used:
+In our tests, we have used:
 
 \begin{itemize}
 	\item 9 Raspberry Pi 3+ Model B with 1GB LPDDR2 SDRAM, 16GB SDCard storage, and 1.4GHz Cortex-A53 64-bit SoC running Raspbian Linux, a Debian-based operating system.
@@ -272,16 +268,14 @@ For the ease of testing, a few ARM-based nodes that are easy to move from place 
 \end{itemize}
 
 \noindent
-as test heterogeneous nodes for creating clusters, regions, and topologies.
+as test nodes for creating clusters, regions, and topologies.
 %
 %
 \subsection{Experiment}\label{sec:experiment}
 %
 Using Go tooling, we were able to build daemon service without changes and dissiminate on all nodes without problems.
 
-We ran tests on different configurations and different nodes clusters using these nodes. All nodes were connected on the network, and experiments were conducted in a controlled environment. Nodes that should be a part of the same cluster were connected on same network for easier experiments.
-
-Experimental research was realized in the laboratory of the Department of Informatics at the Faculty of Technical Sciences in Novi Sad. The laboratory of the Department of Informatics is equipped with adequate computer, communication and software equipment on which the set goals in this thesis can be fully realized.
+We ran tests on different configurations and different nodes clusters using these nodes. All nodes were connected on the network, and experiments were conducted in a controlled environment. Nodes that should be a part of the same cluster were connected on same network.
 
 Our experiment started with separating nodes into groups of \textbf{three}. This number is chosen because in DS, an odd number is used in cases when we need to reach some agreement and we need major majority like consensus, for example. This is not important for purpose of this thesis, we could pick any number, membership protocol does not makes a difference if there are three or four or eleven nodes in the cluster.
 
@@ -297,16 +291,22 @@ The last test was to test health-check protocol once again - we disconnected one
 %
 \section{The existing solutions enhancement}~\label{enhancement_of_the_existing_solutions}
 %
-The protocols defined in this thesis could serve as a base layer for the system developed from scratch. On top of such a solution, other services and features can be added like scheduling, storage, applications, management, monitoring, etc. The protocols described in this thesis ensure proper node registration into the system, organization, and reorganization of node resources into clusters, regions, and topologies, bringing disposable $\upmu$Cs closer to the users at the network edge, allowing that requests are served from the local $\upmu$Cs.
+The protocols defined in this thesis could serve as a base layer for the system developed from scratch. On top of such a solution, other services and features can be added like scheduling, storage, applications, management, monitoring, etc. 
+
+The protocols described in this thesis ensure proper node registration into the system, organization, and reorganization of node resources into clusters, regions, and topologies, bringing disposable $\upmu$Cs closer to the users at the network edge, allowing that requests are served from the local $\upmu$Cs.
 
 The existing orchestrator engines (e.g., Kubernetes, Apache Mesos, Docker Swarm, etc.) operate one cluster level~\cite{BurnsGOBW16, VermaPKOTW15, RossiCPN20, KubeEdge, KubeMulti}. The single cluster could span over multiple availability zones in the cloud, minimizing the chance that a failure in one zone impairs services in other zones~\cite{KubeMulti}. Kubernetes allow extension in terms of multi-cluster deployments~{\cite{KubeMulti}}. In such a scenario, Kubernetes is handling these clusters as disposable --- "treating \textbf{clusters} as cattle, not pets" (i.e., numerous servers/clusters built using automated tools designed for failure, where no servers/clusters are irreplaceable~\cite{CERN}).
 
 The model proposed in this thesis goes one step further, allowing the creation of disposable $\upmu$Cs. Such an extension allows infrastructure optimization in more dimensions~\cite{ForestieroMMPS14}. The users are allowed to build numerous $\upmu$Cs designed for failure using automated tools where no $\upmu$C is irreplaceable --- "treating \textbf{$\upmu$Cs} as cattle, not pets."
 
-The existing solutions can integrate the model proposed in this thesis to serve as a node register. Such integration allows the registration of new nodes into the system, allowing the existing orchestration engines to use new nodes, and expand their available resource pool. In form of specification, the users can provide a list of which available EC nodes need to be part of some $\upmu$C. The system will communicate with the existing orchestrator agent to register/unregister them with the existing cluster. In such a scenario, we can hook on the existing orchestrator health-check mechanism informing our system that a node in some cluster is alive. Unused nodes still use the health-check protocol defined in this thesis informing the system that they are still available for utilization.
+The existing solutions can integrate the model proposed in this thesis to serve as a node register. Such integration allows the registration of new nodes into the system, allowing the existing orchestration engines to use new nodes, and expand their available resource pool. In form of specification, the users can provide a list of which available EC nodes need to be part of some $\upmu$C. 
+
+The system will communicate with the existing orchestrator agent to register/unregister them with the existing cluster. In such a scenario, we can hook on the existing orchestrator health-check mechanism informing our system that a node in some cluster is alive. Unused nodes still use the health-check protocol defined in this thesis informing the system that they are still available for utilization.
 
 The proposed model preserves the node's topology allowing cloud providers and orchestrator engines to treat $\upmu$Cs disposable, abstracting infrastructure to the level of software --- infrastructure as software~{\cite{Fitzgerald}}. This approach benefits from the already available tools, principles, and techniques (e.g., reuse, testing, modeling, and evaluation). The already available tools can be used for the disposable $\upmu$C infrastructure definitions.
 
-The model developed in this thesis is not competing with the existing orchestrator tools. It is not orchestrating applications, but it is a free nodes register and $\upmu$Cs infrastructure descriptor allowed to be offered as a stand-alone service bringing disposable $\upmu$Cs model to the users. The model allows integration with the existing orchestration tools, leveraging existing mechanisms and best practices. Cloud providers can create an operator for various orchestration engines. This allows them to offer dynamically created, disposable $\upmu$Cs as a service to their users, using infrastructure as software principles.
+The model developed in this thesis is not competing with the existing orchestrator tools. It is not orchestrating applications, but it is a free nodes register and $\upmu$Cs infrastructure descriptor allowed to be offered as a stand-alone service bringing disposable $\upmu$Cs model to the users. 
+
+The model allows integration with the existing orchestration tools, leveraging existing mechanisms and best practices. Cloud providers can create an operator for various orchestration engines. This allows them to offer dynamically created, disposable $\upmu$Cs as a service to their users, using infrastructure as software principles, for already existing orchestration engines, that users are already familiar with. And if cloud provider have their own orchestration engines, they can fine-tune integration between the model and their tools tightly integrating it into their their services.
 %
 %
