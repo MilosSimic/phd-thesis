@@ -136,7 +136,7 @@ The layer in the middle (see~Figure~\ref{fig:fig10}) represents resources or EC 
 \item A node must run an operating system with a usable file system;
 \item A node must be able to run some isolation engine for applications, for example, containers or unikernels;
 \item A node must have available resources for utilization so that applications can be run or data stored;
-\item A node must have internet connection;
+\item A node must have internet connection.
 \end{enumerate}
 
 \noindent
@@ -390,13 +390,13 @@ The modeling process is done in two steps.
 	a \emph{message} $\ell_i$ with the \emph{payload} of \emph{sort} $\T_i$, 
 	and then the protocol continues as prescribed with $\G_i$.  
 	$\mu \ty.\G_1$ is a recursive type, and $\ty$ is a recursive variable, 
-	while $\tend$ denotes a terminated protocol. We assume all participants are (implicitly) disconnected at the end of each session (cf.~\cite{HuY17}). 
+	while $\tend$ denotes a terminated protocol. We assume all participants are (implicitly) disconnected at the end of each session (cf.~\cite{HuY17}).
 	
 	The advance of using approach of~\cite{HuY17}, when compared to standard MPST (e.g.,~\cite{HondaYC08}),
 	is in a relaxed form of choice (a participant can choose between sending to different participants), 
 	and, $\twoheadrightarrow$, that explicitly connects two participants, hence (possibly) dynamically 
 	introducing participants in the session.
-	Both of these features will be significant for modeling our protocols (we will return to this point).
+	Both of these features will be significant for modeling our protocols (we will return to this point);
 	
 	\item \textbf{The second step} in modeling protocols by MPST is providing a syntactic projection of the protocol onto each participant as a local type, that is then used to
 	type check the endpoint implementations.  
@@ -623,7 +623,7 @@ where, for instance, type $\ST_\mathtt{nodes}$ specifies $\mathtt{nodes}$ can re
 Another communication protocol that the system relies on, appears in the cluster formation process, where users can form new clusters dynamically. Two different actions are distinguished:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item The first action is user-system communication. Here user sends query parameters to the system to obtain a list of available nodes that satisfy specified query parameters.
+	\item The first action is user-system communication. Here user sends query parameters to the system to obtain a list of available nodes that satisfy specified query parameters;
 	\item The second action is a little bit more complicated than the previous one, and it starts when the user sends a message to the system with a new assembly specification. In this setting, the system involves participants: User, Queue, Scheduler, State, Nodes, Log, and NodesPool. These participants need to cooperate to successfully form new clusters, regions, or topologies dynamically, adhering to the scenario shown in Figure \ref{fig:fig7}.
 \end{enumerate} 
 
@@ -1150,7 +1150,7 @@ This operation may span over multiple services to retreive complete informations
 This protocol comes with two available options: 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{global view} of the system -- all topologies the user manages. This will return just basic information about regions and clusters and their utilization.
+	\item \textbf{global view} of the system -- all topologies the user manages. This will return just basic information about regions and clusters and their utilization;
 	\item \textbf{specific clusters} details -- in-depth details for specified clusters like resources utilization over time (using stored metrics information), node information, configuration data, and running or stopped services.
 \end{enumerate}
 
@@ -1411,9 +1411,9 @@ Figure~\ref{fig:fig30} show high overview of adding a new worker to the system, 
 The model presented in this chapter, has four possible model repercussions:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be a viable option in the CC.
-	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because -- the communication should be implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an organization tool.
-	\item \textbf{Combination}, this approach can be done over multi-cloud principles. Some cloud tasks could be offloaded to the nearest $\upmu$C.
+	\item \textbf{Stand alone}, the proposed model can serve as a base layer for future ECC as a service implementation. On top of it, we can implement other services and features like scheduling, storage, applications, management, monitoring, etc. As such it could be a viable option in the CC;
+	\item \textbf{Integration}, the proposed model could be integrated with existing systems like Kubernetes, OpenShift, or cloud provider infrastructure since they all operate over the cluster. This is possible, with some small infrastructure changes and adaptations because -- the communication should be implemented via standard interfaces like HTTP and JSON, the integrations should be relatively easy to achieve. The proposed model could be used as a geo-distributed description and/or an organization tool;
+	\item \textbf{Combination}, this approach can be done over multi-cloud principles. Some cloud tasks could be offloaded to the nearest $\upmu$C;
 	\item \textbf{Enhancement}, big data tools, esspecially lambda architecture (see Section~\ref{sec:big_data}) could be enhanced using the proposed model creating \textbf{lambda++} architecture. Here we can reduce cost even more, by doing preprocessing and filtering of data closer to their source. After that we can send processed data to stream processing part of traitional lambda architecture, allowing it to process even more data than before.
 \end{enumerate} 
 %

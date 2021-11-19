@@ -77,10 +77,10 @@ When the daemon start, it will first read the configuration file to do the prope
 System messages will be sent to the daemon, but it will not react to these messages. Daemon is not able to communicate with any actor directly. All communication goes through the actor system which is responsible to pass messages to the actors. The actor system at this point has only four existing actors:
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{cluster actor}, this actor reacts on messages about new cluster formation, but he is also responsabile to contact rest of the system that message has arrived.
-	\item \textbf{internal actor}, this actor react to messages from other actors to update the daemon state. For example, on new cluster creation, this actor will update daemon id, name, labels, etc.
-	\item \textbf{health actor}, this actor will periodically send \emph{health-check} data to the system about node state, utilization, etc. This actor will communicate to the rest of the hardware to get proper pieces of information, to collect logs from the node, and send all that data to the system.
-	\item \textbf{gossip actor}, this actor will communicate with other peers in the group using SWIM protocol techniques.
+	\item \textbf{Cluster actor}, this actor reacts on messages about new cluster formation, but he is also responsabile to contact rest of the system that message has arrived.
+	\item \textbf{Internal actor}, this actor react to messages from other actors to update the daemon state. For example, on new cluster creation, this actor will update daemon id, name, labels, etc.
+	\item \textbf{Health actor}, this actor will periodically send \emph{health-check} data to the system about node state, utilization, etc. This actor will communicate to the rest of the hardware to get proper pieces of information, to collect logs from the node, and send all that data to the system.
+	\item \textbf{Gossip actor}, this actor will communicate with other peers in the group using SWIM protocol techniques.
 \end{enumerate}
 
 \noindent
@@ -95,7 +95,7 @@ Before daemon starts, the user needs to specify some parameters for proper confi
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}] \label{imp:features}
 	\item \textbf{Identifier} represents unique identifier of the node. When a node is not a part of some cluster, this can be whatever the user wants. Once the node is a part of some cluster, the identifier will be updated, and it is not advised to change it manually afterwards.;
-	\item \textbf{Name}, represent name of the node. This property also can be changed when a node is part of the cluster, otherwise, it can be whatever we want.
+	\item \textbf{Name}, represent name of the node. This property also can be changed when a node is part of the cluster, otherwise, it can be whatever we want;
 	\item \textbf{Labels} represent the specific features of the node. Labels are used to query for free nodes, and there is no formal restriction of what they can or can not be. This property can be changed when the node is a part of some cluster. It is advised that as labels we put some specific features of the node that might be beneficial for the user who is looking for nodes to create new cluster(s);
 	\item \textbf{Health-check details}, here we have pieces of information to control the health-check mechanism. Since nodes communicate with the rest of the system via publish-subscribe events, we must specify the address of the rest of the system and the topic name, where we publish our pieces of information;
 	\item \textbf{System information} represents basic information for a node to know how to contact the rest of the system. We should specify the system address, so that node knows where to send messages, and where are messages are coming from. We can also specify the version of the system we are trying to contact. System version could be used to support \textbf{backward compatibility} if we have multiple API versions of the system running at the same time or some period.
@@ -183,7 +183,7 @@ Figure~\ref{fig:fig14} shows a communication diagram for the query action, with 
 \end{figure}
 
 \noindent
-Query operation is implemented using \emph{api composition} pattern (cf.~page~\pageref{par:composition}).
+Query operation is implemented using \emph{api composition} pattern (see ~page~\pageref{par:composition}).
 %
 %
 \subsection{Mutate}\label{sec:mutate} 

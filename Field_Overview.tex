@@ -35,12 +35,12 @@ Distributed systems (in computer science) consist of various algorithms, techniq
 DS are hard to implement because of their asinchroninis and faulty nature. James Gosling and Peter Deutsch both fellows at Sun Microsystems at the time created a list of problems for network applications known as \textit{8 fallacies of Distributed Systems}~\cite{articleRotem}:\label{enum:fallacies}
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]\label{ds:8_fallacies}
-	\item \textbf{The network is reliable}; there will always be something that goes wrong with the network --- power failure, a cut cable, environmental disasters, etc.
+	\item \textbf{The network is reliable}; there will always be something that goes wrong with the network --- power failure, a cut cable, environmental disasters, etc.;
 	\item \textbf{Latency is zero}; locally latency is not an issue, but it deteriorates very quickly when you move to the internet and CC scenarios;
-	\item \textbf{Bandwidth is infinite}; even though bandwidth is constantly getting better and better, the amount of data we try to push through it rise as well.
+	\item \textbf{Bandwidth is infinite}; even though bandwidth is constantly getting better and better, the amount of data we try to push through it rise as well;
 	\item \textbf{The network is secure};  Internet attack trends are showing growth, and this becomes a problem even more in public CC;
-	\item \textbf{Topology doesn't change}; network topology is usually out of user control, and network topology changes constantly for numerous reasons --- added or removed new devices, servers, breaks, outages, etc;
-	\item \textbf{There is one administrator}; nowadays there are numerous administrators for web servers, databases, cache and so on, , and companies collaborate with other companies or CC providers;
+	\item \textbf{Topology doesn't change}; network topology is usually out of user control, and network topology changes constantly for numerous reasons --- added or removed new devices, servers, breaks, outages, etc.;
+	\item \textbf{There is one administrator}; nowadays there are numerous administrators for web servers, databases, cache and so on, and companies collaborate with other companies or CC providers;
 	\item \textbf{Transport cost is zero}; we have to serialize information and send data over the wire, which takes resources and adds to the total latency. The problem here is not just latency, but that information serialization takes time and resources;
 	\item \textbf{The network is homogeneous}; today, a homogeneous network is the exception, rather than a rule. We have different servers, systems, clients that interact. The implication of this is that we have to assume interoperability between these systems sooner or later, which we must be aware of. We might also have some proprietary protocols that might also take time to send on and they may stay without support, so we should avoid them.
 \end{enumerate}
@@ -197,8 +197,8 @@ The user can choose a single solution, or combine more of them if such a thing i
 By the ownership, CC can be categorized into three categories:
 
 \begin{itemize}
-	\item \textbf{Public cloud} is a type where CC is delivered over the internet and shared across many many organizations and users. In this type of CC, architecture is built and maintained by others. Users and organizations pay for what they use. Examples include AWS EC2, Google App Engine, Microsoft Azure, etc.
-	\item \textbf{Private cloud} is a type where CC is dedicated only to a single organization. In this type of CC, architecture is built by an organization that may offer their solution or services to the users or other organizations. These services are in the domain of what the organization does, and that organization is in charge of maintenance. Examples include VMWare, XEN, KVM, etc.
+	\item \textbf{Public cloud} is a type where CC is delivered over the internet and shared across many many organizations and users. In this type of CC, architecture is built and maintained by others. Users and organizations pay for what they use. Examples include AWS EC2, Google App Engine, Microsoft Azure, etc.;
+	\item \textbf{Private cloud} is a type where CC is dedicated only to a single organization. In this type of CC, architecture is built by an organization that may offer their solution or services to the users or other organizations. These services are in the domain of what the organization does, and that organization is in charge of maintenance. Examples include VMWare, XEN, KVM, etc.;
 	\item \textbf{Hybrid cloud} is such an environment that uses both public and private clouds. Examples include IBM, HP, VMWare vCloud, etc.
 \end{itemize}
 
@@ -495,8 +495,7 @@ Another option that is commonly used is hashing user specified actions. It is us
 %
 Applications built using microservices architecture propose different strategies for data storage. One common and recommended technique is \emph{database per service} patter~\cite{richardson2018microservices}.
 
-The result of this technique is that overall state of the system will be distributed across multiple data stores, accessible only from their own microservices. This creates two important topics to think about: \textbf{(1)} transactions that span over multiple services can be implemented using \emph{Sagas} for example (cf.~\pageref{sec:sagas})
-, and \textbf{(2)} the complex queries which require data from multiple databases.
+The result of this technique is that overall state of the system will be distributed across multiple data stores, accessible only from their own microservices. This creates two important topics to think about: \textbf{(1)} transactions that span over multiple services can be implemented using \emph{Sagas} for example (see page~\pageref{sec:sagas}), and \textbf{(2)} the complex queries which require data from multiple databases.
 
 The complex queries will involve data available in multiple databases, and a client can access all these microservices and aggregate data, however, this is not the recommended solution because the client does not have full understanding how the system manages the data.
 
@@ -680,7 +679,7 @@ Transactions guarantee following four properties: \textbf{(1)} atomicity, \textb
 %
 \subsection{Distributed transactions}\label{sec:distributed_transactions}
 %
-Because of the nature of DS, more network hosts are involved which significantly complicates the transaction mechanism. Distributed transactions are required to have all four \emph{ACID} properties. This might not be so easy to achieve amongst other due to \emph{CAP} theorem~\pageref{lab:cap}. 
+Because of the nature of DS, more network hosts are involved which significantly complicates the transaction mechanism. Distributed transactions are required to have all four \emph{ACID} properties. This might not be so easy to achieve amongst other due to \emph{CAP} theorem (see page~\pageref{lab:cap}).
 
 In their book, Morgan et al. claim that here exists no distributed commit protocol that can guarantee independent process recovery in the presence of multiple failures (e.g., network partitionings)~\cite{WeikumV2002}.
 
@@ -740,8 +739,8 @@ In~\cite{Sharma} Sharma et al. virtualization is described as technologies that 
 Modern virtualization differentiates several different tools. Some of them are used as an integral part of the infrastructure for some flavors like IaaS, while others are used in different CC flavors as well as microservices packaging and distribution format, or are new and still are looking for their place. These options are:
 
 \begin{itemize}
-	\item \textbf{Virtual machines (VM)} are the oldest technology of the three. They are described as a self-contained operating environment consisting of guest operating system and associated applications, but independent of the host operating system~\cite{Sharma}. VMs enable us to pack isolation and better utilization of hardware in big DCs. They are widely used in IaaS environment~\cite{AbsalomBJ13, YangHCLW13} as a base where users can install their own operating system (OS) and require software tools and applications.
-	\item \textbf{Containers} provide the almost same functionality to VMs, but there are several subtle differences that make them a go-to tool in modern development. Instead of the guest OS running on top of host OS, containers use tools that are in a Linux kernel like \textit{cgroups} that limit process resource usage so that single process can not starve other processes and use all the resources for itself, and \textit{namespaces} to provide isolation and partitions kernel resources so that single process sees node resources like it only exists there. Containers reduce time and footprint from development to testing to production, and they utilize even more hardware resources compared to VMs and show better performance compared to the VMs~\cite{Seo2014PerformanceCA, FelterFRR15}. Containers provide an easier way to pack services and deploy and they are especially used in microservices architecture and service orchestration tools like Kubernetes~\cite{BurnsGOBW16}. Google has stated several times in their online talks that they have used container technology for all their services, they even run VMs inside containers for their cloud platform. Even though they exist for a while, containers get popularized when companies like Docker and CoreOS developed user-friendly APIs.
+	\item \textbf{Virtual machines (VM)} are the oldest technology of the three. They are described as a self-contained operating environment consisting of guest operating system and associated applications, but independent of the host operating system~\cite{Sharma}. VMs enable us to pack isolation and better utilization of hardware in big DCs. They are widely used in IaaS environment~\cite{AbsalomBJ13, YangHCLW13} as a base where users can install their own operating system (OS) and require software tools and applications;
+	\item \textbf{Containers} provide the almost same functionality to VMs, but there are several subtle differences that make them a go-to tool in modern development. Instead of the guest OS running on top of host OS, containers use tools that are in a Linux kernel like \textit{cgroups} that limit process resource usage so that single process can not starve other processes and use all the resources for itself, and \textit{namespaces} to provide isolation and partitions kernel resources so that single process sees node resources like it only exists there. Containers reduce time and footprint from development to testing to production, and they utilize even more hardware resources compared to VMs and show better performance compared to the VMs~\cite{Seo2014PerformanceCA, FelterFRR15}. Containers provide an easier way to pack services and deploy and they are especially used in microservices architecture and service orchestration tools like Kubernetes~\cite{BurnsGOBW16}. Google has stated several times in their online talks that they have used container technology for all their services, they even run VMs inside containers for their cloud platform. Even though they exist for a while, containers get popularized when companies like Docker and CoreOS developed user-friendly APIs;
 	\item \textbf{Unikernels} is the newest addition to the virtualization space. Unikernels are defined as small, fast, secure virtual machines that lack operating systems~\cite{pavlicek2016unikernels}. Unikernels are comprised of source code, along with only the required system calls and drivers. Because of their specific design, they have a single process and they contain and execute what it absolutely needs to nothing more and nothing less~\cite{GoethalsSAVT18}. They are advertised as new technology that will save resources and that they are \textit{green}~\cite{208735}, meaning they save both power and money. When put to the test and compared to containers they give interesting results~\cite{GoethalsSAVT18, PlauthFP17}. Unikernels are still a new technology and they are not widely adopted yet. But they give promising features for the future, especially \textbf{if} properly ported to ARM architectures, and various development languages. Unikernels will probably be used as a user application and function virtualization tool, because of their specific architecture, especially for serverless applications presented in~\ref{sec:microservices}.
 \end{itemize}
 
@@ -770,16 +769,16 @@ Deployments in such complex environment can be separated by how they handle chan
 	\item \textbf{A mutable model} is a model where we have in place changes which mean that the parts of the existing infrastructure or applications get updated or changed to do an update. In place change can produce some problems, and has:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-		\item more risk because in-place change may not finish, which puts our infrastructure or the application in a possible bad state. This is especially a problem if we have a lot of services and multiple copies of the same service. The possibility that our system is not on is a lot higher.
-		\item high complexity, this is a direct implication of the previous feature. Since our change might not get fully done, it cannot be guaranteed that our infrastructure or application is transitioned from one version to another -- change is not \textbf{discrete}, but \textbf{continues} since we might end up in some state in between where we are now and where we want to be.
+		\item More risk because in-place change may not finish, which puts our infrastructure or the application in a possible bad state. This is especially a problem if we have a lot of services and multiple copies of the same service. The possibility that our system is not on is a lot higher;
+		\item High complexity, this is a direct implication of the previous feature. Since our change might not get fully done, it cannot be guaranteed that our infrastructure or application is transitioned from one version to another -- change is not \textbf{discrete}, but \textbf{continues} since we might end up in some state in between where we are now and where we want to be.
 	\end{enumerate}
 	
 	\item \textbf{An immutable model} is a model where no in-place changes on existing infrastructure or application are done whatsoever. In this model, the previous version is replaced completely with a new version that is updated or changed compared to the previous version. The previous version gets discarded in favor of the new version. Compared to the previous model, immutable deployment:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-		\item has less risk, since the existing infrastructure or the application, is not changed, but a new one is started and the previous one is shut down. This is important especially in DS where everything can fail at any time.
-		\item has less complexity of the mutable deployment model. This is a direct implication of the previous feature since the previous version is shut down and fully replaced with the new one. This is a \textbf{discrete} version change and atomic deployment with deferring deployments with fast rollback and recovery processes.
-		\item requires more resources~\cite{Helland16}, since both versions must be present on the node for this process to be done. The second problem is the data that the application has generated should not be lost. The problem is solved by externalizing the data. We should not rely on local storage but store that data elsewhere, especially when the parts of the system are volatile and changed often. The key advantage of this approach is avoiding downtime experienced by the end-user when new features are released. 
+		\item Has less risk, since the existing infrastructure or the application, is not changed, but a new one is started and the previous one is shut down. This is important especially in DS where everything can fail at any time;
+		\item Has less complexity of the mutable deployment model. This is a direct implication of the previous feature since the previous version is shut down and fully replaced with the new one. This is a \textbf{discrete} version change and atomic deployment with deferring deployments with fast rollback and recovery processes;
+		\item Requires more resources~\cite{Helland16}, since both versions must be present on the node for this process to be done. The second problem is the data that the application has generated should not be lost. The problem is solved by externalizing the data. We should not rely on local storage but store that data elsewhere, especially when the parts of the system are volatile and changed often. The key advantage of this approach is avoiding downtime experienced by the end-user when new features are released. 
 	\end{enumerate}
 \end{itemize}
 
@@ -788,8 +787,8 @@ Immutability is a simple concept to understand and simplifies a lot especially i
 Immutable infrastructure deployment offers several benefits on how to deploy changes. Even in production, it is easier to switch to a whole new version. These strategies include:
 
 \begin{itemize}
-	\item \textbf{Blue-Green deployment}, this strategy requires two separate environments: \textbf{(1)} \textit{Blue} current running version, and \textbf{(2)} \textit{Green} is the new version that needs to be deployed. When there is satisfaction that the green version is working properly, the traffic can be gradually rerouted from the old environment to the new one,  for example by modifying the Domain Name System (DNS). This strategy offers near-zero downtime.
-	\item \textbf{A canary update} is a strategy where a small subset of requests is directed to the new version --- the canary, and the rest of them are directed to an old version. If the change is satisfactory, the number of requests can be increased, and it should be monitored how the service is working with increasing load, if there are errors, etc.
+	\item \textbf{Blue-Green deployment}, this strategy requires two separate environments: \textbf{(1)} \textit{Blue} current running version, and \textbf{(2)} \textit{Green} is the new version that needs to be deployed. When there is satisfaction that the green version is working properly, the traffic can be gradually rerouted from the old environment to the new one,  for example by modifying the Domain Name System (DNS). This strategy offers near-zero downtime;
+	\item \textbf{A canary update} is a strategy where a small subset of requests is directed to the new version --- the canary, and the rest of them are directed to an old version. If the change is satisfactory, the number of requests can be increased, and it should be monitored how the service is working with increasing load, if there are errors, etc.;
 	\item \textbf{Rolling update} strategy updates large environments, a few nodes at the time. The setup is similar to blue-green deployment, but here there is a single environment. With this strategy, the new version gradually replaces the old one. If for whatever reason the new version is not working properly on the larger number of nodes, rolling back to the previous version can always be done.
 \end{itemize}
 
@@ -801,8 +800,8 @@ With mutable infrastructure, these strategies would be hard to implement, and ma
 	\item \textbf{Declaratively}, with this option a user has to describe the end state or what is his desired state, and the tool needs to figure out the way how to do this. Here we have a \textit{smart system} that will find a way how to achieve the \textbf{desired state}, and we have a user who\textit{does not care} in what order actions need to be done --- that is what the system needs to do. Users do not need to worry about timing, this simplifies the whole process and the code always represents the latest state. With this type of deployment, we can offer users, two different models:
 	
 	\begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-		\item using existing platform independent formats that users are familiar with, like \textit{JSON, YAML, XML}, etc.;
-		\item using a domain-specific language (DSL) that users need to learn, but we might be able to optimize description.
+		\item Using existing platform independent formats that users are familiar with, like \textit{JSON, YAML, XML}, etc.;
+		\item Using a domain-specific language (DSL) that users need to learn, but we might be able to optimize description.
 	\end{enumerate}
 \end{itemize}
 
@@ -851,8 +850,8 @@ IaC is a continuation of earlier works of Osterweil et al.~\cite{Osterweil}, and
 This pattern enables tracking of resources using two simple states:~\label{loop_pattenr} 
 
 \begin{enumerate}[start=1,label={(\bfseries \arabic*)}]
-	\item \textbf{expected state} represents the desired state provided by the user. This is the state that must be (if possible) achieved at any give point in time;
-	\item \textbf{current state} refers to the actual system state. This state must be refreshed periodically, so that system know should it be corrected or not.
+	\item \textbf{Expected state} represents the desired state provided by the user. This is the state that must be (if possible) achieved at any give point in time;
+	\item \textbf{Current state} refers to the actual system state. This state must be refreshed periodically, so that system know should it be corrected or not.
 \end{enumerate}
 
 \noindent
