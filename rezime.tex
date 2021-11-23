@@ -8,7 +8,9 @@ Pro\v sirena stvarnost (AR), igre preko mre\v ze, automatsko prepoznavanje lica,
 
 Primer koji se nedavno desio jo\v s jedan je u nizu otkaza na Amazon Web Services (AWS) platformi~\cite{GunawiHSLSAE16}. Ovim je platforma bila nedostupna korisnicima i aplikacijama, a kao rezultat nedostupnosti platforme velika koli\v cina aplikacija i servisa, koji se izvr\v savaju preko interneta, postaje potpuno nedostupna korisnicima i na kraju neupotrebljiva. 
 
-Da bi se razumelo kako smo do\v sli do tog problema, prvo moramo razumeti \v sta je zapravo ra\v cunarstvo u oblaku i videti kako se ovaj model organizuje.
+%Da bi se razumelo kako smo do\v sli do tog problema, prvo se mora razumeti \v sta je zapravo ra\v cunarstvo u oblaku i videti kako se ovaj model organizuje.
+
+Da bi se razumelo kako je problem nastao, potrebno je objasniti \v sta je zapravo ra\v cunarstvo u oblaku, predstaviti organizaciju i definisati arhitekturu ovog ra\v cunarskog modela
 
 Ra\v cunarstvo u oblaku definisano je kao skup ra\v cunarskih resursa koji se mogu ponuditi korisnicima kroz takozvani uslu\v zni softver~\cite{Vogels}. Hardver i softver u velikim centrima za obradu podataka pru\v zaju usluge svojim korisnicima preko interneta~\cite {AboveTheCloud}. Resursi poput CPU-a, GPU-a, skladi\v sta podataka i mre\v ze mogu se koristiti za nekakvu obradu podataka, ili osloboditi i to na zahtev i po potrebi korisnika~\cite{ZhangCB10}. 
 
@@ -89,7 +91,7 @@ Primenom  \emph{klastera}, \emph{regiona} i \emph{topologije} mogu\'ce je pokrit
 
 Organizacija \emph{klastera, regiona i topologija} u $\upmu$C-u isklju\v civo je stvar potrebe korisnika, i kao takva sli\v cna je modeliranju u sistemima velikih podataka ~\cite{SonbolOAA20, WangCAL14}. Na primer, klasteri mogu obuhvatiti \v citav jedan grad ili manji koji obuhvataju ure\dj aji u jednom doma\'cinstvu i sve izme\dj u ova dva ekstrema. Grad bi mogao predstavljati jedan region, sa delovima grada koji su organizovani u klastere. Topologija grada mo\v ze se formirati tako \v sto se grad podeli na vi\v se regiona koji sadr\v ze vi\v se klastera. Topologija dr\v zave mo\v ze se formirati tako \v sto se kroz prirodne i/ili administrativne regije defini\v su regioni, iako je i bilo koja druga podela mogu\'ca.
 
-\v Cvorovi unutar svakog klastera treba da izvr\v savaju neki od protokola za odr\v zavanje definicije klastera odnosno pripadnosti \v cvorova klasteru. Neki od \textit{Gossip} protokola poput \textit{SWIM}-a~\cite{DasGM02} mogu se koristiti u saradnji sa mehanizmima replikacije podataka~\cite {LiBCL20, CauCBFCEB16, CRDTS_Nuno} \v cine\'ci ceo sistem otpornijim na potencijalne gre\v ske. Treba prihvatiti \v cinjenicu da \'ce \v cvorovi u takvom sistemu iz raznih razloga biti nedostupni. To se ne m\v zoe izbe\'ci, ali se sistem mo\v ze projektovati tako da servisi ipak budu ipak budu dostupni koriste\'ci pritom neki od kopija servisa.
+\v Cvorovi unutar svakog klastera treba da izvr\v savaju neki od protokola za odr\v zavanje definicije klastera odnosno pripadnosti \v cvorova klasteru. Neki od \textit{Gossip} protokola poput \textit{SWIM}-a~\cite{DasGM02} mogu se koristiti u saradnji sa mehanizmima replikacije podataka~\cite {LiBCL20, CauCBFCEB16, CRDTS_Nuno} \v cine\'ci ceo sistem otpornijim na potencijalne gre\v ske. Treba prihvatiti \v cinjenicu da \'ce \v cvorovi u takvom sistemu iz raznih razloga biti nedostupni. To se ne mo\v ze izbe\'ci, ali se sistem mo\v ze projektovati tako da servisi ipak budu ipak budu dostupni koriste\'ci pritom neki od kopija servisa.
 
 U modelu koji opisuje razne resurse kao usluge~\cite{DuanFZSNH15} EC i mikro ra\v cunarstvo u oblaku nalaze se izme\dj u CaaS-a i PaaS-a, u zavisnosti od potreba korisnika.
 
@@ -135,7 +137,7 @@ Model koji se predla\v ze u ovoj tezi re\v sava gorepomenuti problem pomo\'cu  d
 
 Za formalni opis server ili \v cvorovi (u disertaciji ovi pojmovi se koriste naizmeni\v cno) u sistemu, kori\v s\'cena je teorija skupova. Prethodno definisane protokole mogu\'ce je formalno modelirati upotrebom~\cite{HuY17} pro\v sirenje \emph{multiparty asynchronous session types} (MPST)~\cite {HondaYC08} - klasa tipova pona\v sanja formirana za opisivanje distribuiranih protokola oslanjaju\'ci se na asinhrone komunikacije.
 
-Ova matemati\v cka terorija se mo\v zoe iskoristitit i za verifikaciju, da li definisani protokoli zadovoljavaju MPST sigurnost (nema dostupnog stanja gre\v ske) i napredak (akcija se na kraju izvr\v sava, pod pretpostavkom po\v stenja).
+Ova matemati\v cka terorija se mo\v ze iskoristitit i za verifikaciju, da li definisani protokoli zadovoljavaju MPST sigurnost (nema dostupnog stanja gre\v ske) i napredak (akcija se na kraju izvr\v sava, pod pretpostavkom po\v stenja).
 
 Proces modelovanja odvija se u dva koraka:
 
