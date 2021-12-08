@@ -10,7 +10,7 @@ Primer koji se nedavno desio jo\v s jedan je u nizu otkaza na Amazon Web Service
 
 %Da bi se razumelo kako smo do\v sli do tog problema, prvo se mora razumeti \v sta je zapravo ra\v cunarstvo u oblaku i videti kako se ovaj model organizuje.
 
-Da bi se razumelo kako je problem nastao, potrebno je objasniti \v sta je zapravo ra\v cunarstvo u oblaku, predstaviti organizaciju i definisati arhitekturu ovog ra\v cunarskog modela
+Da bi se razumelo kako je problem nastao, potrebno je objasniti \v sta je zapravo ra\v cunarstvo u oblaku, predstaviti organizaciju i definisati arhitekturu ovog ra\v cunarskog modela.
 
 Ra\v cunarstvo u oblaku definisano je kao skup ra\v cunarskih resursa koji se mogu ponuditi korisnicima kroz takozvani uslu\v zni softver~\cite{Vogels}. Hardver i softver u velikim centrima za obradu podataka pru\v zaju usluge svojim korisnicima preko interneta~\cite {AboveTheCloud}. Resursi poput CPU-a, GPU-a, skladi\v sta podataka i mre\v ze mogu se koristiti za nekakvu obradu podataka, ili osloboditi i to na zahtev i po potrebi korisnika~\cite{ZhangCB10}. 
 
@@ -22,7 +22,7 @@ Me\dj utim, propusni opseg nije dovoljno veliki da bi podr\v zao takve zahteve~\
 
 Centralizovana arhitektura ra\v cunarstva u oblaku, sa ogromnim kapacitetima centara za obradu podataka, stvara efikasno upravljanje resursima. Ovom strategijom dolazi se do smanjenja administrativnih tro\v skova celokupnog sistema~\cite{BariBEGPRZZ13}. Me\dj utim, kada takav sistem do\dj e do svojih granica, centralizacija uzrokuje mnoge druge probleme~\cite{GunawiHSLSAE16, LopezMEDHIBFR15}. Uprkos svim prednostima ovog modela, servisi i usluge vremenom se suo\v cavaju sa ozbiljnom degradacijom kvaliteta odziva i performansi usled velike propusnosti i ka\v snjenja~\cite{KarimIWGSYO16}. To mo\v ze dovesti do nesagledivih posledica po poslovanje, ali potencijalno i te\v ze efekte poput uticaja na ljudske \v zivote. 
 
-Razne organizacije koriste usluge ra\v cunarstva u oblaku i oslanjaju se na njega kako bi izbegle izuzetno velike infrastrukturalne investicije~\cite {MonsalveCC18} poput pravljenja i odr\v zavanja sopstvenih centara za obradu podataka. Oni koriste resurse koje su obezbedili drugi pru\v zaoci usluga~\cite{Satyanarayanan17} i pla\'caju shodno tome koliko vremenski koriste usluge ---- \emph{a pay as you go} model.
+Razne organizacije koriste usluge ra\v cunarstva u oblaku i oslanjaju se na njega kako bi izbegle izuzetno velike infrastrukturalne investicije~\cite {MonsalveCC18} poput pravljenja i odr\v zavanja sopstvenih centara za obradu podataka. Oni koriste resurse koje su obezbedili drugi pru\v zaoci usluga~\cite{Satyanarayanan17} i pla\'caju shodno tome koliko vremenski koriste usluge --- \emph{a pay as you go} model.
 
 Cilj ove teze je predstavljanje i upotreba formalnih modela na osnovu kojih se mogu opisati, i formalno verifikovati protokoli, kao i implementirati radni okvir za distribuirani sistem, koriste\'ci geografski rasprostranjena okru\v zenja nalik ra\v cunarstvu u oblaku. Opisani sistem mogu koristiti ne samo obi\v cni korisnici, ve\'c ga i pru\v zaoci usluga ra\v cunarstva u oblaku mogu integrisati u svoju platformu i svoje servise kako bi se minimalizovao zastoj kriti\v cnih sistemskih segmenata. \v Citav sistem se mo\v ze posmatrati kao skup distribuiranih mikro oblaka ili sloj obrade podataka, koji u oblak \v salje samo va\v zne podatke, smajuju\'ci tro\v skove korisnicima, ali i obezbe\dj uju\'ci ve\'cu dostupnost usluga ra\v cunarstva u oblaku.
 
@@ -175,7 +175,7 @@ Iz prethodno definisanih hipoteza izvode se primarni ciljevi ove teze pri \v cem
 \end{enumerate}
 
 \noindent
-Ovim istra\v zivanjem predstavlja se jedno mogu\'ce re\v senje za organizaciju geografski rasprostranjenog $\upmu$C-a sa EC \v zvorovima, zasnovano na organizaciji ra\v cunarstva u oblaku, prilago\dj eno obradi i skladi\v stenju podataka u blizini korisnika, a organizovano kroz tri koncepta: \emph{topologiju, region i klaster}. 
+Ovim istra\v zivanjem predstavlja se jedno mogu\'ce re\v senje za organizaciju geografski rasprostranjenog $\upmu$C-a sa EC \v cvorovima, zasnovano na organizaciji ra\v cunarstva u oblaku, prilago\dj eno obradi i skladi\v stenju podataka u blizini korisnika, a organizovano kroz tri koncepta: \emph{topologiju, region i klaster}. 
 
 Primenom ovih koncepata mogu\'ce je opisivanje bilo kog geografskog podru\v cja u cilju dobijanja dostupnijeg i pouzdanijeg sistema. Organizacija i reorganizacija ovih elemenata vr\v si se dinami\v cki, opisom \v zeljenog stanja sistema, a veli\v cina regiona, klastera i topologija odre\dj uje se prema potrebama klijenata koje se opslu\v zuje.
 
@@ -218,11 +218,11 @@ Predstavljeni model mo\v ze da obhvata ve\'ce ili manje geografske regione. Pred
 
 Pred kraj ovog poglavlja, prikazano je kako se isti mo\v ze koristiti kao sastavni deo postoje\'cih sistema (kao skladi\v ste informacija o \v cvorovima) ili se mo\v ze koristiti kao novi model u kom mo\v zemo razviti nove podsisteme. Predstavili smo protokole za stvaranje takvog sistema i modelirali ih koriste\'ci formalne matemati\v cke metode ili, konkretno, teoriju asinhronih tipova sesija.
 
-U \textbf{poglavlju~\ref{chapter:Implementation}} pokazali smo implementirani zasnovan na prethodno predstavljenom modelu. Ovde smo tako\dj e detaljno opisali operacije koje se mogu obaviti u prototipu; kako se implementirani model uklapa i gde mu je mesto u prethodno opisanom modelu podele nadle\v znosti.
+U \textbf{poglavlju~\ref{chapter:Implementation}} pokazali smo implementirani zasnovan na prethodno predstavljenom modelu. Ovde smo tako\dj e detaljno opisali operacije koje se mogu obaviti u prototipu, ali i kako se implementirani model uklapa i gde mu je mesto u prethodno opisanom modelu podele nadle\v znosti.
 
 Dalje smo izneli rezultate na\v sih eksperimenata u kontrolisanom okru\v zenju kao i ograni\v cenja implementiranog radnog okvira u trenutnoj fazi razvoja. Tako\dj e, opisali smo mogu\'ce primene ovog sistema, ali i to gde bi ovaj model mogao da se koristi kada bi u\v sao u upotrebu.
 
-\textbf{Poglablje}~\ref{chapter:Model usability} prikazuje upotrebljivost predloženog modela, sa mogućim primenama koje bi se mogle implementirati na osnovu modela. Predstavljamo i jedan primer kontrole prometa virusom COVID-19 u gradu Milanu, Italija.
+\textbf{Poglablje}~\ref{chapter:Model usability} prikazuje upotrebljivost predlo\v zenog modela, sa mogu\'cim scenarijima primene. Predstavljen je i jedan konkretan primer kontrole saobra\'caja i usmeravanje ambulantih vozila i medicinskog osoblja do najbli\v ze bolnice u gradu Milanu, Italija, zahva\'cenim COVID-19 virusom, i kako bi predlo\v zeni sistem mogao da se iskoristi da pomogne medicinskom osoblju pri le\v cenju pacijenata, ali i istra\v ziva\v cima u boljem razumevanju samog virusa.
 
 \textbf{Poglavlje~\ref{chapter:Conclusion}} predstavlja poslednje poglavlje ove teze. U ovom poglavlju sumirali smo doprinose ove teze, dali smo ograni\v cenja predlo\v zenog modela i ,ujedno, ove teze, ali i svega onoga \v cega moramo biti svesni \textbf{ako} ako takva tehnologija bude kori\v s\'cena u realnim situacijama. Na samom kraju poglavlja dali smo pregled \v sta se mo\v ze uraditi u pogledu budu\'cih pravaca istra\v zivanja.\\\\
 
